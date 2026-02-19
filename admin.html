@@ -230,7 +230,7 @@
   // 1) Create the owner user (xtdian) by registering once on this page.
   // 2) Go to Firebase Console → Authentication → Users → copy the UID of xtdian.
   // 3) Paste that UID below AND in Firestore Rules (OWNER_UID).
-  const OWNER_UID = "PASTE_OWNER_UID_HERE";
+  const OWNER_UID = "bXZ3bSYPakQXEJGwtmkJjctD6Os1";
 
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
@@ -359,7 +359,7 @@
       alert("Registered! Your account is pending approval.");
     }catch(e){
       console.error(e);
-      alert(e?.message || "Register failed.");
+      alert(((e&&e.code)?("("+e.code+") "):"") + ((e&&e.message)?e.message:"Register failed.") + "\n\nIf you see permission-denied, publish Firestore Rules.");
     }
   };
 
@@ -426,7 +426,8 @@
       renderBracket();
     }catch(e){
       console.error(e);
-      alert("Auth check failed.");
+      const code = (e && e.code) ? e.code : "";
+      alert("Auth check failed " + (code?("("+code+")"):"") + ".\n\nMost common fix: Firestore → Rules are still default (deny). Publish rules that allow users to read/create their own users/{uid} doc. If code is permission-denied, it\'s Firestore Rules.");
       await signOut(auth);
     }
   });
