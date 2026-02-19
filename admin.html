@@ -203,22 +203,56 @@
   </section>
 </div>
 
-<script>
+<script type="module">
+  // Firebase (CDN modules) — works on GitHub Pages
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+  import {
+    getAuth, onAuthStateChanged,
+    createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut
+  } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+  import {
+    getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc,
+    collection, getDocs, serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+
+  // ✅ Your Firebase config
+  const firebaseConfig = {
+    apiKey: "AIzaSyDZAVhuz9SVBHSCPnEvoxwCjaMrZSQOJ6k",
+    authDomain: "medcesport.firebaseapp.com",
+    projectId: "medcesport",
+    storageBucket: "medcesport.firebasestorage.app",
+    messagingSenderId: "7933255333",
+    appId: "1:7933255333:web:cfe776ebb79f607cdd774c",
+    measurementId: "G-07Z2TFM553"
+  };
+
+  // ✅ IMPORTANT:
+  // 1) Create the owner user (xtdian) by registering once on this page.
+  // 2) Go to Firebase Console → Authentication → Users → copy the UID of xtdian.
+  // 3) Paste that UID below AND in Firestore Rules (OWNER_UID).
+  const OWNER_UID = "PASTE_OWNER_UID_HERE";
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
   /**********************
-   * SECURITY NOTE
-   * This is client-side only (localStorage). Not secure for real online auth.
+   * Helpers
    **********************/
+  const $ = (id) => document.getElementById(id);
+  const uid = () => Math.random().toString(36).slice(2,10);
+  function escapeHtml(s=""){ return (""+s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+  function show(el, yes){ el.classList.toggle("hide", !yes); }
 
-  // OWNER ACCOUNT
-  const OWNER_USER = "xtdian";
-  const OWNER_PASS = "123456789"; // change if you want
+  // Username -> fake email (so users don't need real emails)
+  const toEmail = (username) => `${username.toLowerCase()}@medc.local`;
 
-  // Storage keys
-  const AUTH_KEY = "medc_auth_session_v1";
-  const USERS_KEY = "medc_users_v1";
-  const STATE_KEY = "medc_admin_state_v1";
+  function isOwner(user){ return !!user && user.uid === OWNER_UID; }
 
-  // Tournament state (shared with index.html)
+  /**********************
+   * Tournament state in Firestore
+   * Doc: tournament/state
+   **********************/
   const defaultState = {
     teams: [],
     bracketSize: 8,
@@ -226,28 +260,7 @@
     rosters: {} // rosters[teamId] = { captain:"", players:[] }
   };
 
-  // Helpers
-  const $ = (id) => document.getElementById(id);
-  const uid = () => Math.random().toString(36).slice(2,10);
-  function escapeHtml(s=""){ return (""+s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
-  function show(el, yes){ el.classList.toggle("hide", !yes); }
-
-  // Load/save tournament state
-  let state = loadState();
-  normalizeRosters(state);
-  saveState();
-
-  function loadState(){
-    try{
-      const raw = localStorage.getItem(STATE_KEY);
-      return raw ? JSON.parse(raw) : structuredClone(defaultState);
-    } catch {
-      return structuredClone(defaultState);
-    }
-  }
-  function saveState(){
-    localStorage.setItem(STATE_KEY, JSON.stringify(state));
-  }
+  let state = structuredClone(defaultState);
 
   function normalizeRosters(s){
     if(!s.rosters) s.rosters = {};
@@ -260,176 +273,234 @@
       }
     }
   }
+
   function ensureRoster(teamId){
     if(!state.rosters) state.rosters = {};
     if(!state.rosters[teamId]) state.rosters[teamId] = { captain:"", players:[] };
     if(Array.isArray(state.rosters[teamId])) state.rosters[teamId] = { captain:"", players: state.rosters[teamId] };
   }
 
-  // Users DB (local)
-  function loadUsers(){
-    try{
-      const raw = localStorage.getItem(USERS_KEY);
-      const users = raw ? JSON.parse(raw) : [];
-      // ensure owner exists logically (not stored)
-      return Array.isArray(users) ? users : [];
-    } catch { return []; }
-  }
-  function saveUsers(users){
-    localStorage.setItem(USERS_KEY, JSON.stringify(users));
+  async function loadStateFromDB(){
+    const snap = await getDoc(doc(db, "tournament", "state"));
+    state = snap.exists() ? snap.data() : structuredClone(defaultState);
+    // Ensure required fields
+    if(!state.teams) state.teams = [];
+    if(!state.matches) state.matches = [];
+    if(!state.bracketSize) state.bracketSize = 8;
+    normalizeRosters(state);
   }
 
-  // Session
-  function setSession(sess){ localStorage.setItem(AUTH_KEY, JSON.stringify(sess)); }
-  function clearSession(){ localStorage.removeItem(AUTH_KEY); }
-  function getSession(){
-    try{
-      const raw = localStorage.getItem(AUTH_KEY);
-      return raw ? JSON.parse(raw) : null;
-    } catch { return null; }
+  // Save (debounced so you can click fast without spamming writes)
+  let saveTimer = null;
+  function saveState(){
+    if(saveTimer) clearTimeout(saveTimer);
+    saveTimer = setTimeout(async () => {
+      try{
+        await setDoc(doc(db, "tournament", "state"), {
+          ...state,
+          updatedAt: serverTimestamp()
+        }, { merge:true });
+      }catch(e){
+        console.error(e);
+        alert("Save failed. Check Firestore Rules / internet connection.");
+      }
+    }, 250);
   }
 
-  function currentRole(){
-    const sess = getSession();
-    return sess?.role || "none"; // none | owner | admin
+  /**********************
+   * Users (approval) in Firestore
+   * Collection: users/{uid}
+   **********************/
+  async function getMyProfile(uid){
+    const snap = await getDoc(doc(db, "users", uid));
+    return snap.exists() ? snap.data() : null;
   }
 
-  // AUTH: login/register/approve
-  function applyUI(){
-    const role = currentRole();
+  /**********************
+   * UI / Auth gate
+   **********************/
+  let currentUser = null;
+  let currentRole = "none"; // none | owner | admin
+
+  function setRole(role){
+    currentRole = role;
     $("authPill").textContent = role === "none" ? "Locked" : "Unlocked";
     $("rolePill").textContent = "Role: " + (role === "owner" ? "Owner" : role === "admin" ? "Admin" : "—");
 
     show($("logoutBtn"), role !== "none");
     show($("authView"), role === "none");
     show($("adminView"), role !== "none");
-
-    // owner-only approvals UI
     show($("ownerUsersBox"), role === "owner");
-
-    if(role !== "none"){
-      $("bracketSize").value = String(state.bracketSize || 8);
-      renderTeams();
-      renderTeamSelect();
-      renderBracket();
-      if(role === "owner") renderUsers();
-    }
   }
 
-  $("loginBtn").onclick = () => {
-    const u = $("loginUser").value.trim();
-    const p = $("loginPass").value;
-
-    // Owner
-    if(u === OWNER_USER && p === OWNER_PASS){
-      setSession({ role:"owner", user: OWNER_USER });
-      applyUI();
-      return;
-    }
-
-    // Normal users
-    const users = loadUsers();
-    const found = users.find(x => x.username.toLowerCase() === u.toLowerCase());
-    if(!found) return alert("Account not found. Register first.");
-    if(found.status !== "approved") return alert("Your account is not approved yet (or disabled).");
-
-    // NOTE: password stored in localStorage (not secure)
-    if(found.password !== p) return alert("Wrong password.");
-
-    setSession({ role:"admin", user: found.username });
-    applyUI();
+  $("logoutBtn").onclick = async () => {
+    await signOut(auth);
   };
 
-  $("logoutBtn").onclick = () => {
-    clearSession();
-    applyUI();
-  };
-
-  $("registerBtn").onclick = () => {
+  $("registerBtn").onclick = async () => {
     const u = $("regUser").value.trim();
     const p = $("regPass").value;
     const msg = $("regMsg");
-
     msg.textContent = "";
 
     if(u.length < 3) return msg.textContent = "Username must be at least 3 characters.";
     if(p.length < 6) return msg.textContent = "Password must be at least 6 characters.";
-    if(u.toLowerCase() === OWNER_USER.toLowerCase()) return msg.textContent = "That username is reserved.";
 
-    const users = loadUsers();
-    if(users.some(x => x.username.toLowerCase() === u.toLowerCase())){
-      msg.textContent = "Username already exists.";
-      return;
+    try{
+      const cred = await createUserWithEmailAndPassword(auth, toEmail(u), p);
+
+      // Create profile as pending (rules prevent self-approval)
+      await setDoc(doc(db, "users", cred.user.uid), {
+        username: u,
+        status: "pending",
+        createdAt: serverTimestamp()
+      });
+
+      $("regUser").value = "";
+      $("regPass").value = "";
+      msg.textContent = "Request sent! Wait for owner approval.";
+      alert("Registered! Your account is pending approval.");
+    }catch(e){
+      console.error(e);
+      alert(e?.message || "Register failed.");
     }
-
-    users.push({ id: uid(), username: u, password: p, status: "pending", createdAt: Date.now() });
-    saveUsers(users);
-
-    $("regUser").value = "";
-    $("regPass").value = "";
-    msg.textContent = "Request sent! Wait for owner approval.";
   };
 
-  function renderUsers(){
-    const box = $("usersList");
-    const users = loadUsers();
+  $("loginBtn").onclick = async () => {
+    const u = $("loginUser").value.trim();
+    const p = $("loginPass").value;
+    try{
+      await signInWithEmailAndPassword(auth, toEmail(u), p);
+    }catch(e){
+      console.error(e);
+      alert("Login failed. Check username/password.");
+    }
+  };
 
-    if(users.length === 0){
-      box.innerHTML = `<div class="muted">No user requests yet.</div>`;
+  onAuthStateChanged(auth, async (user) => {
+    currentUser = user;
+
+    if(!user){
+      setRole("none");
       return;
     }
 
-    box.innerHTML = "";
-    users
-      .sort((a,b)=> (a.status===b.status?0 : a.status==="pending"?-1:1))
-      .forEach(u => {
-        const div = document.createElement("div");
-        div.className = "item";
+    // Owner
+    if(isOwner(user)){
+      setRole("owner");
+      await loadStateFromDB();
+      $("bracketSize").value = String(state.bracketSize || 8);
+      renderTeams();
+      renderTeamSelect();
+      renderBracket();
+      await renderUsers();
+      return;
+    }
 
-        const statusPill =
-          u.status === "approved" ? `<span class="pill" style="border-color:var(--greenb)">APPROVED</span>` :
-          u.status === "disabled" ? `<span class="pill" style="border-color:var(--redb)">DISABLED</span>` :
-          `<span class="pill">PENDING</span>`;
+    // Admin needs approval
+    try{
+      const profile = await getMyProfile(user.uid);
+      if(!profile){
+        alert("Profile missing. Register again.");
+        await signOut(auth);
+        return;
+      }
+      if(profile.status !== "approved"){
+        alert("Your account is not approved yet (or disabled).");
+        await signOut(auth);
+        return;
+      }
 
-        div.innerHTML = `
-          <div class="itemTop">
-            <div>
-              <b>${escapeHtml(u.username)}</b>
-              <div class="muted">Status: ${statusPill}</div>
+      setRole("admin");
+      await loadStateFromDB();
+      $("bracketSize").value = String(state.bracketSize || 8);
+      renderTeams();
+      renderTeamSelect();
+      renderBracket();
+    }catch(e){
+      console.error(e);
+      alert("Auth check failed.");
+      await signOut(auth);
+    }
+  });
+
+  /**********************
+   * OWNER: approve/disable/delete users
+   **********************/
+  async function renderUsers(){
+    const box = $("usersList");
+    if(!box) return;
+
+    box.innerHTML = `<div class="muted">Loading users…</div>`;
+    try{
+      const qs = await getDocs(collection(db, "users"));
+      const users = [];
+      qs.forEach(d => users.push({ uid: d.id, ...d.data() }));
+
+      if(users.length === 0){
+        box.innerHTML = `<div class="muted">No user requests yet.</div>`;
+        return;
+      }
+
+      box.innerHTML = "";
+      users
+        .sort((a,b)=> (a.status===b.status?0 : a.status==="pending"?-1:1))
+        .forEach(u => {
+          const div = document.createElement("div");
+          div.className = "item";
+
+          const statusPill =
+            u.status === "approved" ? `<span class="pill" style="border-color:var(--greenb)">APPROVED</span>` :
+            u.status === "disabled" ? `<span class="pill" style="border-color:var(--redb)">DISABLED</span>` :
+            `<span class="pill">PENDING</span>`;
+
+          div.innerHTML = `
+            <div class="itemTop">
+              <div>
+                <b>${escapeHtml(u.username || u.uid)}</b>
+                <div class="muted">Status: ${statusPill}</div>
+              </div>
+              <div class="row" style="justify-content:flex-end">
+                <button class="btn good" type="button" data-act="approve">Approve</button>
+                <button class="btn danger" type="button" data-act="disable">Disable</button>
+                <button class="btn" type="button" data-act="delete">Delete</button>
+              </div>
             </div>
-            <div class="row" style="justify-content:flex-end">
-              <button class="btn good" type="button" data-act="approve">Approve</button>
-              <button class="btn danger" type="button" data-act="disable">Disable</button>
-              <button class="btn" type="button" data-act="delete">Delete</button>
-            </div>
-          </div>
-        `;
+          `;
 
-        div.querySelector('[data-act="approve"]').onclick = () => updateUser(u.id, "approved");
-        div.querySelector('[data-act="disable"]').onclick = () => updateUser(u.id, "disabled");
-        div.querySelector('[data-act="delete"]').onclick = () => deleteUser(u.id);
+          div.querySelector('[data-act="approve"]').onclick = () => updateUser(u.uid, "approved");
+          div.querySelector('[data-act="disable"]').onclick = () => updateUser(u.uid, "disabled");
+          div.querySelector('[data-act="delete"]').onclick = () => deleteUser(u.uid);
 
-        box.appendChild(div);
-      });
+          box.appendChild(div);
+        });
+    }catch(e){
+      console.error(e);
+      box.innerHTML = `<div class="muted">Failed to load users.</div>`;
+    }
   }
 
-  function updateUser(id, status){
-    if(currentRole() !== "owner") return;
-    const users = loadUsers();
-    const u = users.find(x => x.id === id);
-    if(!u) return;
-    u.status = status;
-    saveUsers(users);
-    renderUsers();
+  async function updateUser(userUid, status){
+    if(!currentUser || !isOwner(currentUser)) return;
+    try{
+      await updateDoc(doc(db, "users", userUid), { status });
+      await renderUsers();
+    }catch(e){
+      console.error(e);
+      alert("Update user failed. Check Firestore Rules.");
+    }
   }
 
-  function deleteUser(id){
-    if(currentRole() !== "owner") return;
+  async function deleteUser(userUid){
+    if(!currentUser || !isOwner(currentUser)) return;
     if(!confirm("Delete this user?")) return;
-    let users = loadUsers();
-    users = users.filter(x => x.id !== id);
-    saveUsers(users);
-    renderUsers();
+    try{
+      await deleteDoc(doc(db, "users", userUid));
+      await renderUsers();
+    }catch(e){
+      console.error(e);
+      alert("Delete user failed. Check Firestore Rules.");
+    }
   }
 
   /**********************
@@ -479,7 +550,7 @@
     saveState();
     renderTeams();
     renderTeamSelect(newTeam.id);
-    renderBracket(); // keep select options updated
+    renderBracket();
   }
 
   function removeTeam(teamId){
@@ -835,9 +906,6 @@
   $("clearScoresBtn").onclick = clearScores;
   $("clearBracketBtn").onclick = clearBracket;
   $("advanceAllBtn").onclick = advanceAll;
-
-  // Init
-  applyUI();
-</script>
+</script></script>
 </body>
 </html>
