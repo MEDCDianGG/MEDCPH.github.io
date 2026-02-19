@@ -1,0 +1,903 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>MEDC Invitational — Admin</title>
+    <style>
+        :root {
+            --bg: #070A12;
+            --card: rgba(255,255,255,.04);
+            --line: rgba(255,255,255,.10);
+            --text: #EAF0FF;
+            --muted: rgba(234,240,255,.75);
+            --shadow: 0 18px 60px rgba(0,0,0,.45);
+            --r: 18px;
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            margin: 0;
+            font-family: system-ui,Segoe UI,Arial;
+            background: var(--bg);
+            color: var(--text)
+        }
+
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background: rgba(7,10,18,.86);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--line)
+        }
+
+        .wrap {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 18px
+        }
+
+        .bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 900
+        }
+
+        .btn {
+            border: 1px solid var(--line);
+            background: rgba(255,255,255,.06);
+            color: var(--text);
+            padding: 10px 12px;
+            border-radius: 999px;
+            cursor: pointer;
+            font-weight: 800;
+        }
+
+            .btn.primary {
+                background: rgba(59,130,246,.22);
+                border-color: rgba(59,130,246,.35)
+            }
+
+            .btn.danger {
+                background: rgba(239,68,68,.18);
+                border-color: rgba(239,68,68,.35)
+            }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: var(--r);
+            box-shadow: var(--shadow);
+            overflow: hidden
+        }
+
+        .cardPad {
+            padding: 16px
+        }
+
+        .grid2 {
+            display: grid;
+            grid-template-columns: 420px 1fr;
+            gap: 14px
+        }
+
+        @media(max-width:980px) {
+            .grid2 {
+                grid-template-columns: 1fr
+            }
+        }
+
+        .muted {
+            color: var(--muted)
+        }
+
+        input, select, button {
+            border-radius: 12px;
+            border: 1px solid var(--line);
+            background: rgba(0,0,0,.22);
+            color: var(--text);
+            padding: 10px 12px;
+            outline: none
+        }
+
+        input {
+            width: 100%
+        }
+
+        .list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px
+        }
+
+        .item {
+            padding: 12px;
+            border-radius: 16px;
+            border: 1px solid var(--line);
+            background: rgba(0,0,0,.20)
+        }
+
+        .itemTop {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            align-items: flex-start
+        }
+
+        .bracketGrid {
+            display: grid;
+            grid-template-columns: repeat(4,1fr);
+            gap: 10px;
+            align-items: start
+        }
+
+        @media(max-width:1100px) {
+            .bracketGrid {
+                grid-template-columns: repeat(2,1fr)
+            }
+        }
+
+        @media(max-width:600px) {
+            .bracketGrid {
+                grid-template-columns: 1fr
+            }
+        }
+
+        .match {
+            padding: 12px;
+            border-radius: 16px;
+            border: 1px solid var(--line);
+            background: rgba(0,0,0,.22)
+        }
+
+        .pill {
+            display: inline-flex;
+            gap: 8px;
+            align-items: center;
+            padding: 6px 10px;
+            border-radius: 999px;
+            border: 1px solid var(--line);
+            background: rgba(255,255,255,.04);
+            font-size: 12px;
+            color: var(--muted)
+        }
+
+        .slot {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 10px;
+            border-radius: 12px;
+            background: rgba(255,255,255,.05);
+            border: 1px solid rgba(255,255,255,.06);
+            margin-bottom: 8px
+        }
+
+        .scoreBox {
+            display: flex;
+            gap: 8px;
+            align-items: center
+        }
+
+            .scoreBox input {
+                width: 64px;
+                text-align: center
+            }
+
+        .row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center
+        }
+
+        .hide {
+            display: none !important
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="wrap bar">
+            <div class="brand">
+                <div>MEDC INVITATIONAL</div>
+                <span class="pill" id="authPill">Locked</span>
+            </div>
+            <div class="row">
+                <button class="btn" onclick="location.href='index.html'">Public Page</button>
+                <button id="logoutBtn" class="btn hide">Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="wrap">
+        <!-- LOGIN VIEW -->
+        <section id="loginView" class="card">
+            <div class="cardPad">
+                <h2>Admin Login</h2>
+
+                <div class="grid2">
+                    <div class="item">
+                        <div class="muted">Username</div>
+                        <div style="margin-top:8px"><input id="user" placeholder=""></div>
+
+                        <div class="muted" style="margin-top:12px">Password</div>
+                        <div style="margin-top:8px"><input id="pass" type="password" placeholder=""></div>
+
+                        <div class="row" style="margin-top:12px">
+                            <button id="loginBtn" class="btn primary">Login</button>
+                            <button id="resetAllBtn" class="btn danger">Reset All Data</button>
+                        </div>
+
+                        <p class="muted" style="margin:10px 0 0">This is client-side only (HTML). For real security you need a backend.</p>
+                    </div>
+
+                    <div class="item">
+                        <b>Admin Controls</b>
+                        <ul class="muted">
+                            <li>Add/remove teams</li>
+                            <li>Set captain + player roster</li>
+                            <li>Build bracket 8/16</li>
+                            <li>Assign teams to any slot</li>
+                            <li>Set scores + pick winner</li>
+                            <li>Advance winners to next round</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ADMIN VIEW -->
+        <section id="adminView" class="hide">
+            <div class="grid2">
+
+                <!-- TEAMS + ROSTER -->
+                <div class="card">
+                    <div class="cardPad">
+                        <div class="row" style="justify-content:space-between">
+                            <h2>Teams</h2>
+                            <span class="pill" id="teamCountPill">0 teams</span>
+                        </div>
+
+                        <div class="item" style="margin-top:12px">
+                            <div class="muted">Add a team</div>
+                            <div class="row" style="margin-top:8px">
+                                <input id="teamName" placeholder="Team name...">
+                                <button id="addTeamBtn" class="btn primary">Add</button>
+                            </div>
+                        </div>
+
+                        <div class="item" style="margin-top:10px">
+                            <div class="muted">All teams</div>
+                            <div id="teamsList" class="list" style="margin-top:8px"></div>
+                        </div>
+
+                        <div class="item" style="margin-top:10px">
+                            <b>Roster Manager</b>
+                            <div class="muted" style="margin-top:6px">Select a team, then set captain and add/remove players.</div>
+
+                            <div style="margin-top:10px">
+                                <select id="teamSelect"></select>
+                            </div>
+
+                            <div class="muted" style="margin-top:10px">Team Captain IGN</div>
+                            <div class="row" style="margin-top:8px">
+                                <input id="captainName" placeholder="Captain IGN (required)">
+                                <button id="setCaptainBtn" class="btn primary">Set Captain</button>
+                            </div>
+
+                            <div class="muted" style="margin-top:10px">Add Player IGN</div>
+                            <div class="row" style="margin-top:8px">
+                                <input id="playerName" placeholder="Player IGN (ex: DianGG)">
+                                <button id="addPlayerBtn" class="btn primary">Add Player</button>
+                            </div>
+
+                            <div class="muted" style="margin-top:10px">Players in selected team</div>
+                            <div id="rosterList" class="list" style="margin-top:8px"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BRACKET CONTROL -->
+                <div class="card">
+                    <div class="cardPad">
+                        <div class="row" style="justify-content:space-between">
+                            <h2>Bracket Control</h2>
+                            <span class="pill" id="bracketMeta">—</span>
+                        </div>
+
+                        <div class="row" style="margin-top:10px">
+                            <select id="bracketSize">
+                                <option value="8">8 Teams</option>
+                                <option value="16">16 Teams</option>
+                            </select>
+                            <button id="buildBracketBtn" class="btn primary">Build / Rebuild</button>
+                            <button id="clearScoresBtn" class="btn">Clear Scores</button>
+                            <button id="clearBracketBtn" class="btn danger">Clear Bracket</button>
+                        </div>
+
+                        <p class="muted" style="margin:10px 0 14px">
+                            Full control: assign teams, set scores, pick winners, and advance winners.
+                        </p>
+
+                        <div id="bracketArea" class="bracketGrid"></div>
+
+                        <div class="row" style="margin-top:12px">
+                            <button id="advanceAllBtn" class="btn">Auto-Advance Winners</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // =========================
+        // LOGIN (client-side only)
+        // =========================
+        const ADMIN_USER = "xtdian";
+        const ADMIN_PASS = "123456789";
+        const AUTH_KEY = "medc_admin_logged_in";
+
+        // =========================
+        // STORAGE (shared with index.html)
+        // =========================
+        const KEY = "medc_admin_state_v1";
+        const defaultState = {
+        teams: [],               // [{id, name}]
+        bracketSize: 8,
+        matches: [],             // [{id, round, pos, aTeamId, bTeamId, scoreA, scoreB, winnerTeamId}]
+        rosters: {}              // rosters[teamId] = { captain:"", players:[] }
+        };
+
+        let state = loadState();
+        normalizeRosters();
+        saveState(); // keep schema consistent
+
+        // =========================
+        // HELPERS
+        // =========================
+        const $ = (id) => document.getElementById(id);
+        const uid = () => Math.random().toString(36).slice(2,10);
+        function escapeHtml(s=""){ return (""+s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+
+        function loadState(){
+        try{
+        const raw = localStorage.getItem(KEY);
+        return raw ? JSON.parse(raw) : structuredClone(defaultState);
+        } catch {
+        return structuredClone(defaultState);
+        }
+        }
+        function saveState(){
+        localStorage.setItem(KEY, JSON.stringify(state));
+        }
+
+        function setLoggedIn(on){ localStorage.setItem(AUTH_KEY, on ? "1" : "0"); }
+        function isLoggedIn(){ return localStorage.getItem(AUTH_KEY) === "1"; }
+
+        function show(el, yes){ el.classList.toggle("hide", !yes); }
+
+        function normalizeRosters(){
+        if(!state.rosters) state.rosters = {};
+        for(const tid in state.rosters){
+        const v = state.rosters[tid];
+        if(Array.isArray(v)){
+        state.rosters[tid] = { captain:"", players: v };
+        } else {
+        if(!v.players) v.players = [];
+        if(typeof v.captain !== "string") v.captain = "";
+        }
+        }
+        }
+
+        function ensureRoster(teamId){
+        if(!state.rosters) state.rosters = {};
+        if(!state.rosters[teamId]) state.rosters[teamId] = { captain:"", players:[] };
+        if(Array.isArray(state.rosters[teamId])){
+        state.rosters[teamId] = { captain:"", players: state.rosters[teamId] };
+        }
+        }
+
+        function teamNameById(id){
+        const t = state.teams.find(x => x.id === id);
+        return t ? t.name : "";
+        }
+
+        // =========================
+        // AUTH UI
+        // =========================
+        function applyAuthUI(){
+        const logged = isLoggedIn();
+        $("authPill").textContent = logged ? "Unlocked (Admin)" : "Locked";
+        show($("logoutBtn"), logged);
+        show($("loginView"), !logged);
+        show($("adminView"), logged);
+
+        if(logged){
+        $("bracketSize").value = String(state.bracketSize || 8);
+        renderTeams();
+        renderTeamSelect(true);
+        renderBracket();
+        }
+        }
+
+        $("loginBtn").onclick = () => {
+        const u = $("user").value.trim();
+        const p = $("pass").value;
+        if(u === ADMIN_USER && p === ADMIN_PASS){
+        setLoggedIn(true);
+        applyAuthUI();
+        } else {
+        alert("Wrong login.");
+        }
+        };
+
+        $("logoutBtn").onclick = () => {
+        setLoggedIn(false);
+        applyAuthUI();
+        };
+
+        $("resetAllBtn").onclick = () => {
+        if(!confirm("Reset ALL saved teams + rosters + bracket?")) return;
+        localStorage.removeItem(KEY);
+        state = loadState();
+        normalizeRosters();
+        saveState();
+        setLoggedIn(false);
+        applyAuthUI();
+        };
+
+        // =========================
+        // TEAMS
+        // =========================
+        function renderTeams(){
+        $("teamCountPill").textContent = `${state.teams.length} teams`;
+        const list = $("teamsList");
+        list.innerHTML = "";
+
+        if(state.teams.length === 0){
+        list.innerHTML = `<div class="muted">No teams yet. Add teams to begin.</div>`;
+        return;
+        }
+
+        state.teams.forEach(t => {
+        ensureRoster(t.id);
+        const count = state.rosters[t.id].players.length;
+
+        const div = document.createElement("div");
+        div.className = "item";
+        div.innerHTML = `
+        <div class="itemTop">
+        <div>
+        <b>${escapeHtml(t.name)}</b>
+        <div class="muted">ID: ${t.id} • ${count} players</div>
+        </div>
+        <button class="btn danger">Remove</button>
+        </div>
+        `;
+        div.querySelector("button").onclick = () => removeTeam(t.id);
+        list.appendChild(div);
+        });
+        }
+
+        function addTeam(){
+        const name = $("teamName").value.trim();
+        if(name.length < 2) return alert("Team name too short.");
+        if(state.teams.some(t => t.name.toLowerCase() === name.toLowerCase())) return alert("Team already exists.");
+
+        const newTeam = { id: uid(), name };
+        state.teams.push(newTeam);
+        ensureRoster(newTeam.id);
+
+        $("teamName").value = "";
+        saveState();
+
+        renderTeams();
+        renderTeamSelect(true, newTeam.id); // ✅ refresh dropdown + select new team
+        renderBracket(); // keep bracket selects updated
+        }
+
+        function removeTeam(teamId){
+        if(!confirm("Remove this team?")) return;
+
+        // remove team
+        state.teams = state.teams.filter(t => t.id !== teamId);
+
+        // remove roster
+        if(state.rosters && state.rosters[teamId]) delete state.rosters[teamId];
+
+        // remove from matches
+        state.matches.forEach(m => {
+        if(m.aTeamId === teamId) m.aTeamId = "";
+        if(m.bTeamId === teamId) m.bTeamId = "";
+        if(m.winnerTeamId === teamId) m.winnerTeamId = "";
+        });
+
+        saveState();
+        renderTeams();
+        renderTeamSelect(true);
+        renderBracket();
+        }
+
+        $("addTeamBtn").onclick = addTeam;
+
+        // =========================
+        // TEAM SELECT (DROPDOWN) + ROSTERS
+        // =========================
+        function renderTeamSelect(force=false, preferredId=""){
+        const sel = $("teamSelect");
+        if(!sel) return;
+
+        // clear options
+        sel.innerHTML = "";
+
+        if(!state.teams || state.teams.length === 0){
+        sel.innerHTML = `<option value="">No teams</option>`;
+        $("captainName").value = "";
+        $("playerName").value = "";
+        $("rosterList").innerHTML = `<div class="muted">Create a team first.</div>`;
+        return;
+        }
+
+        // build options
+        state.teams.forEach(t => {
+        const opt = document.createElement("option");
+        opt.value = t.id;
+        opt.textContent = t.name;
+        sel.appendChild(opt);
+        });
+
+        // determine selection
+        const prev = sel.getAttribute("data-prev") || "";
+        const prevStillExists = state.teams.some(t => t.id === prev);
+
+        let pick = "";
+        if(preferredId && state.teams.some(t => t.id === preferredId)) pick = preferredId;
+        else if(prevStillExists) pick = prev;
+        else pick = state.teams[0].id;
+
+        sel.value = pick;
+        sel.setAttribute("data-prev", pick);
+
+        renderRosterList(pick);
+        }
+
+        $("teamSelect").onchange = () => {
+        const tid = $("teamSelect").value;
+        $("teamSelect").setAttribute("data-prev", tid);
+        renderRosterList(tid);
+        };
+
+        function renderRosterList(teamId){
+        const list = $("rosterList");
+
+        if(!teamId){
+        $("captainName").value = "";
+        list.innerHTML = `<div class="muted">Select a team first.</div>`;
+        return;
+        }
+
+        ensureRoster(teamId);
+        const roster = state.rosters[teamId];
+        const players = roster.players || [];
+
+        $("captainName").value = roster.captain || "";
+
+        if(players.length === 0){
+        list.innerHTML = `<div class="muted">No players yet.</div>`;
+        return;
+        }
+
+        list.innerHTML = "";
+        players.forEach((p, idx) => {
+        const div = document.createElement("div");
+        div.className = "item";
+        div.innerHTML = `
+        <div class="itemTop">
+        <div>
+        <b>${escapeHtml(p)}</b>
+        <div class="muted">${roster.captain && p.toLowerCase() === roster.captain.toLowerCase() ? "Captain" : "Player"}</div>
+        </div>
+        <button class="btn danger">Remove</button>
+        </div>
+        `;
+        div.querySelector("button").onclick = () => {
+        players.splice(idx, 1);
+        roster.players = players;
+
+        // if removed player was captain, clear captain
+        if(roster.captain && roster.captain.toLowerCase() === p.toLowerCase()){
+        roster.captain = "";
+        $("captainName").value = "";
+        }
+
+        state.rosters[teamId] = roster;
+        saveState();
+        renderTeams();
+        renderRosterList(teamId);
+        };
+        list.appendChild(div);
+        });
+        }
+
+        $("setCaptainBtn").onclick = () => {
+        const teamId = $("teamSelect").value;
+        if(!teamId) return alert("Select a team first.");
+
+        const cap = $("captainName").value.trim();
+        if(cap.length < 2) return alert("Captain IGN too short.");
+
+        ensureRoster(teamId);
+        const roster = state.rosters[teamId];
+
+        roster.captain = cap;
+
+        // auto-add captain into roster if not already
+        const arr = roster.players || [];
+        if(!arr.some(x => x.toLowerCase() === cap.toLowerCase())) arr.unshift(cap);
+        roster.players = arr;
+
+        state.rosters[teamId] = roster;
+        saveState();
+        renderTeams();
+        renderRosterList(teamId);
+        };
+
+        $("addPlayerBtn").onclick = () => {
+        const teamId = $("teamSelect").value;
+        if(!teamId) return alert("Select a team first.");
+
+        const p = $("playerName").value.trim();
+        if(p.length < 2) return alert("Player name too short.");
+
+        ensureRoster(teamId);
+        const roster = state.rosters[teamId];
+        const arr = roster.players || [];
+
+        if(arr.some(x => x.toLowerCase() === p.toLowerCase()))
+        return alert("Player already in this team.");
+
+        arr.push(p);
+        roster.players = arr;
+        state.rosters[teamId] = roster;
+
+        $("playerName").value = "";
+        saveState();
+        renderTeams();
+        renderRosterList(teamId);
+        };
+
+        // =========================
+        // BRACKET
+        // =========================
+        function buildBracket(size){
+        state.bracketSize = size;
+        const rounds = Math.log2(size);
+        const matches = [];
+        let matchCount = size / 2;
+
+        for(let r=1; r<=rounds; r++){
+        for(let p=1; p<=matchCount; p++){
+        matches.push({
+        id:`R${r}M${p}`,
+        round:r,
+        pos:p,
+        aTeamId:"",
+        bTeamId:"",
+        scoreA:"",
+        scoreB:"",
+        winnerTeamId:""
+        });
+        }
+        matchCount = matchCount / 2;
+        }
+
+        state.matches = matches;
+        saveState();
+        renderBracket();
+        }
+
+        function clearScores(){
+        state.matches.forEach(m => { m.scoreA=""; m.scoreB=""; m.winnerTeamId=""; });
+        saveState();
+        renderBracket();
+        }
+
+        function clearBracket(){
+        if(!confirm("Clear bracket slots + scores?")) return;
+        state.matches.forEach(m => {
+        m.aTeamId=""; m.bTeamId="";
+        m.scoreA=""; m.scoreB="";
+        m.winnerTeamId="";
+        });
+        saveState();
+        renderBracket();
+        }
+
+        function teamOptions(selectedId){
+        const opts = [`<option value="">— Select team —</option>`];
+        state.teams.forEach(t => {
+        opts.push(`<option value="${t.id}" ${t.id===selectedId?"selected":""}>${escapeHtml(t.name)}</option>`);
+        });
+        return opts.join("");
+        }
+
+        function advanceWinner(matchId){
+        const m = state.matches.find(x => x.id === matchId);
+        if(!m || !m.winnerTeamId) return alert("Pick a winner first.");
+
+        const nextRound = m.round + 1;
+        const rounds = Math.log2(state.bracketSize);
+        if(nextRound > rounds) return alert("Final round.");
+
+        const nextPos = Math.ceil(m.pos / 2);
+        const next = state.matches.find(x => x.round === nextRound && x.pos === nextPos);
+        if(!next) return alert("Next match not found.");
+
+        const slot = (m.pos % 2 === 1) ? "A" : "B";
+        if(slot === "A") next.aTeamId = m.winnerTeamId;
+        else next.bTeamId = m.winnerTeamId;
+
+        // if winner invalid now, clear
+        if(next.winnerTeamId && next.winnerTeamId !== next.aTeamId && next.winnerTeamId !== next.bTeamId){
+        next.winnerTeamId = "";
+        }
+
+        saveState();
+        renderBracket();
+        }
+
+        function advanceAll(){
+        const sorted = [...state.matches].sort((a,b)=>(a.round-b.round)||(a.pos-b.pos));
+        const rounds = Math.log2(state.bracketSize);
+        sorted.forEach(m => {
+        if(m.winnerTeamId && m.round < rounds) advanceWinner(m.id);
+        });
+        }
+
+        function renderBracket(){
+        $("bracketMeta").textContent = `${state.teams.length} teams • ${state.matches.length} matches • bracket ${state.bracketSize}`;
+        const area = $("bracketArea");
+        area.innerHTML = "";
+
+        if(!state.matches || state.matches.length === 0){
+        area.innerHTML = `<div class="muted">No bracket yet. Build one.</div>`;
+        return;
+        }
+
+        const rounds = Math.log2(state.bracketSize);
+        for(let r=1; r<=rounds; r++){
+        const col = document.createElement("div");
+        col.className = "list";
+        col.innerHTML = `<div class="pill"><b>Round ${r}</b></div>`;
+
+        state.matches.filter(m=>m.round===r).forEach(m=>{
+        const div = document.createElement("div");
+        div.className="match";
+        div.innerHTML = `
+        <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px">
+        <b>${escapeHtml(m.id)}</b>
+        <span class="pill">${m.winnerTeamId ? "Winner set" : "No winner"}</span>
+        </div>
+
+        <div class="slot">
+        <select data-mid="${m.id}" data-slot="A">${teamOptions(m.aTeamId)}</select>
+        <div class="scoreBox">
+        <input data-mid="${m.id}" data-score="A" inputmode="numeric" placeholder="0" value="${escapeHtml(m.scoreA)}">
+        </div>
+        </div>
+
+        <div class="slot">
+        <select data-mid="${m.id}" data-slot="B">${teamOptions(m.bTeamId)}</select>
+        <div class="scoreBox">
+        <input data-mid="${m.id}" data-score="B" inputmode="numeric" placeholder="0" value="${escapeHtml(m.scoreB)}">
+        </div>
+        </div>
+
+        <div class="row">
+        <button class="btn" data-win="${m.id}" data-pick="A">Pick A Winner</button>
+        <button class="btn" data-win="${m.id}" data-pick="B">Pick B Winner</button>
+        <button class="btn primary" data-adv="${m.id}">Advance Winner →</button>
+        </div>
+
+        <div class="muted" style="margin-top:8px">Winner: <b>${escapeHtml(teamNameById(m.winnerTeamId) || "—")}</b></div>
+        `;
+        col.appendChild(div);
+        });
+
+        area.appendChild(col);
+        }
+
+        // wire selects
+        area.querySelectorAll("select[data-mid]").forEach(sel => {
+        sel.onchange = () => {
+        const mid = sel.getAttribute("data-mid");
+        const slot = sel.getAttribute("data-slot");
+        const match = state.matches.find(x => x.id === mid);
+        if(!match) return;
+
+        if(slot === "A") match.aTeamId = sel.value;
+        if(slot === "B") match.bTeamId = sel.value;
+
+        // clear invalid winner
+        if(match.winnerTeamId && match.winnerTeamId !== match.aTeamId && match.winnerTeamId !== match.bTeamId){
+        match.winnerTeamId = "";
+        }
+
+        saveState();
+        renderBracket();
+        };
+        });
+
+        // wire scores
+        area.querySelectorAll("input[data-mid][data-score]").forEach(inp => {
+        inp.oninput = () => {
+        const mid = inp.getAttribute("data-mid");
+        const which = inp.getAttribute("data-score");
+        const match = state.matches.find(x => x.id === mid);
+        if(!match) return;
+
+        const v = inp.value.trim();
+        if(v !== "" && !/^\d+$/.test(v)) return;
+
+        if(which === "A") match.scoreA = v;
+        if(which === "B") match.scoreB = v;
+
+        saveState();
+        };
+        });
+
+        // pick winner
+        area.querySelectorAll("button[data-win]").forEach(btn => {
+        btn.onclick = () => {
+        const mid = btn.getAttribute("data-win");
+        const pick = btn.getAttribute("data-pick");
+        const match = state.matches.find(x => x.id === mid);
+        if(!match) return;
+
+        const chosen = pick === "A" ? match.aTeamId : match.bTeamId;
+        if(!chosen) return alert("Select a team first.");
+
+        match.winnerTeamId = chosen;
+        saveState();
+        renderBracket();
+        };
+        });
+
+        // advance winner
+        area.querySelectorAll("button[data-adv]").forEach(btn => {
+        btn.onclick = () => advanceWinner(btn.getAttribute("data-adv"));
+        });
+        }
+
+        $("buildBracketBtn").onclick = () => {
+        const size = Number($("bracketSize").value);
+        if(![8,16].includes(size)) return alert("Choose 8 or 16.");
+        buildBracket(size);
+        };
+        $("clearScoresBtn").onclick = clearScores;
+        $("clearBracketBtn").onclick = clearBracket;
+        $("advanceAllBtn").onclick = advanceAll;
+
+        // =========================
+        // INIT
+        // =========================
+        applyAuthUI();
+    </script>
+</body>
+</html>
