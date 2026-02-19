@@ -1,2 +1,252 @@
-# MEDCPH.github.io
-MEDC PH TOURNAMENTS
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>MEDC Invitational — Bracket & Teams</title>
+  <style>
+    :root{--bg:#070A12;--card:rgba(255,255,255,.04);--line:rgba(255,255,255,.10);--text:#EAF0FF;--muted:rgba(234,240,255,.75);--shadow:0 18px 60px rgba(0,0,0,.45);--r:18px}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,Segoe UI,Arial;background:var(--bg);color:var(--text)}
+    header{position:sticky;top:0;z-index:10;background:rgba(7,10,18,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+    .wrap{max-width:1200px;margin:0 auto;padding:18px}
+    .bar{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .brand{display:flex;align-items:center;gap:12px;font-weight:900}
+    .brandLogo{width:46px;height:46px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.04);overflow:hidden}
+    .brandLogo img{width:100%;height:100%;object-fit:cover}
+    .btn{border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--text);padding:10px 12px;border-radius:999px;cursor:pointer;font-weight:800}
+    .btn.primary{background:rgba(59,130,246,.22);border-color:rgba(59,130,246,.35)}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden}
+    .cardPad{padding:16px}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    @media(max-width:980px){.grid2{grid-template-columns:1fr}}
+    .muted{color:var(--muted)}
+    .list{display:flex;flex-direction:column;gap:10px}
+    .item{padding:12px;border-radius:16px;border:1px solid var(--line);background:rgba(0,0,0,.20)}
+    .bracketGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;align-items:start}
+    @media(max-width:1100px){.bracketGrid{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:600px){.bracketGrid{grid-template-columns:1fr}}
+    .match{padding:12px;border-radius:16px;border:1px solid var(--line);background:rgba(0,0,0,.22)}
+    .pill{display:inline-flex;gap:8px;align-items:center;padding:6px 10px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.04);font-size:12px;color:var(--muted)}
+    .slot{display:flex;justify-content:space-between;gap:10px;padding:8px 10px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.06);margin-bottom:8px}
+  </style>
+</head>
+<body>
+    <header>
+        <div class="wrap bar">
+            <div class="brand">
+                <div class="brandLogo">
+                    <img src="C:\Users\DianGG\Documents\MEDC TOURNA STUFF\MEDC INVITATIONAL LOGO.gif" alt="MEDC Invitational Logo">
+                </div>
+                <div>
+                    <div>MEDC INVITATIONAL</div>
+                    <div class="muted" style="font-size:12px;margin-top:2px">Public Bracket & Team List</div>
+                </div>
+            </div>
+            <button class="btn primary" onclick="location.href='admin.html'">Admin Login</button>
+        </div>
+    </header>
+
+    <div class="wrap">
+        <div class="card" style="margin-bottom:14px">
+            <div class="cardPad">
+                <div class="muted">Cover</div>
+                <div style="margin-top:10px;border-radius:16px;overflow:hidden;border:1px solid rgba(255,255,255,.10)">
+                    <img src="C:\Users\DianGG\Downloads\COVER MEDC INV.png" alt="C:\Users\DianGG\Downloads\MEDC Invitational Cover" style="width:100%;display:block">
+                </div>
+                <div class="row" style="margin-top:10px"></div>
+                <div class="pill" id="metaPill">Loading…</div>
+            </div>
+        </div>
+
+        <div class="grid2">
+            <div class="card">
+                <div class="cardPad">
+                    <h2 style="margin:0">Teams</h2>
+                    <p class="muted" style="margin:8px 0 12px">Public view (read-only)</p>
+                    <div id="teamsList" class="list"></div>
+
+                    <div class="item" style="margin-top:10px">
+                        <b>Team Players</b>
+                        <div id="teamDetails" class="muted" style="margin-top:6px">Click a team to view players.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="cardPad">
+                    <h2 style="margin:0">Bracket</h2>
+                    <p class="muted" style="margin:8px 0 12px">Public view (read-only)</p>
+                    <div id="bracketArea" class="bracketGrid"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+  const KEY = "medc_admin_state_v1";
+  const $ = (id) => document.getElementById(id);
+
+  function escapeHtml(s=""){
+    return (""+s).replace(/[&<>"']/g, m => ({
+      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+    }[m]));
+  }
+
+  function loadState(){
+    try{
+      const raw = localStorage.getItem(KEY);
+      return raw ? JSON.parse(raw) : { teams: [], bracketSize: 8, matches: [], rosters: {} };
+    } catch {
+      return { teams: [], bracketSize: 8, matches: [], rosters: {} };
+    }
+  }
+
+  // Supports BOTH formats:
+  // 1) rosters[teamId] = ["p1","p2"] (old)
+  // 2) rosters[teamId] = { captain:"", players:[...] } (new)
+  function normalizeRosters(state){
+    if(!state.rosters) state.rosters = {};
+    for(const tid in state.rosters){
+      const v = state.rosters[tid];
+      if(Array.isArray(v)){
+        state.rosters[tid] = { captain:"", players: v };
+      } else {
+        if(!v.players) v.players = [];
+        if(typeof v.captain !== "string") v.captain = "";
+      }
+    }
+  }
+
+  function teamNameById(state, id){
+    const t = (state.teams || []).find(x => x.id === id);
+    return t ? t.name : "";
+  }
+
+  // PUBLIC TEAMS + ROSTER VIEW (click a team)
+  function renderTeamsPublic(state){
+    const teamsList = $("teamsList");
+    const teamDetails = $("teamDetails");
+
+    if(!teamsList) return;
+    teamsList.innerHTML = "";
+
+    if(!state.teams || state.teams.length === 0){
+      teamsList.innerHTML = `<div class="muted">No teams yet. Check back later.</div>`;
+      if(teamDetails) teamDetails.innerHTML = `<div class="muted">No team selected.</div>`;
+      return;
+    }
+
+    if(teamDetails){
+      teamDetails.innerHTML = `<div class="muted">Click a team to view captain and players.</div>`;
+    }
+
+    state.teams.forEach(t => {
+      const roster = state.rosters?.[t.id] || { captain:"", players:[] };
+      const captain = roster.captain || "";
+      const players = Array.isArray(roster.players) ? roster.players : [];
+
+      const div = document.createElement("div");
+      div.className = "item";
+      div.style.cursor = "pointer";
+      div.innerHTML = `
+        <b>${escapeHtml(t.name)}</b>
+        <div class="muted">${players.length} players${captain ? " • Captain set" : ""}</div>
+      `;
+
+      div.onclick = () => {
+        if(!teamDetails) return;
+
+        const captainHtml = captain
+          ? `<div class="pill"><b>Captain:</b> ${escapeHtml(captain)}</div>`
+          : `<div class="muted">Captain not set yet.</div>`;
+
+        const playersHtml = players.length
+          ? players.map(p => `<div class="pill">${escapeHtml(p)}</div>`).join(" ")
+          : `<div class="muted">No players listed yet.</div>`;
+
+        teamDetails.innerHTML = `
+          <div><b style="font-size:18px">${escapeHtml(t.name)}</b></div>
+
+          <div class="muted" style="margin-top:10px">Team Captain</div>
+          <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">${captainHtml}</div>
+
+          <div class="muted" style="margin-top:12px">Players</div>
+          <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">${playersHtml}</div>
+        `;
+      };
+
+      teamsList.appendChild(div);
+    });
+  }
+
+  function renderBracketPublic(state){
+    const area = $("bracketArea");
+    if(!area) return;
+
+    area.innerHTML = "";
+
+    if(!state.matches || state.matches.length === 0){
+      area.innerHTML = `<div class="muted">Bracket not created yet.</div>`;
+      return;
+    }
+
+    const size = Number(state.bracketSize || 8);
+    const rounds = Math.log2(size);
+
+    for(let r=1; r<=rounds; r++){
+      const col = document.createElement("div");
+      col.className = "list";
+      col.innerHTML = `<div class="pill"><b>Round ${r}</b></div>`;
+
+      state.matches.filter(m=>m.round===r).forEach(m=>{
+        const div = document.createElement("div");
+        div.className="match";
+        div.innerHTML = `
+          <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px">
+            <b>${escapeHtml(m.id)}</b>
+            <span class="pill">${m.winnerTeamId ? "Winner set" : "No winner"}</span>
+          </div>
+          <div class="slot">
+            <span>${escapeHtml(teamNameById(state,m.aTeamId) || "TBD")}</span>
+            <b>${escapeHtml(m.scoreA ?? "")}</b>
+          </div>
+          <div class="slot">
+            <span>${escapeHtml(teamNameById(state,m.bTeamId) || "TBD")}</span>
+            <b>${escapeHtml(m.scoreB ?? "")}</b>
+          </div>
+          <div class="muted">Winner: <b>${escapeHtml(teamNameById(state,m.winnerTeamId) || "—")}</b></div>
+        `;
+        col.appendChild(div);
+      });
+
+      area.appendChild(col);
+    }
+  }
+
+  function render(){
+    const state = loadState();
+    normalizeRosters(state);
+
+    const meta = $("metaPill");
+    if(meta){
+      meta.textContent = `${state.teams?.length || 0} teams • ${state.matches?.length || 0} matches • bracket ${state.bracketSize || 8}`;
+    }
+
+    renderTeamsPublic(state);
+    renderBracketPublic(state);
+  }
+
+  render();
+
+  // refresh when admin updates in another tab
+  window.addEventListener("storage", (e) => {
+    if(e.key === KEY) render();
+  });
+
+  // fallback refresh
+  setInterval(render, 2000);
+</script>
+
+</body>
+</html>
