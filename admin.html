@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>MEDC Invitational — ADMIN PANEL</title>
+  <title>MEDC Invitational — Admin</title>
   <style>
     :root{
       --bg:#070A12; --card:rgba(255,255,255,.04); --line:rgba(255,255,255,.10);
@@ -230,7 +230,7 @@
   // 1) Create the owner user (xtdian) by registering once on this page.
   // 2) Go to Firebase Console → Authentication → Users → copy the UID of xtdian.
   // 3) Paste that UID below AND in Firestore Rules (OWNER_UID).
-  const OWNER_UID = "bXZ3bSYPakQXEJGwtmkJjctD6Os1";
+  const OWNER_UID = "PASTE_OWNER_UID_HERE";
 
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
@@ -243,10 +243,8 @@
   const uid = () => Math.random().toString(36).slice(2,10);
   function escapeHtml(s=""){ return (""+s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
   function show(el, yes){ el.classList.toggle("hide", !yes); }
-  function isOwner() {
-  return request.auth != null &&
-         request.auth.uid == "bXZ3bSYPakQXEJGwtmkJjct...";
-}
+
+  function isOwner(user){ return !!user && user.uid === OWNER_UID; }
 
   /**********************
    * Tournament state in Firestore
@@ -342,8 +340,7 @@
     const msg = $("regMsg");
     msg.textContent = "";
 
-    if(!email) return msg.textContent = "Enter your email.";
-    if(!/^\S+@\S+\.\S+$/.test(email)) return msg.textContent = "Enter a valid email.";
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return msg.textContent = "Enter a valid email address.";
     if(p.length < 6) return msg.textContent = "Password must be at least 6 characters.";
 
     try{
@@ -351,10 +348,10 @@
 
       // Create profile as pending (rules prevent self-approval)
       await setDoc(doc(db, "users", cred.user.uid), {
-        email,
+        email: cred.user.email || email,
         status: "pending",
         createdAt: serverTimestamp()
-      });
+      }, { merge: true });
 
       $("regEmail").value = "";
       $("regPass").value = "";
@@ -370,15 +367,13 @@
     const email = $("loginEmail").value.trim();
     const p = $("loginPass").value;
 
-    if(!email) return alert("Enter your email.");
-    if(!/^\S+@\S+\.\S+$/.test(email)) return alert("Enter a valid email.");
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return alert("Enter a valid email.");
 
     try{
       await signInWithEmailAndPassword(auth, email, p);
     }catch(e){
       console.error(e);
-      // Helpful message for common misconfigurations
-      alert(e?.message || "Login failed.");
+      alert(e?.message || "Login failed. Check email/password.");
     }
   };
 
@@ -406,7 +401,14 @@
     try{
       const profile = await getMyProfile(user.uid);
       if(!profile){
-        alert("Profile missing. Register again.");
+        // If a user was created directly in Firebase Console, they may not have a Firestore profile yet.
+        await setDoc(doc(db, "users", user.uid), {
+          email: user.email || "",
+          status: "pending",
+          createdAt: serverTimestamp()
+        }, { merge: true });
+
+        alert("Your account is not approved yet. A request has been created—ask the owner to approve you.");
         await signOut(auth);
         return;
       }
