@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>MEDC Invitational — ADMIN PANEL</title>
+  <title>MEDC Invitational — Admin</title>
   <style>
     :root{
       --bg:#070A12; --card:rgba(255,255,255,.04); --line:rgba(255,255,255,.10);
@@ -163,7 +163,7 @@
           <!-- OWNER ONLY: USER APPROVAL -->
           <div id="ownerUsersBox" class="item hide" style="margin-top:10px">
             <b>User Approvals</b>
-            <div class="muted" style="margin-top:6px">Approve/disable/delete admin accounts.</div>
+            <div class="muted" style="margin-top:6px">Approve/disable/delete admin accounts. (Delete removes the Firestore profile; full Auth deletion needs a server endpoint.)</div>
             <div id="usersList" class="list" style="margin-top:10px"></div>
           </div>
         </div>
@@ -232,7 +232,12 @@
   // 3) Paste that UID below AND in Firestore Rules (OWNER_UID).
   const OWNER_UID = "bXZ3bSYPakQXEJGwtmkJjctD6Os1";
 
-  const app = initializeApp(firebaseConfig);
+  
+  // OPTIONAL (recommended): Cloud Function / server endpoint to delete Firebase Auth users.
+  // If you leave this as an empty string, "Delete" will only remove the Firestore users/{uid} profile.
+  // Example (callable HTTPS): https://us-central1-YOUR_PROJECT.cloudfunctions.net/deleteUser
+  const DELETE_USER_ENDPOINT = "";
+const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const db = getFirestore(app);
 
@@ -243,10 +248,8 @@
   const uid = () => Math.random().toString(36).slice(2,10);
   function escapeHtml(s=""){ return (""+s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
   function show(el, yes){ el.classList.toggle("hide", !yes); }
-  function isOwner() {
-  return request.auth != null &&
-         request.auth.uid == "bXZ3bSYPakQXEJGwtmkJjct...";
-}
+
+  function isOwner(user){ return !!user && user.uid === OWNER_UID; }
 
   /**********************
    * Tournament state in Firestore
@@ -342,8 +345,7 @@
     const msg = $("regMsg");
     msg.textContent = "";
 
-    if(!email) return msg.textContent = "Enter your email.";
-    if(!/^\S+@\S+\.\S+$/.test(email)) return msg.textContent = "Enter a valid email.";
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return msg.textContent = "Enter a valid email address.";
     if(p.length < 6) return msg.textContent = "Password must be at least 6 characters.";
 
     try{
@@ -351,10 +353,10 @@
 
       // Create profile as pending (rules prevent self-approval)
       await setDoc(doc(db, "users", cred.user.uid), {
-        email,
+        email: cred.user.email || email,
         status: "pending",
         createdAt: serverTimestamp()
-      });
+      }, { merge: true });
 
       $("regEmail").value = "";
       $("regPass").value = "";
@@ -362,7 +364,7 @@
       alert("Registered! Your account is pending approval.");
     }catch(e){
       console.error(e);
-      alert(e?.message || "Register failed.");
+      alert(((e&&e.code)?("("+e.code+") "):"") + ((e&&e.message)?e.message:"Register failed.") + "\n\nIf you see permission-denied, publish Firestore Rules.");
     }
   };
 
@@ -370,15 +372,13 @@
     const email = $("loginEmail").value.trim();
     const p = $("loginPass").value;
 
-    if(!email) return alert("Enter your email.");
-    if(!/^\S+@\S+\.\S+$/.test(email)) return alert("Enter a valid email.");
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return alert("Enter a valid email.");
 
     try{
       await signInWithEmailAndPassword(auth, email, p);
     }catch(e){
       console.error(e);
-      // Helpful message for common misconfigurations
-      alert(e?.message || "Login failed.");
+      alert(e?.message || "Login failed. Check email/password.");
     }
   };
 
@@ -406,7 +406,14 @@
     try{
       const profile = await getMyProfile(user.uid);
       if(!profile){
-        alert("Profile missing. Register again.");
+        // If a user was created directly in Firebase Console, they may not have a Firestore profile yet.
+        await setDoc(doc(db, "users", user.uid), {
+          email: user.email || "",
+          status: "pending",
+          createdAt: serverTimestamp()
+        }, { merge: true });
+
+        alert("Your account is not approved yet. A request has been created—ask the owner to approve you.");
         await signOut(auth);
         return;
       }
@@ -424,7 +431,8 @@
       renderBracket();
     }catch(e){
       console.error(e);
-      alert("Auth check failed.");
+      const code = (e && e.code) ? e.code : "";
+      alert("Auth check failed " + (code?("("+code+")"):"") + ".\n\nMost common fix: Firestore → Rules are still default (deny). Publish rules that allow users to read/create their own users/{uid} doc. If code is permission-denied, it\'s Firestore Rules.");
       await signOut(auth);
     }
   });
@@ -475,7 +483,7 @@
 
           div.querySelector('[data-act="approve"]').onclick = () => updateUser(u.uid, "approved");
           div.querySelector('[data-act="disable"]').onclick = () => updateUser(u.uid, "disabled");
-          div.querySelector('[data-act="delete"]').onclick = () => deleteUser(u.uid);
+          div.querySelector('[data-act="delete"]').onclick = () => deleteUser(u.uid, u.email || "");
 
           box.appendChild(div);
         });
@@ -496,11 +504,57 @@
     }
   }
 
-  async function deleteUser(userUid){
+  async function deleteUser(userUid, email){
     if(!currentUser || !isOwner(currentUser)) return;
-    if(!confirm("Delete this user?")) return;
+
+    if(userUid === OWNER_UID){
+      alert("You cannot delete the owner account.");
+      return;
+    }
+
+    const label = email ? `${email} (${userUid})` : userUid;
+    if(!confirm("Delete this user?
+
+This will DISABLE them and remove their users/{uid} profile.
+If DELETE_USER_ENDPOINT is configured, it will also delete the Firebase Auth account.
+
+User: " + label)) return;
+
     try{
+      // 1) Disable first (so they can't log in even if Auth deletion fails)
+      try { await updateDoc(doc(db, "users", userUid), { status: "disabled" }); } catch(_) {}
+
+      // 2) Remove Firestore profile
       await deleteDoc(doc(db, "users", userUid));
+
+      // 3) OPTIONAL: delete Firebase Auth account via server/Cloud Function
+      if(DELETE_USER_ENDPOINT){
+        try{
+          const token = await currentUser.getIdToken();
+          const res = await fetch(DELETE_USER_ENDPOINT, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": "Bearer " + token
+            },
+            body: JSON.stringify({ uid: userUid })
+          });
+
+          if(!res.ok){
+            const t = await res.text().catch(()=> "");
+            alert("Deleted Firestore profile, but server Auth delete failed:
+" + (t || res.statusText));
+          }
+        }catch(e){
+          console.error(e);
+          alert("Deleted Firestore profile, but server Auth delete failed (network/endpoint error).");
+        }
+      }else{
+        alert("Deleted Firestore users/{uid} profile.
+
+NOTE: Firebase Auth user still exists (client-side cannot delete Auth users). If you want full deletion, set DELETE_USER_ENDPOINT to a Cloud Function.");
+      }
+
       await renderUsers();
     }catch(e){
       console.error(e);
