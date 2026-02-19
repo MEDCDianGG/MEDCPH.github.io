@@ -451,8 +451,6 @@
         applyAuthUI();
         };
 
-        $("resetAllBtn").onclick = () => {
-        if(!confirm("Reset ALL saved teams + rosters + bracket?")) return;
         localStorage.removeItem(KEY);
         state = loadState();
         normalizeRosters();
