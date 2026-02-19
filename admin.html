@@ -513,12 +513,12 @@ const app = initializeApp(firebaseConfig);
     }
 
     const label = email ? `${email} (${userUid})` : userUid;
-    if(!confirm("Delete this user?
+    if(!confirm(`Delete this user?
 
 This will DISABLE them and remove their users/{uid} profile.
 If DELETE_USER_ENDPOINT is configured, it will also delete the Firebase Auth account.
 
-User: " + label)) return;
+User: ${label}`)) return;
 
     try{
       // 1) Disable first (so they can't log in even if Auth deletion fails)
