@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>MEDC Invitational — Admin</title>
+  <title>MEDC Invitational — ADMIN PANEL</title>
   <style>
     :root{
       --bg:#070A12; --card:rgba(255,255,255,.04); --line:rgba(255,255,255,.10);
@@ -76,8 +76,8 @@
       <div class="grid2">
         <!-- Login -->
         <div class="item">
-          <div class="muted">Username</div>
-          <div style="margin-top:8px"><input id="loginUser" placeholder="username"></div>
+          <div class="muted">Email</div>
+          <div style="margin-top:8px"><input id="loginEmail" type="email" placeholder="email@example.com"></div>
           <div class="muted" style="margin-top:12px">Password</div>
           <div style="margin-top:8px"><input id="loginPass" type="password" placeholder="password"></div>
 
@@ -86,17 +86,17 @@
           </div>
 
           <p class="muted" style="margin:10px 0 0">
-            Note: This is <b>local</b> approval/login only (client-side HTML). For real online accounts you need a backend.
+            Accounts use <b>Firebase Authentication</b>. After you register, the owner must approve you before you can access admin tools.
           </p>
         </div>
 
         <!-- Register -->
         <div class="item">
           <h3 style="margin:0">Request Admin Access</h3>
-          <p class="muted" style="margin:8px 0 12px">Create a username/password. Owner must approve you.</p>
+          <p class="muted" style="margin:8px 0 12px">Create an email/password account. Owner must approve you.</p>
 
-          <div class="muted">New username</div>
-          <div style="margin-top:8px"><input id="regUser" placeholder="ex: teammanager1"></div>
+          <div class="muted">Email</div>
+          <div style="margin-top:8px"><input id="regEmail" type="email" placeholder="email@example.com"></div>
 
           <div class="muted" style="margin-top:12px">New password</div>
           <div style="margin-top:8px"><input id="regPass" type="password" placeholder="create password"></div>
@@ -230,7 +230,7 @@
   // 1) Create the owner user (xtdian) by registering once on this page.
   // 2) Go to Firebase Console → Authentication → Users → copy the UID of xtdian.
   // 3) Paste that UID below AND in Firestore Rules (OWNER_UID).
-  const OWNER_UID = "bXZ3bSYPakQXEJGwtmkJjctD6Os1";
+  const OWNER_UID = "PASTE_OWNER_UID_HERE";
 
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
@@ -243,10 +243,6 @@
   const uid = () => Math.random().toString(36).slice(2,10);
   function escapeHtml(s=""){ return (""+s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
   function show(el, yes){ el.classList.toggle("hide", !yes); }
-
-  // Username -> fake email (so users don't need real emails)
-  const toEmail = (username) => `${username.toLowerCase()}@medc.local`;
-
   function isOwner(user){ return !!user && user.uid === OWNER_UID; }
 
   /**********************
@@ -338,25 +334,26 @@
   };
 
   $("registerBtn").onclick = async () => {
-    const u = $("regUser").value.trim();
+    const email = $("regEmail").value.trim();
     const p = $("regPass").value;
     const msg = $("regMsg");
     msg.textContent = "";
 
-    if(u.length < 3) return msg.textContent = "Username must be at least 3 characters.";
+    if(!email) return msg.textContent = "Enter your email.";
+    if(!/^\S+@\S+\.\S+$/.test(email)) return msg.textContent = "Enter a valid email.";
     if(p.length < 6) return msg.textContent = "Password must be at least 6 characters.";
 
     try{
-      const cred = await createUserWithEmailAndPassword(auth, toEmail(u), p);
+      const cred = await createUserWithEmailAndPassword(auth, email, p);
 
       // Create profile as pending (rules prevent self-approval)
       await setDoc(doc(db, "users", cred.user.uid), {
-        username: u,
+        email,
         status: "pending",
         createdAt: serverTimestamp()
       });
 
-      $("regUser").value = "";
+      $("regEmail").value = "";
       $("regPass").value = "";
       msg.textContent = "Request sent! Wait for owner approval.";
       alert("Registered! Your account is pending approval.");
@@ -367,13 +364,18 @@
   };
 
   $("loginBtn").onclick = async () => {
-    const u = $("loginUser").value.trim();
+    const email = $("loginEmail").value.trim();
     const p = $("loginPass").value;
+
+    if(!email) return alert("Enter your email.");
+    if(!/^\S+@\S+\.\S+$/.test(email)) return alert("Enter a valid email.");
+
     try{
-      await signInWithEmailAndPassword(auth, toEmail(u), p);
+      await signInWithEmailAndPassword(auth, email, p);
     }catch(e){
       console.error(e);
-      alert("Login failed. Check username/password.");
+      // Helpful message for common misconfigurations
+      alert(e?.message || "Login failed.");
     }
   };
 
@@ -457,7 +459,7 @@
           div.innerHTML = `
             <div class="itemTop">
               <div>
-                <b>${escapeHtml(u.username || u.uid)}</b>
+                <b>${escapeHtml(u.email || u.uid)}</b>
                 <div class="muted">Status: ${statusPill}</div>
               </div>
               <div class="row" style="justify-content:flex-end">
@@ -906,6 +908,6 @@
   $("clearScoresBtn").onclick = clearScores;
   $("clearBracketBtn").onclick = clearBracket;
   $("advanceAllBtn").onclick = advanceAll;
-</script></script>
+</script>
 </body>
 </html>
