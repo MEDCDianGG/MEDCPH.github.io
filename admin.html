@@ -39,17 +39,10 @@
     .item{padding:12px;border-radius:16px;border:1px solid var(--line);background:rgba(0,0,0,.20)}
     .itemTop{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
     .hide{display:none !important}
-
-    .bracketGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;align-items:start}
-    @media(max-width:1100px){.bracketGrid{grid-template-columns:repeat(2,1fr)}}
-    @media(max-width:600px){.bracketGrid{grid-template-columns:1fr}}
-    .match{padding:12px;border-radius:16px;border:1px solid var(--line);background:rgba(0,0,0,.22)}
-    .slot{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 10px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.06);margin-bottom:8px}
-    .scoreBox{display:flex;gap:8px;align-items:center}
-    .scoreBox input{width:64px;text-align:center}
   </style>
 </head>
 <body>
+
 <header>
   <div class="wrap bar">
     <div class="brand">
@@ -65,6 +58,7 @@
 </header>
 
 <div class="wrap">
+
   <!-- AUTH VIEW -->
   <section id="authView" class="card">
     <div class="cardPad">
@@ -77,17 +71,16 @@
         <!-- Login -->
         <div class="item">
           <div class="muted">Email</div>
-          <div style="margin-top:8px"><input id="loginEmail" type="email" placeholder="email@example.com"></div>
+          <div style="margin-top:8px"><input id="loginEmail" type="email" placeholder="you@example.com"></div>
+
           <div class="muted" style="margin-top:12px">Password</div>
-          <div style="margin-top:8px"><input id="loginPass" type="password" placeholder="password"></div>
+          <div style="margin-top:8px"><input id="loginPass" type="password" placeholder="Password"></div>
 
           <div class="row" style="margin-top:12px">
             <button id="loginBtn" class="btn primary" type="button">Login</button>
           </div>
 
-          <p class="muted" style="margin:10px 0 0">
-            Accounts use <b>Firebase Authentication</b>. After you register, the owner must approve you before you can access admin tools.
-          </p>
+          <div class="muted" id="loginMsg" style="margin-top:10px"></div>
         </div>
 
         <!-- Register -->
@@ -112,95 +105,32 @@
   </section>
 
   <!-- ADMIN VIEW -->
-  <section id="adminView" class="hide">
-    <div class="grid2">
-
-      <!-- LEFT: TEAMS + ROSTERS + (OWNER) USERS -->
-      <div class="card">
-        <div class="cardPad">
-          <div class="row" style="justify-content:space-between">
-            <h2 style="margin:0">Teams</h2>
-            <span class="pill" id="teamCountPill">0 teams</span>
-          </div>
-
-          <div class="item" style="margin-top:12px">
-            <div class="muted">Add a team</div>
-            <div class="row" style="margin-top:8px">
-              <input id="teamName" placeholder="Team name...">
-              <button id="addTeamBtn" class="btn primary" type="button">Add</button>
-            </div>
-          </div>
-
-          <div class="item" style="margin-top:10px">
-            <div class="muted">All teams</div>
-            <div id="teamsList" class="list" style="margin-top:8px"></div>
-          </div>
-
-          <div class="item" style="margin-top:10px">
-            <b>Roster Manager</b>
-            <div class="muted" style="margin-top:6px">Select team → set captain → add/remove players.</div>
-
-            <div style="margin-top:10px">
-              <select id="teamSelect"></select>
-            </div>
-
-            <div class="muted" style="margin-top:10px">Team Captain IGN</div>
-            <div class="row" style="margin-top:8px">
-              <input id="captainName" placeholder="Captain IGN">
-              <button id="setCaptainBtn" class="btn good" type="button">Set Captain</button>
-            </div>
-
-            <div class="muted" style="margin-top:10px">Add Player IGN</div>
-            <div class="row" style="margin-top:8px">
-              <input id="playerName" placeholder="Player IGN">
-              <button id="addPlayerBtn" class="btn primary" type="button">Add Player</button>
-            </div>
-
-            <div class="muted" style="margin-top:10px">Players</div>
-            <div id="rosterList" class="list" style="margin-top:8px"></div>
-          </div>
-
-          <!-- OWNER ONLY: USER APPROVAL -->
-          <div id="ownerUsersBox" class="item hide" style="margin-top:10px">
-            <b>User Approvals</b>
-            <div class="muted" style="margin-top:6px">Approve/disable/delete admin accounts.</div>
-            <div id="usersList" class="list" style="margin-top:10px"></div>
-          </div>
+  <section id="adminView" class="card hide" style="margin-top:14px">
+    <div class="cardPad">
+      <div class="grid2">
+        <div class="item">
+          <h2 style="margin:0">User Approvals</h2>
+          <div class="muted" style="margin-top:6px">Approve/disable/delete admin accounts.</div>
+          <div id="usersList" class="list" style="margin-top:12px"></div>
         </div>
-      </div>
 
-      <!-- RIGHT: BRACKET CONTROL -->
-      <div class="card">
-        <div class="cardPad">
-          <div class="row" style="justify-content:space-between">
-            <h2 style="margin:0">Bracket Control</h2>
-            <span class="pill" id="bracketMeta">—</span>
+        <div class="item">
+          <h2 style="margin:0">Tournament Data</h2>
+          <div class="muted" style="margin-top:6px">
+            (This is just a placeholder box so your admin page still loads clean.)
+            Your teams/bracket editor can be added below and saved to <b>Firestore: tournament/state</b>.
           </div>
-
-          <div class="row" style="margin-top:10px">
-            <select id="bracketSize">
-              <option value="8">8 Teams</option>
-              <option value="16">16 Teams</option>
-            </select>
-            <button id="buildBracketBtn" class="btn primary" type="button">Build / Rebuild</button>
-            <button id="clearScoresBtn" class="btn" type="button">Clear Scores</button>
-            <button id="clearBracketBtn" class="btn danger" type="button">Clear Bracket</button>
-          </div>
-
-          <p class="muted" style="margin:10px 0 14px">
-            Assign teams to slots, set scores, pick winners, advance winners.
-          </p>
-
-          <div id="bracketArea" class="bracketGrid"></div>
 
           <div class="row" style="margin-top:12px">
-            <button id="advanceAllBtn" class="btn" type="button">Auto-Advance Winners</button>
+            <button id="seedTournamentBtn" class="btn primary" type="button">Create tournament/state (empty)</button>
           </div>
+
+          <div class="muted" id="tourMsg" style="margin-top:10px"></div>
         </div>
       </div>
-
     </div>
   </section>
+
 </div>
 
 <script type="module">
@@ -226,694 +156,227 @@
     measurementId: "G-07Z2TFM553"
   };
 
-  // ✅ IMPORTANT:
-  // 1) Create the owner user (xtdian) by registering once on this page.
-  // 2) Go to Firebase Console → Authentication → Users → copy the UID of xtdian.
-  // 3) Paste that UID below AND in Firestore Rules (OWNER_UID).
-  const OWNER_UID = "bXZ3bSYPakQXEJGwtmkJjctD6Os1";
+  // ✅ IMPORTANT: replace this with YOUR UID (Authentication → Users → click your email → UID)
+  const OWNER_UID = "PASTE_OWNER_UID_HERE";
 
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const db = getFirestore(app);
 
-  /**********************
-   * Helpers
-   **********************/
   const $ = (id) => document.getElementById(id);
-  const uid = () => Math.random().toString(36).slice(2,10);
-  function escapeHtml(s=""){ return (""+s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
-  function show(el, yes){ el.classList.toggle("hide", !yes); }
 
-  function isOwner(user){ return !!user && user.uid === OWNER_UID; }
+  function setPills(locked, roleText){
+    $("authPill").textContent = locked ? "Locked" : "Unlocked";
+    $("rolePill").textContent = "Role: " + roleText;
+  }
 
-  /**********************
-   * Tournament state in Firestore
-   * Doc: tournament/state
-   **********************/
-  const defaultState = {
-    teams: [],
-    bracketSize: 8,
-    matches: [],
-    rosters: {} // rosters[teamId] = { captain:"", players:[] }
+  function isValidEmail(email){
+    return /^\S+@\S+\.\S+$/.test(email);
+  }
+
+  function show(el, on){ el.classList.toggle("hide", !on); }
+
+  function niceErr(e){
+    return (e?.code ? e.code : "") + (e?.message ? " — " + e.message : "");
+  }
+
+  function isOwner(user){
+    return user && user.uid === OWNER_UID;
+  }
+
+  async function ensureProfileDoc(user){
+    // If user exists in Auth but missing Firestore profile, create it as pending
+    const ref = doc(db, "users", user.uid);
+    const snap = await getDoc(ref);
+    if(!snap.exists()){
+      await setDoc(ref, {
+        email: user.email || "",
+        status: "pending",
+        createdAt: serverTimestamp()
+      });
+    }
+    return (await getDoc(ref)).data();
+  }
+
+  // Register (Request)
+  $("registerBtn").onclick = async () => {
+    $("regMsg").textContent = "";
+    try{
+      const email = $("regEmail").value.trim();
+      const pass = $("regPass").value;
+
+      if(!isValidEmail(email)) return $("regMsg").textContent = "Enter a valid email.";
+      if(pass.length < 6) return $("regMsg").textContent = "Password must be at least 6 characters.";
+
+      const cred = await createUserWithEmailAndPassword(auth, email, pass);
+
+      await setDoc(doc(db, "users", cred.user.uid), {
+        email,
+        status: "pending",
+        createdAt: serverTimestamp()
+      });
+
+      $("regEmail").value = "";
+      $("regPass").value = "";
+      alert("Registered! Wait for owner approval.");
+    } catch(e){
+      $("regMsg").textContent = "Register failed: " + niceErr(e);
+    }
   };
 
-  let state = structuredClone(defaultState);
+  // Login
+  $("loginBtn").onclick = async () => {
+    $("loginMsg").textContent = "";
+    try{
+      const email = $("loginEmail").value.trim();
+      const pass = $("loginPass").value;
 
-  function normalizeRosters(s){
-    if(!s.rosters) s.rosters = {};
-    for(const tid in s.rosters){
-      const v = s.rosters[tid];
-      if(Array.isArray(v)) s.rosters[tid] = { captain:"", players:v };
-      else {
-        if(!v.players) v.players = [];
-        if(typeof v.captain !== "string") v.captain = "";
-      }
+      if(!isValidEmail(email)) return $("loginMsg").textContent = "Enter a valid email.";
+      await signInWithEmailAndPassword(auth, email, pass);
+    } catch(e){
+      $("loginMsg").textContent = "Login failed: " + niceErr(e);
+      alert("Login failed: " + (e?.code || e?.message || e));
     }
-  }
+  };
 
-  function ensureRoster(teamId){
-    if(!state.rosters) state.rosters = {};
-    if(!state.rosters[teamId]) state.rosters[teamId] = { captain:"", players:[] };
-    if(Array.isArray(state.rosters[teamId])) state.rosters[teamId] = { captain:"", players: state.rosters[teamId] };
-  }
-
-  async function loadStateFromDB(){
-    const snap = await getDoc(doc(db, "tournament", "state"));
-    state = snap.exists() ? snap.data() : structuredClone(defaultState);
-    // Ensure required fields
-    if(!state.teams) state.teams = [];
-    if(!state.matches) state.matches = [];
-    if(!state.bracketSize) state.bracketSize = 8;
-    normalizeRosters(state);
-  }
-
-  // Save (debounced so you can click fast without spamming writes)
-  let saveTimer = null;
-  function saveState(){
-    if(saveTimer) clearTimeout(saveTimer);
-    saveTimer = setTimeout(async () => {
-      try{
-        await setDoc(doc(db, "tournament", "state"), {
-          ...state,
-          updatedAt: serverTimestamp()
-        }, { merge:true });
-      }catch(e){
-        console.error(e);
-        alert("Save failed. Check Firestore Rules / internet connection.");
-      }
-    }, 250);
-  }
-
-  /**********************
-   * Users (approval) in Firestore
-   * Collection: users/{uid}
-   **********************/
-  async function getMyProfile(uid){
-    const snap = await getDoc(doc(db, "users", uid));
-    return snap.exists() ? snap.data() : null;
-  }
-
-  /**********************
-   * UI / Auth gate
-   **********************/
-  let currentUser = null;
-  let currentRole = "none"; // none | owner | admin
-
-  function setRole(role){
-    currentRole = role;
-    $("authPill").textContent = role === "none" ? "Locked" : "Unlocked";
-    $("rolePill").textContent = "Role: " + (role === "owner" ? "Owner" : role === "admin" ? "Admin" : "—");
-
-    show($("logoutBtn"), role !== "none");
-    show($("authView"), role === "none");
-    show($("adminView"), role !== "none");
-    show($("ownerUsersBox"), role === "owner");
-  }
-
+  // Logout
   $("logoutBtn").onclick = async () => {
     await signOut(auth);
   };
 
-  $("registerBtn").onclick = async () => {
-    const email = $("regEmail").value.trim();
-    const p = $("regPass").value;
-    const msg = $("regMsg");
-    msg.textContent = "";
+  // Render approvals
+  async function renderApprovals(){
+    const list = $("usersList");
+    list.innerHTML = `<div class="muted">Loading...</div>`;
 
-    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return msg.textContent = "Enter a valid email address.";
-    if(p.length < 6) return msg.textContent = "Password must be at least 6 characters.";
+    const qs = await getDocs(collection(db, "users"));
+    const users = [];
+    qs.forEach(d => users.push({ uid: d.id, ...d.data() }));
 
+    // pending first
+    users.sort((a,b)=> (a.status===b.status?0 : a.status==="pending"?-1:1));
+
+    list.innerHTML = "";
+    if(users.length === 0){
+      list.innerHTML = `<div class="muted">No requests yet.</div>`;
+      return;
+    }
+
+    users.forEach(u => {
+      const div = document.createElement("div");
+      div.className = "item";
+
+      div.innerHTML = `
+        <div class="itemTop">
+          <div>
+            <b>${u.email || "(no email)"}</b>
+            <div class="muted">Status: <b>${u.status || "pending"}</b></div>
+          </div>
+          <div class="row" style="justify-content:flex-end">
+            <button class="btn good" type="button">Approve</button>
+            <button class="btn danger" type="button">Disable</button>
+            <button class="btn" type="button">Delete</button>
+          </div>
+        </div>
+      `;
+
+      const [approveBtn, disableBtn, deleteBtn] = div.querySelectorAll("button");
+
+      approveBtn.onclick = async () => {
+        try{
+          await updateDoc(doc(db,"users",u.uid), { status:"approved" });
+          await renderApprovals();
+        } catch(e){
+          alert("Approve failed: " + niceErr(e));
+        }
+      };
+
+      disableBtn.onclick = async () => {
+        try{
+          await updateDoc(doc(db,"users",u.uid), { status:"disabled" });
+          await renderApprovals();
+        } catch(e){
+          alert("Disable failed: " + niceErr(e));
+        }
+      };
+
+      deleteBtn.onclick = async () => {
+        if(!confirm(`Delete request for ${u.email || u.uid}?`)) return;
+        try{
+          // NOTE: This deletes the Firestore profile/approval doc.
+          // It does NOT delete the Firebase Auth user (that requires server/admin SDK).
+          await deleteDoc(doc(db,"users",u.uid));
+          await renderApprovals();
+        } catch(e){
+          alert("Delete failed: " + niceErr(e));
+        }
+      };
+
+      list.appendChild(div);
+    });
+  }
+
+  // Create empty tournament doc
+  $("seedTournamentBtn").onclick = async () => {
+    $("tourMsg").textContent = "";
     try{
-      const cred = await createUserWithEmailAndPassword(auth, email, p);
-
-      // Create profile as pending (rules prevent self-approval)
-      await setDoc(doc(db, "users", cred.user.uid), {
-        email: cred.user.email || email,
-        status: "pending",
-        createdAt: serverTimestamp()
+      await setDoc(doc(db,"tournament","state"), {
+        teams: [],
+        rosters: {},
+        matches: [],
+        bracketSize: 8,
+        updatedAt: serverTimestamp()
       }, { merge: true });
 
-      $("regEmail").value = "";
-      $("regPass").value = "";
-      msg.textContent = "Request sent! Wait for owner approval.";
-      alert("Registered! Your account is pending approval.");
-    }catch(e){
-      console.error(e);
-      alert(((e&&e.code)?("("+e.code+") "):"") + ((e&&e.message)?e.message:"Register failed.") + "\n\nIf you see permission-denied, publish Firestore Rules.");
+      $("tourMsg").textContent = "Created/updated tournament/state.";
+    } catch(e){
+      $("tourMsg").textContent = "Failed: " + niceErr(e);
     }
   };
 
-  $("loginBtn").onclick = async () => {
-    const email = $("loginEmail").value.trim();
-    const p = $("loginPass").value;
-
-    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return alert("Enter a valid email.");
-
-    try{
-      await signInWithEmailAndPassword(auth, email, p);
-    }catch(e){
-      console.error(e);
-      alert(e?.message || "Login failed. Check email/password.");
-    }
-  };
-
+  // Auth state
   onAuthStateChanged(auth, async (user) => {
-    currentUser = user;
-
     if(!user){
-      setRole("none");
+      setPills(true, "—");
+      show($("logoutBtn"), false);
+      show($("authView"), true);
+      show($("adminView"), false);
       return;
     }
 
-    // Owner
+    show($("logoutBtn"), true);
+
+    // Owner gets full access
     if(isOwner(user)){
-      setRole("owner");
-      await loadStateFromDB();
-      $("bracketSize").value = String(state.bracketSize || 8);
-      renderTeams();
-      renderTeamSelect();
-      renderBracket();
-      await renderUsers();
+      setPills(false, "Owner");
+      show($("authView"), false);
+      show($("adminView"), true);
+      await renderApprovals();
       return;
     }
 
-    // Admin needs approval
+    // Non-owner must be approved
     try{
-      const profile = await getMyProfile(user.uid);
-      if(!profile){
-        // If a user was created directly in Firebase Console, they may not have a Firestore profile yet.
-        await setDoc(doc(db, "users", user.uid), {
-          email: user.email || "",
-          status: "pending",
-          createdAt: serverTimestamp()
-        }, { merge: true });
-
-        alert("Your account is not approved yet. A request has been created—ask the owner to approve you.");
-        await signOut(auth);
-        return;
-      }
-      if(profile.status !== "approved"){
-        alert("Your account is not approved yet (or disabled).");
+      const prof = await ensureProfileDoc(user);
+      if(prof.status !== "approved"){
+        alert(`Not approved yet. Current status: ${prof.status || "pending"}`);
         await signOut(auth);
         return;
       }
 
-      setRole("admin");
-      await loadStateFromDB();
-      $("bracketSize").value = String(state.bracketSize || 8);
-      renderTeams();
-      renderTeamSelect();
-      renderBracket();
-    }catch(e){
-      console.error(e);
-      const code = (e && e.code) ? e.code : "";
-      alert("Auth check failed " + (code?("("+code+")"):"") + ".\n\nMost common fix: Firestore → Rules are still default (deny). Publish rules that allow users to read/create their own users/{uid} doc. If code is permission-denied, it\'s Firestore Rules.");
+      setPills(false, "Admin");
+      show($("authView"), false);
+      show($("adminView"), true);
+
+      // Optional: admins can see approvals or not — you can decide:
+      // For now: hide approvals for non-owner by clearing list
+      $("usersList").innerHTML = `<div class="muted">Owner only.</div>`;
+    } catch(e){
+      alert("Auth check failed (" + (e?.code || e?.message || e) + ").");
       await signOut(auth);
     }
   });
-
-  /**********************
-   * OWNER: approve/disable/delete users
-   **********************/
-  async function renderUsers(){
-    const box = $("usersList");
-    if(!box) return;
-
-    box.innerHTML = `<div class="muted">Loading users…</div>`;
-    try{
-      const qs = await getDocs(collection(db, "users"));
-      const users = [];
-      qs.forEach(d => users.push({ uid: d.id, ...d.data() }));
-
-      if(users.length === 0){
-        box.innerHTML = `<div class="muted">No user requests yet.</div>`;
-        return;
-      }
-
-      box.innerHTML = "";
-      users
-        .sort((a,b)=> (a.status===b.status?0 : a.status==="pending"?-1:1))
-        .forEach(u => {
-          const div = document.createElement("div");
-          div.className = "item";
-
-          const statusPill =
-            u.status === "approved" ? `<span class="pill" style="border-color:var(--greenb)">APPROVED</span>` :
-            u.status === "disabled" ? `<span class="pill" style="border-color:var(--redb)">DISABLED</span>` :
-            `<span class="pill">PENDING</span>`;
-
-          div.innerHTML = `
-            <div class="itemTop">
-              <div>
-                <b>${escapeHtml(u.email || u.uid)}</b>
-                <div class="muted">Status: ${statusPill}</div>
-              </div>
-              <div class="row" style="justify-content:flex-end">
-                <button class="btn good" type="button" data-act="approve">Approve</button>
-                <button class="btn danger" type="button" data-act="disable">Disable</button>
-                <button class="btn" type="button" data-act="delete">Delete</button>
-              </div>
-            </div>
-          `;
-
-          div.querySelector('[data-act="approve"]').onclick = () => updateUser(u.uid, "approved");
-          div.querySelector('[data-act="disable"]').onclick = () => updateUser(u.uid, "disabled");
-          div.querySelector('[data-act="delete"]').onclick = () => deleteUser(u.uid);
-
-          box.appendChild(div);
-        });
-    }catch(e){
-      console.error(e);
-      box.innerHTML = `<div class="muted">Failed to load users.</div>`;
-    }
-  }
-
-  async function updateUser(userUid, status){
-    if(!currentUser || !isOwner(currentUser)) return;
-    try{
-      await updateDoc(doc(db, "users", userUid), { status });
-      await renderUsers();
-    }catch(e){
-      console.error(e);
-      alert("Update user failed. Check Firestore Rules.");
-    }
-  }
-
-  async function deleteUser(userUid){
-    if(!currentUser || !isOwner(currentUser)) return;
-    if(!confirm("Delete this user?")) return;
-    try{
-      await deleteDoc(doc(db, "users", userUid));
-      await renderUsers();
-    }catch(e){
-      console.error(e);
-      alert("Delete user failed. Check Firestore Rules.");
-    }
-  }
-
-  /**********************
-   * TEAMS + ROSTERS
-   **********************/
-  function renderTeams(){
-    $("teamCountPill").textContent = `${state.teams.length} teams`;
-    const list = $("teamsList");
-    list.innerHTML = "";
-
-    if(state.teams.length === 0){
-      list.innerHTML = `<div class="muted">No teams yet. Add teams to begin.</div>`;
-      return;
-    }
-
-    state.teams.forEach(t => {
-      ensureRoster(t.id);
-      const count = state.rosters[t.id].players.length;
-
-      const div = document.createElement("div");
-      div.className = "item";
-      div.innerHTML = `
-        <div class="itemTop">
-          <div>
-            <b>${escapeHtml(t.name)}</b>
-            <div class="muted">ID: ${t.id} • ${count} players</div>
-          </div>
-          <button class="btn danger" type="button">Remove</button>
-        </div>
-      `;
-
-      div.querySelector("button").onclick = () => removeTeam(t.id);
-      list.appendChild(div);
-    });
-  }
-
-  function addTeam(){
-    const name = $("teamName").value.trim();
-    if(name.length < 2) return alert("Team name too short.");
-    if(state.teams.some(t => t.name.toLowerCase() === name.toLowerCase())) return alert("Team already exists.");
-
-    const newTeam = { id: uid(), name };
-    state.teams.push(newTeam);
-    ensureRoster(newTeam.id);
-
-    $("teamName").value = "";
-    saveState();
-    renderTeams();
-    renderTeamSelect(newTeam.id);
-    renderBracket();
-  }
-
-  function removeTeam(teamId){
-    if(!confirm("Remove this team?")) return;
-
-    state.teams = state.teams.filter(t => t.id !== teamId);
-    if(state.rosters && state.rosters[teamId]) delete state.rosters[teamId];
-
-    state.matches.forEach(m => {
-      if(m.aTeamId === teamId) m.aTeamId = "";
-      if(m.bTeamId === teamId) m.bTeamId = "";
-      if(m.winnerTeamId === teamId) m.winnerTeamId = "";
-    });
-
-    saveState();
-    renderTeams();
-    renderTeamSelect();
-    renderBracket();
-  }
-
-  $("addTeamBtn").onclick = addTeam;
-
-  function renderTeamSelect(preferredId=""){
-    const sel = $("teamSelect");
-    sel.innerHTML = "";
-
-    if(state.teams.length === 0){
-      sel.innerHTML = `<option value="">No teams</option>`;
-      $("captainName").value = "";
-      $("playerName").value = "";
-      $("rosterList").innerHTML = `<div class="muted">Create a team first.</div>`;
-      return;
-    }
-
-    state.teams.forEach(t => {
-      const opt = document.createElement("option");
-      opt.value = t.id;
-      opt.textContent = t.name;
-      sel.appendChild(opt);
-    });
-
-    const prev = sel.getAttribute("data-prev") || "";
-    const prevOk = state.teams.some(t => t.id === prev);
-    let pick = "";
-
-    if(preferredId && state.teams.some(t => t.id === preferredId)) pick = preferredId;
-    else if(prevOk) pick = prev;
-    else pick = state.teams[0].id;
-
-    sel.value = pick;
-    sel.setAttribute("data-prev", pick);
-    renderRosterList(pick);
-  }
-
-  $("teamSelect").onchange = () => {
-    const tid = $("teamSelect").value;
-    $("teamSelect").setAttribute("data-prev", tid);
-    renderRosterList(tid);
-  };
-
-  function renderRosterList(teamId){
-    const list = $("rosterList");
-
-    if(!teamId){
-      $("captainName").value = "";
-      list.innerHTML = `<div class="muted">Select a team first.</div>`;
-      return;
-    }
-
-    ensureRoster(teamId);
-    const roster = state.rosters[teamId];
-    const players = roster.players || [];
-
-    $("captainName").value = roster.captain || "";
-
-    if(players.length === 0){
-      list.innerHTML = `<div class="muted">No players yet.</div>`;
-      return;
-    }
-
-    list.innerHTML = "";
-    players.forEach((p, idx) => {
-      const div = document.createElement("div");
-      div.className = "item";
-      div.innerHTML = `
-        <div class="itemTop">
-          <div>
-            <b>${escapeHtml(p)}</b>
-            <div class="muted">${roster.captain && p.toLowerCase() === roster.captain.toLowerCase() ? "Captain" : "Player"}</div>
-          </div>
-          <button class="btn danger" type="button">Remove</button>
-        </div>
-      `;
-
-      div.querySelector("button").onclick = () => {
-        players.splice(idx, 1);
-        roster.players = players;
-
-        if(roster.captain && roster.captain.toLowerCase() === p.toLowerCase()){
-          roster.captain = "";
-          $("captainName").value = "";
-        }
-
-        state.rosters[teamId] = roster;
-        saveState();
-        renderTeams();
-        renderRosterList(teamId);
-      };
-
-      list.appendChild(div);
-    });
-  }
-
-  $("setCaptainBtn").onclick = () => {
-    const teamId = $("teamSelect").value;
-    if(!teamId) return alert("Select a team first.");
-
-    const cap = $("captainName").value.trim();
-    if(cap.length < 2) return alert("Captain IGN too short.");
-
-    ensureRoster(teamId);
-    const roster = state.rosters[teamId];
-
-    roster.captain = cap;
-
-    // auto-add captain into players if missing
-    if(!roster.players.some(x => x.toLowerCase() === cap.toLowerCase())){
-      roster.players.unshift(cap);
-    }
-
-    state.rosters[teamId] = roster;
-    saveState();
-    renderTeams();
-    renderRosterList(teamId);
-  };
-
-  $("addPlayerBtn").onclick = () => {
-    const teamId = $("teamSelect").value;
-    if(!teamId) return alert("Select a team first.");
-
-    const p = $("playerName").value.trim();
-    if(p.length < 2) return alert("Player name too short.");
-
-    ensureRoster(teamId);
-    const roster = state.rosters[teamId];
-
-    if(roster.players.some(x => x.toLowerCase() === p.toLowerCase())){
-      return alert("Player already in this team.");
-    }
-
-    roster.players.push(p);
-    state.rosters[teamId] = roster;
-
-    $("playerName").value = "";
-    saveState();
-    renderTeams();
-    renderRosterList(teamId);
-  };
-
-  /**********************
-   * BRACKET
-   **********************/
-  function teamNameById(id){
-    const t = state.teams.find(x => x.id === id);
-    return t ? t.name : "";
-  }
-
-  function buildBracket(size){
-    state.bracketSize = size;
-    const rounds = Math.log2(size);
-    const matches = [];
-    let matchCount = size / 2;
-
-    for(let r=1; r<=rounds; r++){
-      for(let p=1; p<=matchCount; p++){
-        matches.push({ id:`R${r}M${p}`, round:r, pos:p, aTeamId:"", bTeamId:"", scoreA:"", scoreB:"", winnerTeamId:"" });
-      }
-      matchCount = matchCount / 2;
-    }
-
-    state.matches = matches;
-    saveState();
-    renderBracket();
-  }
-
-  function clearScores(){
-    state.matches.forEach(m => { m.scoreA=""; m.scoreB=""; m.winnerTeamId=""; });
-    saveState();
-    renderBracket();
-  }
-
-  function clearBracket(){
-    if(!confirm("Clear bracket slots + scores?")) return;
-    state.matches.forEach(m => { m.aTeamId=""; m.bTeamId=""; m.scoreA=""; m.scoreB=""; m.winnerTeamId=""; });
-    saveState();
-    renderBracket();
-  }
-
-  function teamOptions(selectedId){
-    const opts = [`<option value="">— Select team —</option>`];
-    state.teams.forEach(t => {
-      opts.push(`<option value="${t.id}" ${t.id===selectedId?"selected":""}>${escapeHtml(t.name)}</option>`);
-    });
-    return opts.join("");
-  }
-
-  function advanceWinner(matchId){
-    const m = state.matches.find(x => x.id === matchId);
-    if(!m || !m.winnerTeamId) return alert("Pick a winner first.");
-
-    const nextRound = m.round + 1;
-    const rounds = Math.log2(state.bracketSize);
-    if(nextRound > rounds) return alert("Final round.");
-
-    const nextPos = Math.ceil(m.pos / 2);
-    const next = state.matches.find(x => x.round === nextRound && x.pos === nextPos);
-    if(!next) return alert("Next match not found.");
-
-    const slot = (m.pos % 2 === 1) ? "A" : "B";
-    if(slot === "A") next.aTeamId = m.winnerTeamId;
-    else next.bTeamId = m.winnerTeamId;
-
-    if(next.winnerTeamId && next.winnerTeamId !== next.aTeamId && next.winnerTeamId !== next.bTeamId){
-      next.winnerTeamId = "";
-    }
-
-    saveState();
-    renderBracket();
-  }
-
-  function advanceAll(){
-    const sorted = [...state.matches].sort((a,b)=>(a.round-b.round)||(a.pos-b.pos));
-    const rounds = Math.log2(state.bracketSize);
-    sorted.forEach(m => {
-      if(m.winnerTeamId && m.round < rounds) advanceWinner(m.id);
-    });
-  }
-
-  function renderBracket(){
-    $("bracketMeta").textContent = `${state.teams.length} teams • ${state.matches.length} matches • bracket ${state.bracketSize}`;
-
-    const area = $("bracketArea");
-    area.innerHTML = "";
-
-    if(!state.matches || state.matches.length === 0){
-      area.innerHTML = `<div class="muted">No bracket yet. Build one.</div>`;
-      return;
-    }
-
-    const rounds = Math.log2(state.bracketSize);
-
-    for(let r=1; r<=rounds; r++){
-      const col = document.createElement("div");
-      col.className = "list";
-      col.innerHTML = `<div class="pill"><b>Round ${r}</b></div>`;
-
-      state.matches.filter(m=>m.round===r).forEach(m=>{
-        const div = document.createElement("div");
-        div.className = "match";
-        div.innerHTML = `
-          <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px">
-            <b>${escapeHtml(m.id)}</b>
-            <span class="pill">${m.winnerTeamId ? "Winner set" : "No winner"}</span>
-          </div>
-
-          <div class="slot">
-            <select data-mid="${m.id}" data-slot="A">${teamOptions(m.aTeamId)}</select>
-            <div class="scoreBox"><input data-mid="${m.id}" data-score="A" inputmode="numeric" placeholder="0" value="${escapeHtml(m.scoreA)}"></div>
-          </div>
-
-          <div class="slot">
-            <select data-mid="${m.id}" data-slot="B">${teamOptions(m.bTeamId)}</select>
-            <div class="scoreBox"><input data-mid="${m.id}" data-score="B" inputmode="numeric" placeholder="0" value="${escapeHtml(m.scoreB)}"></div>
-          </div>
-
-          <div class="row">
-            <button class="btn" type="button" data-win="${m.id}" data-pick="A">Pick A Winner</button>
-            <button class="btn" type="button" data-win="${m.id}" data-pick="B">Pick B Winner</button>
-            <button class="btn primary" type="button" data-adv="${m.id}">Advance Winner →</button>
-          </div>
-
-          <div class="muted" style="margin-top:8px">Winner: <b>${escapeHtml(teamNameById(m.winnerTeamId) || "—")}</b></div>
-        `;
-        col.appendChild(div);
-      });
-
-      area.appendChild(col);
-    }
-
-    // Wire match controls
-    area.querySelectorAll("select[data-mid]").forEach(sel => {
-      sel.onchange = () => {
-        const mid = sel.getAttribute("data-mid");
-        const slot = sel.getAttribute("data-slot");
-        const match = state.matches.find(x => x.id === mid);
-        if(!match) return;
-
-        if(slot === "A") match.aTeamId = sel.value;
-        if(slot === "B") match.bTeamId = sel.value;
-
-        if(match.winnerTeamId && match.winnerTeamId !== match.aTeamId && match.winnerTeamId !== match.bTeamId){
-          match.winnerTeamId = "";
-        }
-
-        saveState();
-        renderBracket();
-      };
-    });
-
-    area.querySelectorAll("input[data-mid][data-score]").forEach(inp => {
-      inp.oninput = () => {
-        const mid = inp.getAttribute("data-mid");
-        const which = inp.getAttribute("data-score");
-        const match = state.matches.find(x => x.id === mid);
-        if(!match) return;
-
-        const v = inp.value.trim();
-        if(v !== "" && !/^\d+$/.test(v)) return;
-
-        if(which === "A") match.scoreA = v;
-        if(which === "B") match.scoreB = v;
-
-        saveState();
-      };
-    });
-
-    area.querySelectorAll("button[data-win]").forEach(btn => {
-      btn.onclick = () => {
-        const mid = btn.getAttribute("data-win");
-        const pick = btn.getAttribute("data-pick");
-        const match = state.matches.find(x => x.id === mid);
-        if(!match) return;
-
-        const chosen = pick === "A" ? match.aTeamId : match.bTeamId;
-        if(!chosen) return alert("Select a team first.");
-        match.winnerTeamId = chosen;
-
-        saveState();
-        renderBracket();
-      };
-    });
-
-    area.querySelectorAll("button[data-adv]").forEach(btn => {
-      btn.onclick = () => advanceWinner(btn.getAttribute("data-adv"));
-    });
-  }
-
-  $("buildBracketBtn").onclick = () => {
-    const size = Number($("bracketSize").value);
-    if(![8,16].includes(size)) return alert("Choose 8 or 16.");
-    buildBracket(size);
-  };
-  $("clearScoresBtn").onclick = clearScores;
-  $("clearBracketBtn").onclick = clearBracket;
-  $("advanceAllBtn").onclick = advanceAll;
 </script>
+
 </body>
 </html>
