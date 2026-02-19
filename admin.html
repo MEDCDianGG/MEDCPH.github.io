@@ -1,932 +1,949 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>MEDC Invitational — Admin</title>
-  <style>
-    :root{
-      --bg:#070A12; --card:rgba(255,255,255,.04); --line:rgba(255,255,255,.10);
-      --text:#EAF0FF; --muted:rgba(234,240,255,.75);
-      --shadow:0 18px 60px rgba(0,0,0,.45); --r:18px;
-      --blue:rgba(59,130,246,.22); --blueb:rgba(59,130,246,.35);
-      --red:rgba(239,68,68,.18); --redb:rgba(239,68,68,.35);
-      --green:rgba(34,197,94,.16); --greenb:rgba(34,197,94,.35);
-    }
-    *{box-sizing:border-box}
-    body{margin:0;font-family:system-ui,Segoe UI,Arial;background:var(--bg);color:var(--text)}
-    header{position:sticky;top:0;z-index:10;background:rgba(7,10,18,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
-    .wrap{max-width:1200px;margin:0 auto;padding:18px}
-    .bar{display:flex;align-items:center;justify-content:space-between;gap:12px}
-    .brand{display:flex;align-items:center;gap:12px;font-weight:900}
-    .pill{display:inline-flex;gap:8px;align-items:center;padding:6px 10px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.04);font-size:12px;color:var(--muted)}
-    .btn{
-      border:1px solid var(--line); background:rgba(255,255,255,.06); color:var(--text);
-      padding:10px 12px; border-radius:999px; cursor:pointer; font-weight:800;
-    }
-    .btn.primary{background:var(--blue);border-color:var(--blueb)}
-    .btn.good{background:var(--green);border-color:var(--greenb)}
-    .btn.danger{background:var(--red);border-color:var(--redb)}
-    .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden}
-    .cardPad{padding:16px}
-    .grid2{display:grid;grid-template-columns:420px 1fr;gap:14px}
-    @media(max-width:980px){.grid2{grid-template-columns:1fr}}
-    .muted{color:var(--muted)}
-    input,select,button{border-radius:12px;border:1px solid var(--line);background:rgba(0,0,0,.22);color:var(--text);padding:10px 12px;outline:none}
-    input{width:100%}
-    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-    .list{display:flex;flex-direction:column;gap:10px}
-    .item{padding:12px;border-radius:16px;border:1px solid var(--line);background:rgba(0,0,0,.20)}
-    .itemTop{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
-    .hide{display:none !important}
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>MEDC Invitational — Admin</title>
+    <style>
+        :root {
+            --bg: #070A12;
+            --card: rgba(255,255,255,.04);
+            --line: rgba(255,255,255,.10);
+            --text: #EAF0FF;
+            --muted: rgba(234,240,255,.75);
+            --shadow: 0 18px 60px rgba(0,0,0,.45);
+            --r: 18px;
+            --blue: rgba(59,130,246,.22);
+            --blueb: rgba(59,130,246,.35);
+            --red: rgba(239,68,68,.18);
+            --redb: rgba(239,68,68,.35);
+            --green: rgba(34,197,94,.16);
+            --greenb: rgba(34,197,94,.35);
+        }
 
-    .bracketGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;align-items:start}
-    @media(max-width:1100px){.bracketGrid{grid-template-columns:repeat(2,1fr)}}
-    @media(max-width:600px){.bracketGrid{grid-template-columns:1fr}}
-    .match{padding:12px;border-radius:16px;border:1px solid var(--line);background:rgba(0,0,0,.22)}
-    .slot{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 10px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.06);margin-bottom:8px}
-    .scoreBox{display:flex;gap:8px;align-items:center}
-    .scoreBox input{width:64px;text-align:center}
-  </style>
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            margin: 0;
+            font-family: system-ui,Segoe UI,Arial;
+            background: var(--bg);
+            color: var(--text)
+        }
+
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background: rgba(7,10,18,.86);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--line)
+        }
+
+        .wrap {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 18px
+        }
+
+        .bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 900
+        }
+
+        .pill {
+            display: inline-flex;
+            gap: 8px;
+            align-items: center;
+            padding: 6px 10px;
+            border-radius: 999px;
+            border: 1px solid var(--line);
+            background: rgba(255,255,255,.04);
+            font-size: 12px;
+            color: var(--muted)
+        }
+
+        .btn {
+            border: 1px solid var(--line);
+            background: rgba(255,255,255,.06);
+            color: var(--text);
+            padding: 10px 12px;
+            border-radius: 999px;
+            cursor: pointer;
+            font-weight: 800;
+        }
+
+            .btn.primary {
+                background: var(--blue);
+                border-color: var(--blueb)
+            }
+
+            .btn.good {
+                background: var(--green);
+                border-color: var(--greenb)
+            }
+
+            .btn.danger {
+                background: var(--red);
+                border-color: var(--redb)
+            }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: var(--r);
+            box-shadow: var(--shadow);
+            overflow: hidden
+        }
+
+        .cardPad {
+            padding: 16px
+        }
+
+        .grid2 {
+            display: grid;
+            grid-template-columns: 420px 1fr;
+            gap: 14px
+        }
+
+        @media(max-width:980px) {
+            .grid2 {
+                grid-template-columns: 1fr
+            }
+        }
+
+        .muted {
+            color: var(--muted)
+        }
+
+        input, select, button {
+            border-radius: 12px;
+            border: 1px solid var(--line);
+            background: rgba(0,0,0,.22);
+            color: var(--text);
+            padding: 10px 12px;
+            outline: none
+        }
+
+        input {
+            width: 100%
+        }
+
+        .row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center
+        }
+
+        .list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px
+        }
+
+        .item {
+            padding: 12px;
+            border-radius: 16px;
+            border: 1px solid var(--line);
+            background: rgba(0,0,0,.20)
+        }
+
+        .itemTop {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            align-items: flex-start
+        }
+
+        .hide {
+            display: none !important
+        }
+
+        .bracketGrid {
+            display: grid;
+            grid-template-columns: repeat(4,1fr);
+            gap: 10px;
+            align-items: start
+        }
+
+        @media(max-width:1100px) {
+            .bracketGrid {
+                grid-template-columns: repeat(2,1fr)
+            }
+        }
+
+        @media(max-width:600px) {
+            .bracketGrid {
+                grid-template-columns: 1fr
+            }
+        }
+
+        .match {
+            padding: 12px;
+            border-radius: 16px;
+            border: 1px solid var(--line);
+            background: rgba(0,0,0,.22)
+        }
+
+        .slot {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 10px;
+            border-radius: 12px;
+            background: rgba(255,255,255,.05);
+            border: 1px solid rgba(255,255,255,.06);
+            margin-bottom: 8px
+        }
+
+        .scoreBox {
+            display: flex;
+            gap: 8px;
+            align-items: center
+        }
+
+            .scoreBox input {
+                width: 64px;
+                text-align: center
+            }
+    </style>
 </head>
 <body>
-  <div id="debugBox" style="position:fixed;bottom:12px;right:12px;max-width:520px;z-index:99999;background:rgba(0,0,0,.85);border:1px solid rgba(255,255,255,.15);border-radius:14px;padding:10px 12px;font:12px/1.4 system-ui,Segoe UI,Arial;color:#eaeaea;display:none;white-space:pre-wrap;"></div>
-
-<header>
-  <div class="wrap bar">
-    <div class="brand">
-      <div>MEDC INVITATIONAL</div>
-      <span class="pill" id="authPill">Locked</span>
-      <span class="pill" id="rolePill">Role: —</span>
-    </div>
-    <div class="row">
-      <button class="btn" type="button" onclick="location.href='index.html'">Public Page</button>
-      <button id="logoutBtn" class="btn hide" type="button">Logout</button>
-    </div>
-  </div>
-</header>
-
-<div class="wrap">
-  <!-- AUTH VIEW -->
-  <section id="authView" class="card">
-    <div class="cardPad">
-      <h2>Login</h2>
-      <p class="muted" style="margin:8px 0 14px">
-        Users can register and will be <b>PENDING</b> until approved by owner.
-      </p>
-
-      <div class="grid2">
-        <!-- Login -->
-        <div class="item">
-          <div class="muted">Email</div>
-          <div style="margin-top:8px"><input id="loginEmail" type="email" placeholder="email@example.com"></div>
-          <div class="muted" style="margin-top:12px">Password</div>
-          <div style="margin-top:8px"><input id="loginPass" type="password" placeholder="password"></div>
-
-          <div class="row" style="margin-top:12px">
-            <button id="loginBtn" class="btn primary" type="button">Login</button>
-          </div>
-
-          <p class="muted" style="margin:10px 0 0">
-            Accounts use <b>Firebase Authentication</b>. After you register, the owner must approve you before you can access admin tools.
-          </p>
+    <header>
+        <div class="wrap bar">
+            <div class="brand">
+                <div>MEDC INVITATIONAL</div>
+                <span class="pill" id="authPill">Locked</span>
+                <span class="pill" id="rolePill">Role: —</span>
+            </div>
+            <div class="row">
+                <button class="btn" type="button" onclick="location.href='index.html'">Public Page</button>
+                <button id="logoutBtn" class="btn hide" type="button">Logout</button>
+            </div>
         </div>
+    </header>
 
-        <!-- Register -->
-        <div class="item">
-          <h3 style="margin:0">Request Admin Access</h3>
-          <p class="muted" style="margin:8px 0 12px">Create an email/password account. Owner must approve you.</p>
+    <div class="wrap">
+        <!-- AUTH VIEW -->
+        <section id="authView" class="card">
+            <div class="cardPad">
+                <h2>Login</h2>
+                <p class="muted" style="margin:8px 0 14px">
+                    Owner: <b>xtdian</b> • (Owner password is set in the script).<br>
+                    Users can register and will be <b>PENDING</b> until approved by owner.
+                </p>
 
-          <div class="muted">Email</div>
-          <div style="margin-top:8px"><input id="regEmail" type="email" placeholder="email@example.com"></div>
+                <div class="grid2">
+                    <!-- Login -->
+                    <div class="item">
+                        <div class="muted">Username</div>
+                        <div style="margin-top:8px"><input id="loginUser" placeholder="username"></div>
+                        <div class="muted" style="margin-top:12px">Password</div>
+                        <div style="margin-top:8px"><input id="loginPass" type="password" placeholder="password"></div>
 
-          <div class="muted" style="margin-top:12px">New password</div>
-          <div style="margin-top:8px"><input id="regPass" type="password" placeholder="create password"></div>
+                        <div class="row" style="margin-top:12px">
+                            <button id="loginBtn" class="btn primary" type="button">Login</button>
+                        </div>
 
-          <div class="row" style="margin-top:12px">
-            <button id="registerBtn" class="btn good" type="button">Register (Request)</button>
-          </div>
+                        <p class="muted" style="margin:10px 0 0">
+                            Note: This is <b>local</b> approval/login only (client-side HTML). For real online accounts you need a backend.
+                        </p>
+                    </div>
 
-          <div class="muted" id="regMsg" style="margin-top:10px"></div>
-        </div>
-      </div>
+                    <!-- Register -->
+                    <div class="item">
+                        <h3 style="margin:0">Request Admin Access</h3>
+                        <p class="muted" style="margin:8px 0 12px">Create a username/password. Owner must approve you.</p>
+
+                        <div class="muted">New username</div>
+                        <div style="margin-top:8px"><input id="regUser" placeholder="ex: teammanager1"></div>
+
+                        <div class="muted" style="margin-top:12px">New password</div>
+                        <div style="margin-top:8px"><input id="regPass" type="password" placeholder="create password"></div>
+
+                        <div class="row" style="margin-top:12px">
+                            <button id="registerBtn" class="btn good" type="button">Register (Request)</button>
+                        </div>
+
+                        <div class="muted" id="regMsg" style="margin-top:10px"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ADMIN VIEW -->
+        <section id="adminView" class="hide">
+            <div class="grid2">
+
+                <!-- LEFT: TEAMS + ROSTERS + (OWNER) USERS -->
+                <div class="card">
+                    <div class="cardPad">
+                        <div class="row" style="justify-content:space-between">
+                            <h2 style="margin:0">Teams</h2>
+                            <span class="pill" id="teamCountPill">0 teams</span>
+                        </div>
+
+                        <div class="item" style="margin-top:12px">
+                            <div class="muted">Add a team</div>
+                            <div class="row" style="margin-top:8px">
+                                <input id="teamName" placeholder="Team name...">
+                                <button id="addTeamBtn" class="btn primary" type="button">Add</button>
+                            </div>
+                        </div>
+
+                        <div class="item" style="margin-top:10px">
+                            <div class="muted">All teams</div>
+                            <div id="teamsList" class="list" style="margin-top:8px"></div>
+                        </div>
+
+                        <div class="item" style="margin-top:10px">
+                            <b>Roster Manager</b>
+                            <div class="muted" style="margin-top:6px">Select team → set captain → add/remove players.</div>
+
+                            <div style="margin-top:10px">
+                                <select id="teamSelect"></select>
+                            </div>
+
+                            <div class="muted" style="margin-top:10px">Team Captain IGN</div>
+                            <div class="row" style="margin-top:8px">
+                                <input id="captainName" placeholder="Captain IGN">
+                                <button id="setCaptainBtn" class="btn good" type="button">Set Captain</button>
+                            </div>
+
+                            <div class="muted" style="margin-top:10px">Add Player IGN</div>
+                            <div class="row" style="margin-top:8px">
+                                <input id="playerName" placeholder="Player IGN">
+                                <button id="addPlayerBtn" class="btn primary" type="button">Add Player</button>
+                            </div>
+
+                            <div class="muted" style="margin-top:10px">Players</div>
+                            <div id="rosterList" class="list" style="margin-top:8px"></div>
+                        </div>
+
+                        <!-- OWNER ONLY: USER APPROVAL -->
+                        <div id="ownerUsersBox" class="item hide" style="margin-top:10px">
+                            <b>User Approvals</b>
+                            <div class="muted" style="margin-top:6px">Approve/disable/delete admin accounts.</div>
+                            <div id="usersList" class="list" style="margin-top:10px"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RIGHT: BRACKET CONTROL -->
+                <div class="card">
+                    <div class="cardPad">
+                        <div class="row" style="justify-content:space-between">
+                            <h2 style="margin:0">Bracket Control</h2>
+                            <span class="pill" id="bracketMeta">—</span>
+                        </div>
+
+                        <div class="row" style="margin-top:10px">
+                            <select id="bracketSize">
+                                <option value="8">8 Teams</option>
+                                <option value="16">16 Teams</option>
+                            </select>
+                            <button id="buildBracketBtn" class="btn primary" type="button">Build / Rebuild</button>
+                            <button id="clearScoresBtn" class="btn" type="button">Clear Scores</button>
+                            <button id="clearBracketBtn" class="btn danger" type="button">Clear Bracket</button>
+                        </div>
+
+                        <p class="muted" style="margin:10px 0 14px">
+                            Assign teams to slots, set scores, pick winners, advance winners.
+                        </p>
+
+                        <div id="bracketArea" class="bracketGrid"></div>
+
+                        <div class="row" style="margin-top:12px">
+                            <button id="advanceAllBtn" class="btn" type="button">Auto-Advance Winners</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
     </div>
-  </section>
 
-  <!-- ADMIN VIEW -->
-  <section id="adminView" class="hide">
-    <div class="grid2">
+    <script>
+        /**********************
+        * SECURITY NOTE
+        * This is client-side only (localStorage). Not secure for real online auth.
+        **********************/
 
-      <!-- LEFT: TEAMS + ROSTERS + (OWNER) USERS -->
-      <div class="card">
-        <div class="cardPad">
-          <div class="row" style="justify-content:space-between">
-            <h2 style="margin:0">Teams</h2>
-            <span class="pill" id="teamCountPill">0 teams</span>
-          </div>
+        // OWNER ACCOUNT
+        const OWNER_USER = "xtdian";
+        const OWNER_PASS = "123456789"; // change if you want
 
-          <div class="item" style="margin-top:12px">
-            <div class="muted">Add a team</div>
-            <div class="row" style="margin-top:8px">
-              <input id="teamName" placeholder="Team name...">
-              <button id="addTeamBtn" class="btn primary" type="button">Add</button>
-            </div>
-          </div>
+        // Storage keys
+        const AUTH_KEY = "medc_auth_session_v1";
+        const USERS_KEY = "medc_users_v1";
+        const STATE_KEY = "medc_admin_state_v1";
 
-          <div class="item" style="margin-top:10px">
-            <div class="muted">All teams</div>
-            <div id="teamsList" class="list" style="margin-top:8px"></div>
-          </div>
+        // Tournament state (shared with index.html)
+        const defaultState = {
+        teams: [],
+        bracketSize: 8,
+        matches: [],
+        rosters: {} // rosters[teamId] = { captain:"", players:[] }
+        };
 
-          <div class="item" style="margin-top:10px">
-            <b>Roster Manager</b>
-            <div class="muted" style="margin-top:6px">Select team → set captain → add/remove players.</div>
+        // Helpers
+        const $ = (id) => document.getElementById(id);
+        const uid = () => Math.random().toString(36).slice(2,10);
+        function escapeHtml(s=""){ return (""+s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+        function show(el, yes){ el.classList.toggle("hide", !yes); }
 
-            <div style="margin-top:10px">
-              <select id="teamSelect"></select>
-            </div>
+        // Load/save tournament state
+        let state = loadState();
+        normalizeRosters(state);
+        saveState();
 
-            <div class="muted" style="margin-top:10px">Team Captain IGN</div>
-            <div class="row" style="margin-top:8px">
-              <input id="captainName" placeholder="Captain IGN">
-              <button id="setCaptainBtn" class="btn good" type="button">Set Captain</button>
-            </div>
+        function loadState(){
+        try{
+        const raw = localStorage.getItem(STATE_KEY);
+        return raw ? JSON.parse(raw) : structuredClone(defaultState);
+        } catch {
+        return structuredClone(defaultState);
+        }
+        }
+        function saveState(){
+        localStorage.setItem(STATE_KEY, JSON.stringify(state));
+        }
 
-            <div class="muted" style="margin-top:10px">Add Player IGN</div>
-            <div class="row" style="margin-top:8px">
-              <input id="playerName" placeholder="Player IGN">
-              <button id="addPlayerBtn" class="btn primary" type="button">Add Player</button>
-            </div>
-
-            <div class="muted" style="margin-top:10px">Players</div>
-            <div id="rosterList" class="list" style="margin-top:8px"></div>
-          </div>
-
-          <!-- OWNER ONLY: USER APPROVAL -->
-          <div id="ownerUsersBox" class="item hide" style="margin-top:10px">
-            <b>User Approvals</b>
-            <div class="muted" style="margin-top:6px">Approve/disable/delete admin accounts. (Delete removes the Firestore profile; full Auth deletion needs a server endpoint.)</div>
-            <div id="usersList" class="list" style="margin-top:10px"></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- RIGHT: BRACKET CONTROL -->
-      <div class="card">
-        <div class="cardPad">
-          <div class="row" style="justify-content:space-between">
-            <h2 style="margin:0">Bracket Control</h2>
-            <span class="pill" id="bracketMeta">—</span>
-          </div>
-
-          <div class="row" style="margin-top:10px">
-            <select id="bracketSize">
-              <option value="8">8 Teams</option>
-              <option value="16">16 Teams</option>
-            </select>
-            <button id="buildBracketBtn" class="btn primary" type="button">Build / Rebuild</button>
-            <button id="clearScoresBtn" class="btn" type="button">Clear Scores</button>
-            <button id="clearBracketBtn" class="btn danger" type="button">Clear Bracket</button>
-          </div>
-
-          <p class="muted" style="margin:10px 0 14px">
-            Assign teams to slots, set scores, pick winners, advance winners.
-     <script type="module">
-  // ===== Debug helpers (shows errors on-screen) =====
-  const debugBox = document.getElementById("debugBox");
-  function debug(msg){
-    try{
-      debugBox.style.display = "block";
-      debugBox.textContent += (debugBox.textContent ? "\n" : "") + msg;
-    }catch(_){}
-    console.log("[MEDC]", msg);
-  }
-  window.addEventListener("error", (e)=> debug("JS Error: " + (e?.message || e)));
-  window.addEventListener("unhandledrejection", (e)=> debug("Promise Rejection: " + (e?.reason?.message || e?.reason || e)));
-
-  // Quick click-test: if you see this message, handlers are attached.
-  const _lb = document.getElementById("loginBtn");
-  const _rb = document.getElementById("registerBtn");
-  if(_lb) _lb.addEventListener("click", ()=> debug("Login clicked (handler attached)."));
-  if(_rb) _rb.addEventListener("click", ()=> debug("Register clicked (handler attached)."));
-
-  // ===== Load Firebase SDK dynamically so we can catch errors =====
-  let initializeApp, getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut;
-  let getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, getDocs, query, where, serverTimestamp;
-  try{
-    ({ initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js"));
-    ({ getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } =
-      await import("https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js"));
-    ({ getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, getDocs, query, where, serverTimestamp } =
-      await import("https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js"));
-    debug("Firebase SDK loaded.");
-  }catch(e){
-    debug("FAILED to load Firebase SDK. This is usually:
-- blocked CDN
-- bad internet / adblock
-- CSP issue
-
-Error: " + (e?.message || e));
-    // Stop running the app
-    throw e;
-  }
-
-
-  // Firebase (CDN modules) — works on GitHub Pages
-    getAuth, onAuthStateChanged,
-    createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut
-  } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
-    getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc,
-    collection, getDocs, serverTimestamp
-  } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
-
-  // ✅ Your Firebase config
-  const firebaseConfig = {
-    apiKey: "AIzaSyDZAVhuz9SVBHSCPnEvoxwCjaMrZSQOJ6k",
-    authDomain: "medcesport.firebaseapp.com",
-    projectId: "medcesport",
-    storageBucket: "medcesport.firebasestorage.app",
-    messagingSenderId: "7933255333",
-    appId: "1:7933255333:web:cfe776ebb79f607cdd774c",
-    measurementId: "G-07Z2TFM553"
-  };
-
-  // ✅ IMPORTANT:
-  // 1) Create the owner user (xtdian) by registering once on this page.
-  // 2) Go to Firebase Console → Authentication → Users → copy the UID of xtdian.
-  // 3) Paste that UID below AND in Firestore Rules (OWNER_UID).
-  const OWNER_UID = "bXZ3bSYPakQXEJGwtmkJjctD6Os1";
-
-  
-  // OPTIONAL (recommended): Cloud Function / server endpoint to delete Firebase Auth users.
-  // If you leave this as an empty string, "Delete" will only remove the Firestore users/{uid} profile.
-  // Example (callable HTTPS): https://us-central1-YOUR_PROJECT.cloudfunctions.net/deleteUser
-  const DELETE_USER_ENDPOINT = "";
-const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
-
-  /**********************
-   * Helpers
-   **********************/
-  const $ = (id) => document.getElementById(id);
-  const uid = () => Math.random().toString(36).slice(2,10);
-  function escapeHtml(s=""){ return (""+s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
-  function show(el, yes){ el.classList.toggle("hide", !yes); }
-
-  function isOwner(user){ return !!user && user.uid === OWNER_UID; }
-
-  /**********************
-   * Tournament state in Firestore
-   * Doc: tournament/state
-   **********************/
-  const defaultState = {
-    teams: [],
-    bracketSize: 8,
-    matches: [],
-    rosters: {} // rosters[teamId] = { captain:"", players:[] }
-  };
-
-  let state = structuredClone(defaultState);
-
-  function normalizeRosters(s){
-    if(!s.rosters) s.rosters = {};
-    for(const tid in s.rosters){
-      const v = s.rosters[tid];
-      if(Array.isArray(v)) s.rosters[tid] = { captain:"", players:v };
-      else {
+        function normalizeRosters(s){
+        if(!s.rosters) s.rosters = {};
+        for(const tid in s.rosters){
+        const v = s.rosters[tid];
+        if(Array.isArray(v)) s.rosters[tid] = { captain:"", players:v };
+        else {
         if(!v.players) v.players = [];
         if(typeof v.captain !== "string") v.captain = "";
-      }
-    }
-  }
+        }
+        }
+        }
+        function ensureRoster(teamId){
+        if(!state.rosters) state.rosters = {};
+        if(!state.rosters[teamId]) state.rosters[teamId] = { captain:"", players:[] };
+        if(Array.isArray(state.rosters[teamId])) state.rosters[teamId] = { captain:"", players: state.rosters[teamId] };
+        }
 
-  function ensureRoster(teamId){
-    if(!state.rosters) state.rosters = {};
-    if(!state.rosters[teamId]) state.rosters[teamId] = { captain:"", players:[] };
-    if(Array.isArray(state.rosters[teamId])) state.rosters[teamId] = { captain:"", players: state.rosters[teamId] };
-  }
+        // Users DB (local)
+        function loadUsers(){
+        try{
+        const raw = localStorage.getItem(USERS_KEY);
+        const users = raw ? JSON.parse(raw) : [];
+        // ensure owner exists logically (not stored)
+        return Array.isArray(users) ? users : [];
+        } catch { return []; }
+        }
+        function saveUsers(users){
+        localStorage.setItem(USERS_KEY, JSON.stringify(users));
+        }
 
-  async function loadStateFromDB(){
-    const snap = await getDoc(doc(db, "tournament", "state"));
-    state = snap.exists() ? snap.data() : structuredClone(defaultState);
-    // Ensure required fields
-    if(!state.teams) state.teams = [];
-    if(!state.matches) state.matches = [];
-    if(!state.bracketSize) state.bracketSize = 8;
-    normalizeRosters(state);
-  }
+        // Session
+        function setSession(sess){ localStorage.setItem(AUTH_KEY, JSON.stringify(sess)); }
+        function clearSession(){ localStorage.removeItem(AUTH_KEY); }
+        function getSession(){
+        try{
+        const raw = localStorage.getItem(AUTH_KEY);
+        return raw ? JSON.parse(raw) : null;
+        } catch { return null; }
+        }
 
-  // Save (debounced so you can click fast without spamming writes)
-  let saveTimer = null;
-  function saveState(){
-    if(saveTimer) clearTimeout(saveTimer);
-    saveTimer = setTimeout(async () => {
-      try{
-        await setDoc(doc(db, "tournament", "state"), {
-          ...state,
-          updatedAt: serverTimestamp()
-        }, { merge:true });
-      }catch(e){
-        console.error(e);
-        alert("Save failed. Check Firestore Rules / internet connection.");
-      }
-    }, 250);
-  }
+        function currentRole(){
+        const sess = getSession();
+        return sess?.role || "none"; // none | owner | admin
+        }
 
-  /**********************
-   * Users (approval) in Firestore
-   * Collection: users/{uid}
-   **********************/
-  async function getMyProfile(uid){
-    const snap = await getDoc(doc(db, "users", uid));
-    return snap.exists() ? snap.data() : null;
-  }
+        // AUTH: login/register/approve
+        function applyUI(){
+        const role = currentRole();
+        $("authPill").textContent = role === "none" ? "Locked" : "Unlocked";
+        $("rolePill").textContent = "Role: " + (role === "owner" ? "Owner" : role === "admin" ? "Admin" : "—");
 
-  /**********************
-   * UI / Auth gate
-   **********************/
-  let currentUser = null;
-  let currentRole = "none"; // none | owner | admin
+        show($("logoutBtn"), role !== "none");
+        show($("authView"), role === "none");
+        show($("adminView"), role !== "none");
 
-  function setRole(role){
-    currentRole = role;
-    $("authPill").textContent = role === "none" ? "Locked" : "Unlocked";
-    $("rolePill").textContent = "Role: " + (role === "owner" ? "Owner" : role === "admin" ? "Admin" : "—");
+        // owner-only approvals UI
+        show($("ownerUsersBox"), role === "owner");
 
-    show($("logoutBtn"), role !== "none");
-    show($("authView"), role === "none");
-    show($("adminView"), role !== "none");
-    show($("ownerUsersBox"), role === "owner");
-  }
+        if(role !== "none"){
+        $("bracketSize").value = String(state.bracketSize || 8);
+        renderTeams();
+        renderTeamSelect();
+        renderBracket();
+        if(role === "owner") renderUsers();
+        }
+        }
 
-  $("logoutBtn").onclick = async () => {
-    await signOut(auth);
-  };
+        $("loginBtn").onclick = () => {
+        const u = $("loginUser").value.trim();
+        const p = $("loginPass").value;
 
-  $("registerBtn").onclick = async () => {
-    const email = $("regEmail").value.trim();
-    const p = $("regPass").value;
-    const msg = $("regMsg");
-    msg.textContent = "";
-
-    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return msg.textContent = "Enter a valid email address.";
-    if(p.length < 6) return msg.textContent = "Password must be at least 6 characters.";
-
-    try{
-      const cred = await createUserWithEmailAndPassword(auth, email, p);
-
-      // Create profile as pending (rules prevent self-approval)
-      await setDoc(doc(db, "users", cred.user.uid), {
-        email: cred.user.email || email,
-        status: "pending",
-        createdAt: serverTimestamp()
-      }, { merge: true });
-
-      $("regEmail").value = "";
-      $("regPass").value = "";
-      msg.textContent = "Request sent! Wait for owner approval.";
-      alert("Registered! Your account is pending approval.");
-    }catch(e){
-      console.error(e);
-      alert(((e&&e.code)?("("+e.code+") "):"") + ((e&&e.message)?e.message:"Register failed.") + "\n\nIf you see permission-denied, publish Firestore Rules.");
-    }
-  };
-
-  $("loginBtn").onclick = async () => {
-    const email = $("loginEmail").value.trim();
-    const p = $("loginPass").value;
-
-    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return alert("Enter a valid email.");
-
-    try{
-      await signInWithEmailAndPassword(auth, email, p);
-    }catch(e){
-      console.error(e);
-      alert(e?.message || "Login failed. Check email/password.");
-    }
-  };
-
-  onAuthStateChanged(auth, async (user) => {
-    currentUser = user;
-
-    if(!user){
-      setRole("none");
-      return;
-    }
-
-    // Owner
-    if(isOwner(user)){
-      setRole("owner");
-      await loadStateFromDB();
-      $("bracketSize").value = String(state.bracketSize || 8);
-      renderTeams();
-      renderTeamSelect();
-      renderBracket();
-      await renderUsers();
-      return;
-    }
-
-    // Admin needs approval
-    try{
-      const profile = await getMyProfile(user.uid);
-      if(!profile){
-        // If a user was created directly in Firebase Console, they may not have a Firestore profile yet.
-        await setDoc(doc(db, "users", user.uid), {
-          email: user.email || "",
-          status: "pending",
-          createdAt: serverTimestamp()
-        }, { merge: true });
-
-        alert("Your account is not approved yet. A request has been created—ask the owner to approve you.");
-        await signOut(auth);
+        // Owner
+        if(u === OWNER_USER && p === OWNER_PASS){
+        setSession({ role:"owner", user: OWNER_USER });
+        applyUI();
         return;
-      }
-      if(profile.status !== "approved"){
-        alert("Your account is not approved yet (or disabled).");
-        await signOut(auth);
+        }
+
+        // Normal users
+        const users = loadUsers();
+        const found = users.find(x => x.username.toLowerCase() === u.toLowerCase());
+        if(!found) return alert("Account not found. Register first.");
+        if(found.status !== "approved") return alert("Your account is not approved yet (or disabled).");
+
+        // NOTE: password stored in localStorage (not secure)
+        if(found.password !== p) return alert("Wrong password.");
+
+        setSession({ role:"admin", user: found.username });
+        applyUI();
+        };
+
+        $("logoutBtn").onclick = () => {
+        clearSession();
+        applyUI();
+        };
+
+        $("registerBtn").onclick = () => {
+        const u = $("regUser").value.trim();
+        const p = $("regPass").value;
+        const msg = $("regMsg");
+
+        msg.textContent = "";
+
+        if(u.length < 3) return msg.textContent = "Username must be at least 3 characters.";
+        if(p.length < 6) return msg.textContent = "Password must be at least 6 characters.";
+        if(u.toLowerCase() === OWNER_USER.toLowerCase()) return msg.textContent = "That username is reserved.";
+
+        const users = loadUsers();
+        if(users.some(x => x.username.toLowerCase() === u.toLowerCase())){
+        msg.textContent = "Username already exists.";
         return;
-      }
+        }
 
-      setRole("admin");
-      await loadStateFromDB();
-      $("bracketSize").value = String(state.bracketSize || 8);
-      renderTeams();
-      renderTeamSelect();
-      renderBracket();
-    }catch(e){
-      console.error(e);
-      const code = (e && e.code) ? e.code : "";
-      alert("Auth check failed " + (code?("("+code+")"):"") + ".\n\nMost common fix: Firestore → Rules are still default (deny). Publish rules that allow users to read/create their own users/{uid} doc. If code is permission-denied, it\'s Firestore Rules.");
-      await signOut(auth);
-    }
-  });
+        users.push({ id: uid(), username: u, password: p, status: "pending", createdAt: Date.now() });
+        saveUsers(users);
 
-  /**********************
-   * OWNER: approve/disable/delete users
-   **********************/
-  async function renderUsers(){
-    const box = $("usersList");
-    if(!box) return;
+        $("regUser").value = "";
+        $("regPass").value = "";
+        msg.textContent = "Request sent! Wait for owner approval.";
+        };
 
-    box.innerHTML = `<div class="muted">Loading users…</div>`;
-    try{
-      const qs = await getDocs(collection(db, "users"));
-      const users = [];
-      qs.forEach(d => users.push({ uid: d.id, ...d.data() }));
+        function renderUsers(){
+        const box = $("usersList");
+        const users = loadUsers();
 
-      if(users.length === 0){
+        if(users.length === 0){
         box.innerHTML = `<div class="muted">No user requests yet.</div>`;
         return;
-      }
+        }
 
-      box.innerHTML = "";
-      users
+        box.innerHTML = "";
+        users
         .sort((a,b)=> (a.status===b.status?0 : a.status==="pending"?-1:1))
         .forEach(u => {
-          const div = document.createElement("div");
-          div.className = "item";
+        const div = document.createElement("div");
+        div.className = "item";
 
-          const statusPill =
-            u.status === "approved" ? `<span class="pill" style="border-color:var(--greenb)">APPROVED</span>` :
-            u.status === "disabled" ? `<span class="pill" style="border-color:var(--redb)">DISABLED</span>` :
-            `<span class="pill">PENDING</span>`;
+        const statusPill =
+        u.status === "approved" ? `<span class="pill" style="border-color:var(--greenb)">APPROVED</span>` :
+        u.status === "disabled" ? `<span class="pill" style="border-color:var(--redb)">DISABLED</span>` :
+        `<span class="pill">PENDING</span>`;
 
-          div.innerHTML = `
-            <div class="itemTop">
-              <div>
-                <b>${escapeHtml(u.email || u.uid)}</b>
-                <div class="muted">Status: ${statusPill}</div>
-              </div>
-              <div class="row" style="justify-content:flex-end">
-                <button class="btn good" type="button" data-act="approve">Approve</button>
-                <button class="btn danger" type="button" data-act="disable">Disable</button>
-                <button class="btn" type="button" data-act="delete">Delete</button>
-              </div>
-            </div>
-          `;
+        div.innerHTML = `
+        <div class="itemTop">
+        <div>
+        <b>${escapeHtml(u.username)}</b>
+        <div class="muted">Status: ${statusPill}</div>
+        </div>
+        <div class="row" style="justify-content:flex-end">
+        <button class="btn good" type="button" data-act="approve">Approve</button>
+        <button class="btn danger" type="button" data-act="disable">Disable</button>
+        <button class="btn" type="button" data-act="delete">Delete</button>
+        </div>
+        </div>
+        `;
 
-          div.querySelector('[data-act="approve"]').onclick = () => updateUser(u.uid, "approved");
-          div.querySelector('[data-act="disable"]').onclick = () => updateUser(u.uid, "disabled");
-          div.querySelector('[data-act="delete"]').onclick = () => deleteUser(u.uid, u.email || "");
+        div.querySelector('[data-act="approve"]').onclick = () => updateUser(u.id, "approved");
+        div.querySelector('[data-act="disable"]').onclick = () => updateUser(u.id, "disabled");
+        div.querySelector('[data-act="delete"]').onclick = () => deleteUser(u.id);
 
-          box.appendChild(div);
+        box.appendChild(div);
         });
-    }catch(e){
-      console.error(e);
-      box.innerHTML = `<div class="muted">Failed to load users.</div>`;
-    }
-  }
-
-  async function updateUser(userUid, status){
-    if(!currentUser || !isOwner(currentUser)) return;
-    try{
-      await updateDoc(doc(db, "users", userUid), { status });
-      await renderUsers();
-    }catch(e){
-      console.error(e);
-      alert("Update user failed. Check Firestore Rules.");
-    }
-  }
-
-  async function deleteUser(userUid, email){
-    if(!currentUser || !isOwner(currentUser)) return;
-
-    if(userUid === OWNER_UID){
-      alert("You cannot delete the owner account.");
-      return;
-    }
-
-    const label = email ? `${email} (${userUid})` : userUid;
-    if(!confirm(`Delete this user?
-
-This will DISABLE them and remove their users/{uid} profile.
-If DELETE_USER_ENDPOINT is configured, it will also delete the Firebase Auth account.
-
-User: ${label}`)) return;
-
-    try{
-      // 1) Disable first (so they can't log in even if Auth deletion fails)
-      try { await updateDoc(doc(db, "users", userUid), { status: "disabled" }); } catch(_) {}
-
-      // 2) Remove Firestore profile
-      await deleteDoc(doc(db, "users", userUid));
-
-      // 3) OPTIONAL: delete Firebase Auth account via server/Cloud Function
-      if(DELETE_USER_ENDPOINT){
-        try{
-          const token = await currentUser.getIdToken();
-          const res = await fetch(DELETE_USER_ENDPOINT, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": "Bearer " + token
-            },
-            body: JSON.stringify({ uid: userUid })
-          });
-
-          if(!res.ok){
-            const t = await res.text().catch(()=> "");
-            alert("Deleted Firestore profile, but server Auth delete failed:
-" + (t || res.statusText));
-          }
-        }catch(e){
-          console.error(e);
-          alert("Deleted Firestore profile, but server Auth delete failed (network/endpoint error).");
         }
-      }else{
-        alert("Deleted Firestore users/{uid} profile.
 
-NOTE: Firebase Auth user still exists (client-side cannot delete Auth users). If you want full deletion, set DELETE_USER_ENDPOINT to a Cloud Function.");
-      }
+        function updateUser(id, status){
+        if(currentRole() !== "owner") return;
+        const users = loadUsers();
+        const u = users.find(x => x.id === id);
+        if(!u) return;
+        u.status = status;
+        saveUsers(users);
+        renderUsers();
+        }
 
-      await renderUsers();
-    }catch(e){
-      console.error(e);
-      alert("Delete user failed. Check Firestore Rules.");
-    }
-  }
+        function deleteUser(id){
+        if(currentRole() !== "owner") return;
+        if(!confirm("Delete this user?")) return;
+        let users = loadUsers();
+        users = users.filter(x => x.id !== id);
+        saveUsers(users);
+        renderUsers();
+        }
 
-  /**********************
-   * TEAMS + ROSTERS
-   **********************/
-  function renderTeams(){
-    $("teamCountPill").textContent = `${state.teams.length} teams`;
-    const list = $("teamsList");
-    list.innerHTML = "";
+        /**********************
+        * TEAMS + ROSTERS
+        **********************/
+        function renderTeams(){
+        $("teamCountPill").textContent = `${state.teams.length} teams`;
+        const list = $("teamsList");
+        list.innerHTML = "";
 
-    if(state.teams.length === 0){
-      list.innerHTML = `<div class="muted">No teams yet. Add teams to begin.</div>`;
-      return;
-    }
+        if(state.teams.length === 0){
+        list.innerHTML = `<div class="muted">No teams yet. Add teams to begin.</div>`;
+        return;
+        }
 
-    state.teams.forEach(t => {
-      ensureRoster(t.id);
-      const count = state.rosters[t.id].players.length;
+        state.teams.forEach(t => {
+        ensureRoster(t.id);
+        const count = state.rosters[t.id].players.length;
 
-      const div = document.createElement("div");
-      div.className = "item";
-      div.innerHTML = `
+        const div = document.createElement("div");
+        div.className = "item";
+        div.innerHTML = `
         <div class="itemTop">
-          <div>
-            <b>${escapeHtml(t.name)}</b>
-            <div class="muted">ID: ${t.id} • ${count} players</div>
-          </div>
-          <button class="btn danger" type="button">Remove</button>
+        <div>
+        <b>${escapeHtml(t.name)}</b>
+        <div class="muted">ID: ${t.id} • ${count} players</div>
         </div>
-      `;
+        <button class="btn danger" type="button">Remove</button>
+        </div>
+        `;
 
-      div.querySelector("button").onclick = () => removeTeam(t.id);
-      list.appendChild(div);
-    });
-  }
+        div.querySelector("button").onclick = () => removeTeam(t.id);
+        list.appendChild(div);
+        });
+        }
 
-  function addTeam(){
-    const name = $("teamName").value.trim();
-    if(name.length < 2) return alert("Team name too short.");
-    if(state.teams.some(t => t.name.toLowerCase() === name.toLowerCase())) return alert("Team already exists.");
+        function addTeam(){
+        const name = $("teamName").value.trim();
+        if(name.length < 2) return alert("Team name too short.");
+        if(state.teams.some(t => t.name.toLowerCase() === name.toLowerCase())) return alert("Team already exists.");
 
-    const newTeam = { id: uid(), name };
-    state.teams.push(newTeam);
-    ensureRoster(newTeam.id);
+        const newTeam = { id: uid(), name };
+        state.teams.push(newTeam);
+        ensureRoster(newTeam.id);
 
-    $("teamName").value = "";
-    saveState();
-    renderTeams();
-    renderTeamSelect(newTeam.id);
-    renderBracket();
-  }
+        $("teamName").value = "";
+        saveState();
+        renderTeams();
+        renderTeamSelect(newTeam.id);
+        renderBracket(); // keep select options updated
+        }
 
-  function removeTeam(teamId){
-    if(!confirm("Remove this team?")) return;
+        function removeTeam(teamId){
+        if(!confirm("Remove this team?")) return;
 
-    state.teams = state.teams.filter(t => t.id !== teamId);
-    if(state.rosters && state.rosters[teamId]) delete state.rosters[teamId];
+        state.teams = state.teams.filter(t => t.id !== teamId);
+        if(state.rosters && state.rosters[teamId]) delete state.rosters[teamId];
 
-    state.matches.forEach(m => {
-      if(m.aTeamId === teamId) m.aTeamId = "";
-      if(m.bTeamId === teamId) m.bTeamId = "";
-      if(m.winnerTeamId === teamId) m.winnerTeamId = "";
-    });
+        state.matches.forEach(m => {
+        if(m.aTeamId === teamId) m.aTeamId = "";
+        if(m.bTeamId === teamId) m.bTeamId = "";
+        if(m.winnerTeamId === teamId) m.winnerTeamId = "";
+        });
 
-    saveState();
-    renderTeams();
-    renderTeamSelect();
-    renderBracket();
-  }
+        saveState();
+        renderTeams();
+        renderTeamSelect();
+        renderBracket();
+        }
 
-  $("addTeamBtn").onclick = addTeam;
+        $("addTeamBtn").onclick = addTeam;
 
-  function renderTeamSelect(preferredId=""){
-    const sel = $("teamSelect");
-    sel.innerHTML = "";
+        function renderTeamSelect(preferredId=""){
+        const sel = $("teamSelect");
+        sel.innerHTML = "";
 
-    if(state.teams.length === 0){
-      sel.innerHTML = `<option value="">No teams</option>`;
-      $("captainName").value = "";
-      $("playerName").value = "";
-      $("rosterList").innerHTML = `<div class="muted">Create a team first.</div>`;
-      return;
-    }
+        if(state.teams.length === 0){
+        sel.innerHTML = `<option value="">No teams</option>`;
+        $("captainName").value = "";
+        $("playerName").value = "";
+        $("rosterList").innerHTML = `<div class="muted">Create a team first.</div>`;
+        return;
+        }
 
-    state.teams.forEach(t => {
-      const opt = document.createElement("option");
-      opt.value = t.id;
-      opt.textContent = t.name;
-      sel.appendChild(opt);
-    });
+        state.teams.forEach(t => {
+        const opt = document.createElement("option");
+        opt.value = t.id;
+        opt.textContent = t.name;
+        sel.appendChild(opt);
+        });
 
-    const prev = sel.getAttribute("data-prev") || "";
-    const prevOk = state.teams.some(t => t.id === prev);
-    let pick = "";
+        const prev = sel.getAttribute("data-prev") || "";
+        const prevOk = state.teams.some(t => t.id === prev);
+        let pick = "";
 
-    if(preferredId && state.teams.some(t => t.id === preferredId)) pick = preferredId;
-    else if(prevOk) pick = prev;
-    else pick = state.teams[0].id;
+        if(preferredId && state.teams.some(t => t.id === preferredId)) pick = preferredId;
+        else if(prevOk) pick = prev;
+        else pick = state.teams[0].id;
 
-    sel.value = pick;
-    sel.setAttribute("data-prev", pick);
-    renderRosterList(pick);
-  }
+        sel.value = pick;
+        sel.setAttribute("data-prev", pick);
+        renderRosterList(pick);
+        }
 
-  $("teamSelect").onchange = () => {
-    const tid = $("teamSelect").value;
-    $("teamSelect").setAttribute("data-prev", tid);
-    renderRosterList(tid);
-  };
+        $("teamSelect").onchange = () => {
+        const tid = $("teamSelect").value;
+        $("teamSelect").setAttribute("data-prev", tid);
+        renderRosterList(tid);
+        };
 
-  function renderRosterList(teamId){
-    const list = $("rosterList");
+        function renderRosterList(teamId){
+        const list = $("rosterList");
 
-    if(!teamId){
-      $("captainName").value = "";
-      list.innerHTML = `<div class="muted">Select a team first.</div>`;
-      return;
-    }
+        if(!teamId){
+        $("captainName").value = "";
+        list.innerHTML = `<div class="muted">Select a team first.</div>`;
+        return;
+        }
 
-    ensureRoster(teamId);
-    const roster = state.rosters[teamId];
-    const players = roster.players || [];
+        ensureRoster(teamId);
+        const roster = state.rosters[teamId];
+        const players = roster.players || [];
 
-    $("captainName").value = roster.captain || "";
+        $("captainName").value = roster.captain || "";
 
-    if(players.length === 0){
-      list.innerHTML = `<div class="muted">No players yet.</div>`;
-      return;
-    }
+        if(players.length === 0){
+        list.innerHTML = `<div class="muted">No players yet.</div>`;
+        return;
+        }
 
-    list.innerHTML = "";
-    players.forEach((p, idx) => {
-      const div = document.createElement("div");
-      div.className = "item";
-      div.innerHTML = `
+        list.innerHTML = "";
+        players.forEach((p, idx) => {
+        const div = document.createElement("div");
+        div.className = "item";
+        div.innerHTML = `
         <div class="itemTop">
-          <div>
-            <b>${escapeHtml(p)}</b>
-            <div class="muted">${roster.captain && p.toLowerCase() === roster.captain.toLowerCase() ? "Captain" : "Player"}</div>
-          </div>
-          <button class="btn danger" type="button">Remove</button>
+        <div>
+        <b>${escapeHtml(p)}</b>
+        <div class="muted">${roster.captain && p.toLowerCase() === roster.captain.toLowerCase() ? "Captain" : "Player"}</div>
         </div>
-      `;
+        <button class="btn danger" type="button">Remove</button>
+        </div>
+        `;
 
-      div.querySelector("button").onclick = () => {
+        div.querySelector("button").onclick = () => {
         players.splice(idx, 1);
         roster.players = players;
 
         if(roster.captain && roster.captain.toLowerCase() === p.toLowerCase()){
-          roster.captain = "";
-          $("captainName").value = "";
+        roster.captain = "";
+        $("captainName").value = "";
         }
 
         state.rosters[teamId] = roster;
         saveState();
         renderTeams();
         renderRosterList(teamId);
-      };
+        };
 
-      list.appendChild(div);
-    });
-  }
+        list.appendChild(div);
+        });
+        }
 
-  $("setCaptainBtn").onclick = () => {
-    const teamId = $("teamSelect").value;
-    if(!teamId) return alert("Select a team first.");
+        $("setCaptainBtn").onclick = () => {
+        const teamId = $("teamSelect").value;
+        if(!teamId) return alert("Select a team first.");
 
-    const cap = $("captainName").value.trim();
-    if(cap.length < 2) return alert("Captain IGN too short.");
+        const cap = $("captainName").value.trim();
+        if(cap.length < 2) return alert("Captain IGN too short.");
 
-    ensureRoster(teamId);
-    const roster = state.rosters[teamId];
+        ensureRoster(teamId);
+        const roster = state.rosters[teamId];
 
-    roster.captain = cap;
+        roster.captain = cap;
 
-    // auto-add captain into players if missing
-    if(!roster.players.some(x => x.toLowerCase() === cap.toLowerCase())){
-      roster.players.unshift(cap);
-    }
+        // auto-add captain into players if missing
+        if(!roster.players.some(x => x.toLowerCase() === cap.toLowerCase())){
+        roster.players.unshift(cap);
+        }
 
-    state.rosters[teamId] = roster;
-    saveState();
-    renderTeams();
-    renderRosterList(teamId);
-  };
+        state.rosters[teamId] = roster;
+        saveState();
+        renderTeams();
+        renderRosterList(teamId);
+        };
 
-  $("addPlayerBtn").onclick = () => {
-    const teamId = $("teamSelect").value;
-    if(!teamId) return alert("Select a team first.");
+        $("addPlayerBtn").onclick = () => {
+        const teamId = $("teamSelect").value;
+        if(!teamId) return alert("Select a team first.");
 
-    const p = $("playerName").value.trim();
-    if(p.length < 2) return alert("Player name too short.");
+        const p = $("playerName").value.trim();
+        if(p.length < 2) return alert("Player name too short.");
 
-    ensureRoster(teamId);
-    const roster = state.rosters[teamId];
+        ensureRoster(teamId);
+        const roster = state.rosters[teamId];
 
-    if(roster.players.some(x => x.toLowerCase() === p.toLowerCase())){
-      return alert("Player already in this team.");
-    }
+        if(roster.players.some(x => x.toLowerCase() === p.toLowerCase())){
+        return alert("Player already in this team.");
+        }
 
-    roster.players.push(p);
-    state.rosters[teamId] = roster;
+        roster.players.push(p);
+        state.rosters[teamId] = roster;
 
-    $("playerName").value = "";
-    saveState();
-    renderTeams();
-    renderRosterList(teamId);
-  };
+        $("playerName").value = "";
+        saveState();
+        renderTeams();
+        renderRosterList(teamId);
+        };
 
-  /**********************
-   * BRACKET
-   **********************/
-  function teamNameById(id){
-    const t = state.teams.find(x => x.id === id);
-    return t ? t.name : "";
-  }
+        /**********************
+        * BRACKET
+        **********************/
+        function teamNameById(id){
+        const t = state.teams.find(x => x.id === id);
+        return t ? t.name : "";
+        }
 
-  function buildBracket(size){
-    state.bracketSize = size;
-    const rounds = Math.log2(size);
-    const matches = [];
-    let matchCount = size / 2;
+        function buildBracket(size){
+        state.bracketSize = size;
+        const rounds = Math.log2(size);
+        const matches = [];
+        let matchCount = size / 2;
 
-    for(let r=1; r<=rounds; r++){
-      for(let p=1; p<=matchCount; p++){
+        for(let r=1; r<=rounds; r++){
+        for(let p=1; p<=matchCount; p++){
         matches.push({ id:`R${r}M${p}`, round:r, pos:p, aTeamId:"", bTeamId:"", scoreA:"", scoreB:"", winnerTeamId:"" });
-      }
-      matchCount = matchCount / 2;
-    }
+        }
+        matchCount = matchCount / 2;
+        }
 
-    state.matches = matches;
-    saveState();
-    renderBracket();
-  }
+        state.matches = matches;
+        saveState();
+        renderBracket();
+        }
 
-  function clearScores(){
-    state.matches.forEach(m => { m.scoreA=""; m.scoreB=""; m.winnerTeamId=""; });
-    saveState();
-    renderBracket();
-  }
+        function clearScores(){
+        state.matches.forEach(m => { m.scoreA=""; m.scoreB=""; m.winnerTeamId=""; });
+        saveState();
+        renderBracket();
+        }
 
-  function clearBracket(){
-    if(!confirm("Clear bracket slots + scores?")) return;
-    state.matches.forEach(m => { m.aTeamId=""; m.bTeamId=""; m.scoreA=""; m.scoreB=""; m.winnerTeamId=""; });
-    saveState();
-    renderBracket();
-  }
+        function clearBracket(){
+        if(!confirm("Clear bracket slots + scores?")) return;
+        state.matches.forEach(m => { m.aTeamId=""; m.bTeamId=""; m.scoreA=""; m.scoreB=""; m.winnerTeamId=""; });
+        saveState();
+        renderBracket();
+        }
 
-  function teamOptions(selectedId){
-    const opts = [`<option value="">— Select team —</option>`];
-    state.teams.forEach(t => {
-      opts.push(`<option value="${t.id}" ${t.id===selectedId?"selected":""}>${escapeHtml(t.name)}</option>`);
-    });
-    return opts.join("");
-  }
+        function teamOptions(selectedId){
+        const opts = [`<option value="">— Select team —</option>`];
+        state.teams.forEach(t => {
+        opts.push(`<option value="${t.id}" ${t.id===selectedId?"selected":""}>${escapeHtml(t.name)}</option>`);
+        });
+        return opts.join("");
+        }
 
-  function advanceWinner(matchId){
-    const m = state.matches.find(x => x.id === matchId);
-    if(!m || !m.winnerTeamId) return alert("Pick a winner first.");
+        function advanceWinner(matchId){
+        const m = state.matches.find(x => x.id === matchId);
+        if(!m || !m.winnerTeamId) return alert("Pick a winner first.");
 
-    const nextRound = m.round + 1;
-    const rounds = Math.log2(state.bracketSize);
-    if(nextRound > rounds) return alert("Final round.");
+        const nextRound = m.round + 1;
+        const rounds = Math.log2(state.bracketSize);
+        if(nextRound > rounds) return alert("Final round.");
 
-    const nextPos = Math.ceil(m.pos / 2);
-    const next = state.matches.find(x => x.round === nextRound && x.pos === nextPos);
-    if(!next) return alert("Next match not found.");
+        const nextPos = Math.ceil(m.pos / 2);
+        const next = state.matches.find(x => x.round === nextRound && x.pos === nextPos);
+        if(!next) return alert("Next match not found.");
 
-    const slot = (m.pos % 2 === 1) ? "A" : "B";
-    if(slot === "A") next.aTeamId = m.winnerTeamId;
-    else next.bTeamId = m.winnerTeamId;
+        const slot = (m.pos % 2 === 1) ? "A" : "B";
+        if(slot === "A") next.aTeamId = m.winnerTeamId;
+        else next.bTeamId = m.winnerTeamId;
 
-    if(next.winnerTeamId && next.winnerTeamId !== next.aTeamId && next.winnerTeamId !== next.bTeamId){
-      next.winnerTeamId = "";
-    }
+        if(next.winnerTeamId && next.winnerTeamId !== next.aTeamId && next.winnerTeamId !== next.bTeamId){
+        next.winnerTeamId = "";
+        }
 
-    saveState();
-    renderBracket();
-  }
+        saveState();
+        renderBracket();
+        }
 
-  function advanceAll(){
-    const sorted = [...state.matches].sort((a,b)=>(a.round-b.round)||(a.pos-b.pos));
-    const rounds = Math.log2(state.bracketSize);
-    sorted.forEach(m => {
-      if(m.winnerTeamId && m.round < rounds) advanceWinner(m.id);
-    });
-  }
+        function advanceAll(){
+        const sorted = [...state.matches].sort((a,b)=>(a.round-b.round)||(a.pos-b.pos));
+        const rounds = Math.log2(state.bracketSize);
+        sorted.forEach(m => {
+        if(m.winnerTeamId && m.round < rounds) advanceWinner(m.id);
+        });
+        }
 
-  function renderBracket(){
-    $("bracketMeta").textContent = `${state.teams.length} teams • ${state.matches.length} matches • bracket ${state.bracketSize}`;
+        function renderBracket(){
+        $("bracketMeta").textContent = `${state.teams.length} teams • ${state.matches.length} matches • bracket ${state.bracketSize}`;
 
-    const area = $("bracketArea");
-    area.innerHTML = "";
+        const area = $("bracketArea");
+        area.innerHTML = "";
 
-    if(!state.matches || state.matches.length === 0){
-      area.innerHTML = `<div class="muted">No bracket yet. Build one.</div>`;
-      return;
-    }
+        if(!state.matches || state.matches.length === 0){
+        area.innerHTML = `<div class="muted">No bracket yet. Build one.</div>`;
+        return;
+        }
 
-    const rounds = Math.log2(state.bracketSize);
+        const rounds = Math.log2(state.bracketSize);
 
-    for(let r=1; r<=rounds; r++){
-      const col = document.createElement("div");
-      col.className = "list";
-      col.innerHTML = `<div class="pill"><b>Round ${r}</b></div>`;
+        for(let r=1; r<=rounds; r++){
+        const col = document.createElement("div");
+        col.className = "list";
+        col.innerHTML = `<div class="pill"><b>Round ${r}</b></div>`;
 
-      state.matches.filter(m=>m.round===r).forEach(m=>{
+        state.matches.filter(m=>m.round===r).forEach(m=>{
         const div = document.createElement("div");
         div.className = "match";
         div.innerHTML = `
-          <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px">
-            <b>${escapeHtml(m.id)}</b>
-            <span class="pill">${m.winnerTeamId ? "Winner set" : "No winner"}</span>
-          </div>
+        <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px">
+        <b>${escapeHtml(m.id)}</b>
+        <span class="pill">${m.winnerTeamId ? "Winner set" : "No winner"}</span>
+        </div>
 
-          <div class="slot">
-            <select data-mid="${m.id}" data-slot="A">${teamOptions(m.aTeamId)}</select>
-            <div class="scoreBox"><input data-mid="${m.id}" data-score="A" inputmode="numeric" placeholder="0" value="${escapeHtml(m.scoreA)}"></div>
-          </div>
+        <div class="slot">
+        <select data-mid="${m.id}" data-slot="A">${teamOptions(m.aTeamId)}</select>
+        <div class="scoreBox"><input data-mid="${m.id}" data-score="A" inputmode="numeric" placeholder="0" value="${escapeHtml(m.scoreA)}"></div>
+        </div>
 
-          <div class="slot">
-            <select data-mid="${m.id}" data-slot="B">${teamOptions(m.bTeamId)}</select>
-            <div class="scoreBox"><input data-mid="${m.id}" data-score="B" inputmode="numeric" placeholder="0" value="${escapeHtml(m.scoreB)}"></div>
-          </div>
+        <div class="slot">
+        <select data-mid="${m.id}" data-slot="B">${teamOptions(m.bTeamId)}</select>
+        <div class="scoreBox"><input data-mid="${m.id}" data-score="B" inputmode="numeric" placeholder="0" value="${escapeHtml(m.scoreB)}"></div>
+        </div>
 
-          <div class="row">
-            <button class="btn" type="button" data-win="${m.id}" data-pick="A">Pick A Winner</button>
-            <button class="btn" type="button" data-win="${m.id}" data-pick="B">Pick B Winner</button>
-            <button class="btn primary" type="button" data-adv="${m.id}">Advance Winner →</button>
-          </div>
+        <div class="row">
+        <button class="btn" type="button" data-win="${m.id}" data-pick="A">Pick A Winner</button>
+        <button class="btn" type="button" data-win="${m.id}" data-pick="B">Pick B Winner</button>
+        <button class="btn primary" type="button" data-adv="${m.id}">Advance Winner →</button>
+        </div>
 
-          <div class="muted" style="margin-top:8px">Winner: <b>${escapeHtml(teamNameById(m.winnerTeamId) || "—")}</b></div>
+        <div class="muted" style="margin-top:8px">Winner: <b>${escapeHtml(teamNameById(m.winnerTeamId) || "—")}</b></div>
         `;
         col.appendChild(div);
-      });
+        });
 
-      area.appendChild(col);
-    }
+        area.appendChild(col);
+        }
 
-    // Wire match controls
-    area.querySelectorAll("select[data-mid]").forEach(sel => {
-      sel.onchange = () => {
+        // Wire match controls
+        area.querySelectorAll("select[data-mid]").forEach(sel => {
+        sel.onchange = () => {
         const mid = sel.getAttribute("data-mid");
         const slot = sel.getAttribute("data-slot");
         const match = state.matches.find(x => x.id === mid);
@@ -936,16 +953,16 @@ NOTE: Firebase Auth user still exists (client-side cannot delete Auth users). If
         if(slot === "B") match.bTeamId = sel.value;
 
         if(match.winnerTeamId && match.winnerTeamId !== match.aTeamId && match.winnerTeamId !== match.bTeamId){
-          match.winnerTeamId = "";
+        match.winnerTeamId = "";
         }
 
         saveState();
         renderBracket();
-      };
-    });
+        };
+        });
 
-    area.querySelectorAll("input[data-mid][data-score]").forEach(inp => {
-      inp.oninput = () => {
+        area.querySelectorAll("input[data-mid][data-score]").forEach(inp => {
+        inp.oninput = () => {
         const mid = inp.getAttribute("data-mid");
         const which = inp.getAttribute("data-score");
         const match = state.matches.find(x => x.id === mid);
@@ -958,11 +975,11 @@ NOTE: Firebase Auth user still exists (client-side cannot delete Auth users). If
         if(which === "B") match.scoreB = v;
 
         saveState();
-      };
-    });
+        };
+        });
 
-    area.querySelectorAll("button[data-win]").forEach(btn => {
-      btn.onclick = () => {
+        area.querySelectorAll("button[data-win]").forEach(btn => {
+        btn.onclick = () => {
         const mid = btn.getAttribute("data-win");
         const pick = btn.getAttribute("data-pick");
         const match = state.matches.find(x => x.id === mid);
@@ -974,29 +991,25 @@ NOTE: Firebase Auth user still exists (client-side cannot delete Auth users). If
 
         saveState();
         renderBracket();
-      };
-    });
+        };
+        });
 
-    area.querySelectorAll("button[data-adv]").forEach(btn => {
-      btn.onclick = () => advanceWinner(btn.getAttribute("data-adv"));
-    });
-  }
+        area.querySelectorAll("button[data-adv]").forEach(btn => {
+        btn.onclick = () => advanceWinner(btn.getAttribute("data-adv"));
+        });
+        }
 
-  $("buildBracketBtn").onclick = () => {
-    const size = Number($("bracketSize").value);
-    if(![8,16].includes(size)) return alert("Choose 8 or 16.");
-    buildBracket(size);
-  };
-  $("clearScoresBtn").onclick = clearScores;
-  $("clearBracketBtn").onclick = clearBracket;
-  $("advanceAllBtn").onclick = advanceAll;.onclick = () => {
-    const size = Number($("bracketSize").value);
-    if(![8,16].includes(size)) return alert("Choose 8 or 16.");
-    buildBracket(size);
-  };
-  $("clearScoresBtn").onclick = clearScores;
-  $("clearBracketBtn").onclick = clearBracket;
-  $("advanceAllBtn").onclick = advanceAll;
-</script>
+        $("buildBracketBtn").onclick = () => {
+        const size = Number($("bracketSize").value);
+        if(![8,16].includes(size)) return alert("Choose 8 or 16.");
+        buildBracket(size);
+        };
+        $("clearScoresBtn").onclick = clearScores;
+        $("clearBracketBtn").onclick = clearBracket;
+        $("advanceAllBtn").onclick = advanceAll;
+
+        // Init
+        applyUI();
+    </script>
 </body>
 </html>
