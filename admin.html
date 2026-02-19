@@ -122,7 +122,31 @@
           </div>
 
           <div class="row" style="margin-top:12px">
-            <button id="seedTournamentBtn" class="btn primary" type="button">Create tournament/state (empty)</button>
+            // Create tournament doc ONLY if it doesn't exist (safe)
+$("seedTournamentBtn").onclick = async () => {
+  $("tourMsg").textContent = "";
+  try {
+    const ref = doc(db, "tournament", "state");
+    const snap = await getDoc(ref);
+
+    if (snap.exists()) {
+      $("tourMsg").textContent = "tournament/state already exists — not touching your data.";
+      return;
+    }
+
+    await setDoc(ref, {
+      teams: [],
+      rosters: {},
+      matches: [],
+      bracketSize: 8,
+      updatedAt: serverTimestamp()
+    });
+
+    $("tourMsg").textContent = "Created tournament/state (fresh).";
+  } catch (e) {
+    $("tourMsg").textContent = "Failed: " + niceErr(e);
+  }
+};
           </div>
 
           <div class="muted" id="tourMsg" style="margin-top:10px"></div>
