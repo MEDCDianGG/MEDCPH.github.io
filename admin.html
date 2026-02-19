@@ -50,6 +50,8 @@
   </style>
 </head>
 <body>
+  <div id="debugBox" style="position:fixed;bottom:12px;right:12px;max-width:520px;z-index:99999;background:rgba(0,0,0,.85);border:1px solid rgba(255,255,255,.15);border-radius:14px;padding:10px 12px;font:12px/1.4 system-ui,Segoe UI,Arial;color:#eaeaea;display:none;white-space:pre-wrap;"></div>
+
 <header>
   <div class="wrap bar">
     <div class="brand">
@@ -189,48 +191,76 @@
 
           <p class="muted" style="margin:10px 0 14px">
             Assign teams to slots, set scores, pick winners, advance winners.
-          </p>
+     <script type="module">
+  // ===== Debug helpers (shows errors on-screen) =====
+  const debugBox = document.getElementById("debugBox");
+  function debug(msg){
+    try{
+      debugBox.style.display = "block";
+      debugBox.textContent += (debugBox.textContent ? "\n" : "") + msg;
+    }catch(_){}
+    console.log("[MEDC]", msg);
+  }
+  window.addEventListener("error", (e)=> debug("JS Error: " + (e?.message || e)));
+  window.addEventListener("unhandledrejection", (e)=> debug("Promise Rejection: " + (e?.reason?.message || e?.reason || e)));
 
-          <div id="bracketArea" class="bracketGrid"></div>
+  // Quick click-test: if you see this message, handlers are attached.
+  const _lb = document.getElementById("loginBtn");
+  const _rb = document.getElementById("registerBtn");
+  if(_lb) _lb.addEventListener("click", ()=> debug("Login clicked (handler attached)."));
+  if(_rb) _rb.addEventListener("click", ()=> debug("Register clicked (handler attached)."));
 
-          <div class="row" style="margin-top:12px">
-            <button id="advanceAllBtn" class="btn" type="button">Auto-Advance Winners</button>
-          </div>
-        </div>
-      </div>
+  // ===== Load Firebase SDK dynamically so we can catch errors =====
+  let initializeApp, getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut;
+  let getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, getDocs, query, where, serverTimestamp;
+  try{
+    ({ initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js"));
+    ({ getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } =
+      await import("https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js"));
+    ({ getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, getDocs, query, where, serverTimestamp } =
+      await import("https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js"));
+    debug("Firebase SDK loaded.");
+  }catch(e){
+    debug("FAILED to load Firebase SDK. This is usually:
+- blocked CDN
+- bad internet / adblock
+- CSP issue
 
-    </div>
-  </section>
-</div>
-
-<script type="module">
-
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-import {
-  getAuth, onAuthStateChanged,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signOut
-} from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
-
-import {
-  getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc,
-  collection, getDocs, serverTimestamp
-} from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+Error: " + (e?.message || e));
+    // Stop running the app
+    throw e;
+  }
 
 
-/* 🔥 YOUR FIREBASE CONFIG */
-const firebaseConfig = {
-  apiKey: "AIzaSyDZAVhuz9SVBHSCPnEvoxwCjaMrZSQOJ6k",
-  authDomain: "medcesport.firebaseapp.com",
-  projectId: "medcesport",
-  storageBucket: "medcesport.firebasestorage.app",
-  messagingSenderId: "7933255333",
-  appId: "1:7933255333:web:cfe776ebb79f607cdd774c",
-  measurementId: "G-07Z2TFM553"
-};
+  // Firebase (CDN modules) — works on GitHub Pages
+    getAuth, onAuthStateChanged,
+    createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut
+  } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+    getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc,
+    collection, getDocs, serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+
+  // ✅ Your Firebase config
+  const firebaseConfig = {
+    apiKey: "AIzaSyDZAVhuz9SVBHSCPnEvoxwCjaMrZSQOJ6k",
+    authDomain: "medcesport.firebaseapp.com",
+    projectId: "medcesport",
+    storageBucket: "medcesport.firebasestorage.app",
+    messagingSenderId: "7933255333",
+    appId: "1:7933255333:web:cfe776ebb79f607cdd774c",
+    measurementId: "G-07Z2TFM553"
+  };
+
+  // ✅ IMPORTANT:
+  // 1) Create the owner user (xtdian) by registering once on this page.
+  // 2) Go to Firebase Console → Authentication → Users → copy the UID of xtdian.
+  // 3) Paste that UID below AND in Firestore Rules (OWNER_UID).
   const OWNER_UID = "bXZ3bSYPakQXEJGwtmkJjctD6Os1";
+
   
+  // OPTIONAL (recommended): Cloud Function / server endpoint to delete Firebase Auth users.
+  // If you leave this as an empty string, "Delete" will only remove the Firestore users/{uid} profile.
+  // Example (callable HTTPS): https://us-central1-YOUR_PROJECT.cloudfunctions.net/deleteUser
   const DELETE_USER_ENDPOINT = "";
 const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
@@ -257,7 +287,7 @@ const app = initializeApp(firebaseConfig);
     rosters: {} // rosters[teamId] = { captain:"", players:[] }
   };
 
-  let state = clone(defaultState);
+  let state = structuredClone(defaultState);
 
   function normalizeRosters(s){
     if(!s.rosters) s.rosters = {};
@@ -279,7 +309,7 @@ const app = initializeApp(firebaseConfig);
 
   async function loadStateFromDB(){
     const snap = await getDoc(doc(db, "tournament", "state"));
-    state = snap.exists() ? snap.data() : clone(defaultState);
+    state = snap.exists() ? snap.data() : structuredClone(defaultState);
     // Ensure required fields
     if(!state.teams) state.teams = [];
     if(!state.matches) state.matches = [];
@@ -537,7 +567,8 @@ User: ${label}`)) return;
 
           if(!res.ok){
             const t = await res.text().catch(()=> "");
-            alert("Deleted Firestore profile, but server Auth delete failed:\n" + (t || res.statusText));
+            alert("Deleted Firestore profile, but server Auth delete failed:
+" + (t || res.statusText));
           }
         }catch(e){
           console.error(e);
@@ -952,6 +983,13 @@ NOTE: Firebase Auth user still exists (client-side cannot delete Auth users). If
   }
 
   $("buildBracketBtn").onclick = () => {
+    const size = Number($("bracketSize").value);
+    if(![8,16].includes(size)) return alert("Choose 8 or 16.");
+    buildBracket(size);
+  };
+  $("clearScoresBtn").onclick = clearScores;
+  $("clearBracketBtn").onclick = clearBracket;
+  $("advanceAllBtn").onclick = advanceAll;.onclick = () => {
     const size = Number($("bracketSize").value);
     if(![8,16].includes(size)) return alert("Choose 8 or 16.");
     buildBracket(size);
