@@ -6,6 +6,21 @@
   <title>MEDC Invitational - Home</title>
   <meta name="description" content="MEDC Invitational Esports Tournament - built by the community, for the community. Compete, improve, and grow together." />
   <style>
+    /* ===== HERO LOGO SIZE ===== */
+.heroLogo{
+  width:100%;
+  max-width:520px;   /* 🔥 adjust this number */
+  height:auto;
+  display:block;
+  margin:0 auto;
+}
+
+/* smaller on mobile */
+@media (max-width:768px){
+  .heroLogo{
+    max-width:320px;
+  }
+}
     :root{
       --bg:#070A12;
       --panel:#0D1223;
@@ -445,6 +460,18 @@
       .footGrid{ grid-template-columns: 1fr; }
       .links{ justify-content:flex-start; }
     }
+    body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:-1;
+  background:
+    linear-gradient(180deg, rgba(5,7,19,.75), rgba(5,7,19,.9)),
+    url("COVER MEDC INV.png") center / cover no-repeat;
+  background-attachment: fixed;
+  opacity:.35;
+  will-change: transform;
+}
   </style>
 </head>
 <body>
@@ -452,7 +479,7 @@
     <div class="wrap topbar">
       <div class="brand">
         <div class="brandLogo">
-        <img src="MEDC INVITATIONAL LOGO.gif" alt="MEDC Invitational Logo">
+        <img src="MEDC INVITATIONAL LOGO.gif" class="heroLogo" alt="MEDC Invitational Logo">
         <div>
           <h1>MEDC Invitational</h1>
           <small>Road to Champions • Community Esports</small>
@@ -832,5 +859,15 @@
       history.replaceState(null, '', id);
     });
   </script>
+  <script>
+/* ===== Smooth Parallax Effect ===== */
+window.addEventListener("scroll", () => {
+  const scrolled = window.pageYOffset;
+  document.body.style.setProperty(
+    "--parallaxY",
+    scrolled * 0.3 + "px"
+  );
+});
+</script>
 </body>
 </html>
