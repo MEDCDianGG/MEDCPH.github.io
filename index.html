@@ -11,119 +11,29 @@
       --shadow:0 18px 60px rgba(0,0,0,.45); --r:18px;
       --blue:rgba(59,130,246,.22); --blueb:rgba(59,130,246,.35);
       --green:rgba(34,197,94,.16); --greenb:rgba(34,197,94,.35);
-      --glow: 0 0 0 rgba(0,0,0,0);
     }
-
     *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;
-      font-family:system-ui,Segoe UI,Arial;
-      background:
-        radial-gradient(1200px 600px at 10% 0%, rgba(59,130,246,.14), transparent 60%),
-        radial-gradient(900px 500px at 90% 10%, rgba(34,197,94,.10), transparent 60%),
-        radial-gradient(700px 380px at 50% 0%, rgba(168,85,247,.10), transparent 55%),
-        var(--bg);
-      color:var(--text);
-      overflow-x:hidden;
-    }
-
-    /* Smooth scrolling feel */
-    @media (prefers-reduced-motion: no-preference){
-      html{scroll-behavior:smooth}
-    }
-
-    header{
-      position:sticky;top:0;z-index:10;
-      background:rgba(7,10,18,.72);
-      backdrop-filter: blur(12px);
-      border-bottom:1px solid rgba(255,255,255,.10);
-    }
-
+    body{margin:0;font-family:system-ui,Segoe UI,Arial;background:var(--bg);color:var(--text)}
+    header{position:sticky;top:0;z-index:10;background:rgba(7,10,18,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
     .wrap{max-width:1200px;margin:0 auto;padding:18px}
     .bar{display:flex;align-items:center;justify-content:space-between;gap:12px}
     .brand{display:flex;align-items:center;gap:12px;font-weight:900}
-    .pill{
-      display:inline-flex;gap:8px;align-items:center;
-      padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.12);
-      background:rgba(255,255,255,.04);
-      font-size:12px;color:var(--muted);
-      box-shadow: 0 10px 30px rgba(0,0,0,.20);
-    }
-
-    /* Cards: modern glass + interactive */
-    .card{
-      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
-      border:1px solid rgba(255,255,255,.12);
-      border-radius:var(--r);
-      box-shadow: var(--shadow);
-      overflow:hidden;
-      transform-style:preserve-3d;
-      will-change: transform;
-      position:relative;
-    }
-    .card::before{
-      content:"";
-      position:absolute; inset:-2px;
-      background:
-        radial-gradient(500px 220px at var(--mx, 50%) var(--my, 20%), rgba(255,255,255,.10), transparent 60%),
-        radial-gradient(420px 200px at 20% 10%, rgba(59,130,246,.14), transparent 65%),
-        radial-gradient(420px 240px at 90% 20%, rgba(34,197,94,.10), transparent 65%);
-      opacity:.55;
-      pointer-events:none;
-      transform: translateZ(20px);
-    }
-    .cardPad{padding:16px; position:relative; z-index:1}
-
+    .pill{display:inline-flex;gap:8px;align-items:center;padding:6px 10px;border-radius:999px;border:1px solid var(--line);
+      background:rgba(255,255,255,.04);font-size:12px;color:var(--muted)}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden}
+    .cardPad{padding:16px}
     .grid2{display:grid;grid-template-columns:420px 1fr;gap:14px}
     @media(max-width:980px){.grid2{grid-template-columns:1fr}}
     .muted{color:var(--muted)}
     .list{display:flex;flex-direction:column;gap:10px}
-
-    .item{
-      padding:12px;border-radius:16px;border:1px solid rgba(255,255,255,.10);
-      background:rgba(0,0,0,.20);
-      position:relative;
-      overflow:hidden;
-    }
-    .item::after{
-      content:"";
-      position:absolute; inset:-2px;
-      background: radial-gradient(280px 120px at var(--mx, 50%) var(--my, 30%), rgba(255,255,255,.08), transparent 60%);
-      opacity:.45;
-      pointer-events:none;
-      transition: opacity .25s ease;
-    }
-    .item:hover::after{opacity:.75}
-
+    .item{padding:12px;border-radius:16px;border:1px solid var(--line);background:rgba(0,0,0,.20)}
     .itemTop{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
-
     .bracketGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;align-items:start}
     @media(max-width:1100px){.bracketGrid{grid-template-columns:repeat(2,1fr)}}
     @media(max-width:600px){.bracketGrid{grid-template-columns:1fr}}
-
-    .match{
-      padding:12px;border-radius:16px;border:1px solid rgba(255,255,255,.10);
-      background:rgba(0,0,0,.22);
-      position:relative;
-      overflow:hidden;
-    }
-    .match::before{
-      content:"";
-      position:absolute; inset:-2px;
-      background: radial-gradient(320px 140px at var(--mx, 40%) var(--my, 20%), rgba(59,130,246,.14), transparent 60%);
-      opacity:.45;
-      pointer-events:none;
-    }
-
-    .slot{
-      display:flex;justify-content:space-between;align-items:center;gap:10px;
-      padding:8px 10px;border-radius:12px;
-      background:rgba(255,255,255,.05);
-      border:1px solid rgba(255,255,255,.06);
-      margin-bottom:8px;
-    }
-
+    .match{padding:12px;border-radius:16px;border:1px solid var(--line);background:rgba(0,0,0,.22)}
+    .slot{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 10px;border-radius:12px;
+      background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.06);margin-bottom:8px}
     #dbg{
       position:fixed; right:14px; bottom:14px; z-index:9999;
       max-width:520px; padding:10px 12px; border-radius:14px;
@@ -132,16 +42,12 @@
       font-size:12px; color:rgba(234,240,255,.9); white-space:pre-wrap
     }
     #dbg.hide{display:none}
-
-    /* --- Logo + Cover --- */
-    .brandLogo{
-      width:46px;height:46px;border-radius:14px;
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(255,255,255,.04);
-      overflow:hidden;
-      box-shadow: 0 18px 50px rgba(0,0,0,.35);
-    }
+  
+    /* --- Logo + Cover (from your old design) --- */
+    .brandLogo{width:46px;height:46px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.04);overflow:hidden}
     .brandLogo img{width:100%;height:100%;object-fit:cover}
+    .coverCardImg{width:100%;display:block}
+
 
     /* ===========================
        PARALLAX HERO (Cover)
@@ -151,24 +57,21 @@
       border-radius:16px;
       overflow:hidden;
       border:1px solid rgba(255,255,255,.12);
-      height: 320px;
+      height: 340px;
       isolation:isolate;
     }
     @media(max-width:600px){ .hero{height:260px} }
 
-    /* Background image layer (parallax) */
     .heroBg{
-      position:absolute; inset:-30px;
+      position:absolute; inset:-40px;
       background-image: var(--hero-img);
       background-size: cover;
       background-position: center;
       filter: saturate(1.05) contrast(1.05);
-      transform: translate3d(0, var(--pY, 0px), 0) scale(1.06);
+      transform: translate3d(var(--pX, 0px), var(--pY, 0px), 0) scale(1.10);
       will-change: transform;
       z-index:0;
     }
-
-    /* Extra depth layers */
     .heroGlow{
       position:absolute; inset:-2px;
       background:
@@ -176,14 +79,12 @@
         radial-gradient(700px 320px at 85% 30%, rgba(34,197,94,.16), transparent 60%),
         radial-gradient(900px 420px at 50% 0%, rgba(168,85,247,.16), transparent 55%);
       mix-blend-mode: screen;
-      opacity:.65;
+      opacity:.70;
       z-index:1;
-      transform: translate3d(0, calc(var(--pY, 0px) * .35), 0);
+      transform: translate3d(calc(var(--pX, 0px) * .35), calc(var(--pY, 0px) * .35), 0);
       will-change: transform;
       pointer-events:none;
     }
-
-    /* Subtle starfield (parallax faster) */
     .heroStars{
       position:absolute; inset:-10px;
       background-image:
@@ -193,14 +94,12 @@
         radial-gradient(2px 2px at 82% 62%, rgba(255,255,255,.22) 40%, transparent 41%),
         radial-gradient(1.5px 1.5px at 55% 18%, rgba(255,255,255,.14) 40%, transparent 41%),
         radial-gradient(1.5px 1.5px at 8% 82%, rgba(255,255,255,.12) 40%, transparent 41%);
-      opacity:.7;
+      opacity:.75;
       z-index:2;
-      transform: translate3d(0, calc(var(--pY, 0px) * .55), 0);
+      transform: translate3d(calc(var(--pX, 0px) * .55), calc(var(--pY, 0px) * .55), 0);
       will-change: transform;
       pointer-events:none;
     }
-
-    /* Vignette + glass */
     .heroVignette{
       position:absolute; inset:0;
       background:
@@ -209,17 +108,12 @@
       z-index:3;
       pointer-events:none;
     }
-
     .heroContent{
       position:absolute; inset:0;
       display:flex;
       align-items:flex-end;
       padding:18px;
       z-index:4;
-    }
-    .heroBadge{
-      display:flex; flex-wrap:wrap; gap:10px;
-      align-items:center;
     }
     .heroTitle{
       font-weight:950;
@@ -241,18 +135,8 @@
       align-items:center;
     }
 
-    /* Smooth entrance */
-    .fadeUp{
-      opacity:0;
-      transform: translateY(10px);
-      animation: fadeUp .7s ease forwards;
-    }
-    @keyframes fadeUp{
-      to{opacity:1; transform: translateY(0)}
-    }
-  </style>
+</style>
 </head>
-
 <body>
 <header>
   <div class="wrap bar">
@@ -274,18 +158,11 @@
 
 <div class="wrap">
 
-  <!-- PARALLAX COVER -->
   <div class="card" style="margin-bottom:14px">
     <div class="cardPad">
-      <div class="muted">Cover</div>
+      <div class="muted"></div>
 
-      <!-- Hero uses your cover image. Change file name if needed -->
-      <div
-        class="hero fadeUp"
-        id="hero"
-        style="margin-top:10px; --hero-img: url('COVER MEDC INV.png');"
-        aria-label="MEDC Invitational Cover"
-      >
+      <div class="hero" id="hero" style="margin-top:10px; --hero-img: url('COVER MEDC INV.png');">
         <div class="heroBg" aria-hidden="true"></div>
         <div class="heroGlow" aria-hidden="true"></div>
         <div class="heroStars" aria-hidden="true"></div>
@@ -295,9 +172,7 @@
           <div>
             <h1 class="heroTitle">MEDC INVITATIONAL</h1>
             <div class="heroSub">Road to Champions • Live bracket updates</div>
-            <div class="heroBadge" style="margin-top:10px">
-              <span class="pill" id="metaPill">Loading…</span>
-            </div>
+            <div class="pill" id="metaPill" style="margin-top:10px">Point Blank Zepetto</div>
           </div>
 
           <div class="heroRight">
@@ -306,15 +181,12 @@
           </div>
         </div>
       </div>
-
-      <!-- Keep this hidden image if you still want it for fallback (optional) -->
-      <!-- <img src="COVER MEDC INV.png" alt="MEDC Invitational Cover" class="coverCardImg" style="display:none"> -->
     </div>
   </div>
 
   <div class="grid2">
     <!-- LEFT: TEAMS + ROSTERS -->
-    <div class="card tilt">
+    <div class="card">
       <div class="cardPad">
         <div class="itemTop">
           <div>
@@ -337,7 +209,7 @@
     </div>
 
     <!-- RIGHT: BRACKET -->
-    <div class="card tilt">
+    <div class="card">
       <div class="cardPad">
         <div class="itemTop">
           <div>
@@ -356,7 +228,10 @@
 <script type="module">
   /**********************
    * MEDC Public Page (Read-only)
-   * Connects to: tournament/state
+   * Connects to the SAME Firestore doc used by admin:
+   *   tournament/state
+   *
+   * ✅ Paste your Firebase web config below.
    **********************/
   const dbgEl = document.getElementById("dbg");
   const dbg = (msg) => { dbgEl.classList.remove("hide"); dbgEl.textContent = msg; };
@@ -365,15 +240,15 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
   import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
-  const firebaseConfig = {
-    "apiKey": "AIzaSyDZAVhuz9SVBHSCPnEvoxwCjaMrZSQOJ6k",
-    "authDomain": "medcesport.firebaseapp.com",
-    "projectId": "medcesport",
-    "storageBucket": "medcesport.firebasestorage.app",
-    "messagingSenderId": "7933255333",
-    "appId": "1:7933255333:web:cfe776ebb79f607cdd774c",
-    "measurementId": "G-07Z2TFM553"
-  };
+	  const firebaseConfig = {
+	  "apiKey": "AIzaSyDZAVhuz9SVBHSCPnEvoxwCjaMrZSQOJ6k",
+	  "authDomain": "medcesport.firebaseapp.com",
+	  "projectId": "medcesport",
+	  "storageBucket": "medcesport.firebasestorage.app",
+	  "messagingSenderId": "7933255333",
+	  "appId": "1:7933255333:web:cfe776ebb79f607cdd774c",
+	  "measurementId": "G-07Z2TFM553"
+	};
 
   // UI helpers
   const $ = (id) => document.getElementById(id);
@@ -485,87 +360,48 @@
     }
   }
 
+
   // ===========================
-  // Parallax + Card hover tilt
+  // Parallax (strong + visible)
   // ===========================
   const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  function setPointerVars(el, x, y){
-    const r = el.getBoundingClientRect();
-    const mx = ((x - r.left) / r.width) * 100;
-    const my = ((y - r.top) / r.height) * 100;
-    el.style.setProperty("--mx", mx.toFixed(2) + "%");
-    el.style.setProperty("--my", my.toFixed(2) + "%");
-  }
-
-  // Hover highlight on items/matches/cards
-  document.addEventListener("pointermove", (e) => {
-    const target = e.target.closest(".card, .item, .match");
-    if(!target) return;
-    setPointerVars(target, e.clientX, e.clientY);
-  }, {passive:true});
-
-  // Scroll parallax on hero
   const hero = document.getElementById("hero");
-  function updateHeroParallax(){
-    if(!hero || prefersReduced) return;
-    const r = hero.getBoundingClientRect();
-    const vh = window.innerHeight || 800;
-    const inView = r.bottom > 0 && r.top < vh;
-    if(!inView) return;
+  if(hero && !prefersReduced){
+    let mouseX = 0, mouseY = 0;
 
-    // progress from -1 (above) to +1 (below)
-    const mid = r.top + r.height/2;
-    const p = (mid - vh/2) / (vh/2);
-    const clamped = Math.max(-1, Math.min(1, p));
-    const y = clamped * 18; // px
-    hero.style.setProperty("--pY", (y).toFixed(2) + "px");
-  }
+    hero.addEventListener("pointermove", (e) => {
+      const r = hero.getBoundingClientRect();
+      mouseX = (e.clientX - (r.left + r.width/2)) / r.width;   // approx -0.5..0.5
+      mouseY = (e.clientY - (r.top + r.height/2)) / r.height;  // approx -0.5..0.5
+    }, {passive:true});
 
-  // Card tilt on mouse move (subtle)
-  function attachTilt(card){
-    if(!card || prefersReduced) return;
-    let raf = 0;
-    function onMove(e){
-      const r = card.getBoundingClientRect();
-      const cx = r.left + r.width/2;
-      const cy = r.top + r.height/2;
-      const dx = (e.clientX - cx) / r.width;
-      const dy = (e.clientY - cy) / r.height;
+    hero.addEventListener("pointerleave", () => { mouseX = 0; mouseY = 0; }, {passive:true});
 
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(() => {
-        const rx = (-dy * 4).toFixed(2);
-        const ry = ( dx * 6).toFixed(2);
-        card.style.transform = `perspective(900px) rotateX(${rx}deg) rotateY(${ry}deg) translateZ(0)`;
-      });
+    function update(){
+      const docY = window.scrollY || document.documentElement.scrollTop || 0;
+
+      // Where hero sits in the document
+      const rect = hero.getBoundingClientRect();
+      const heroTop = docY + rect.top;
+
+      // Parallax from scroll (stronger so you can SEE it)
+      let y = (docY - heroTop) * 0.20;
+      y = Math.max(-70, Math.min(70, y));
+
+      // Add mouse parallax so it moves even if you barely scroll
+      const mx = mouseX * 22;
+      const my = mouseY * 34;
+
+      hero.style.setProperty("--pX", mx.toFixed(2) + "px");
+      hero.style.setProperty("--pY", (y + my).toFixed(2) + "px");
+
+      requestAnimationFrame(update);
     }
-    function onLeave(){
-      card.style.transform = "perspective(900px) rotateX(0deg) rotateY(0deg)";
-    }
-    card.addEventListener("pointermove", onMove, {passive:true});
-    card.addEventListener("pointerleave", onLeave, {passive:true});
+    requestAnimationFrame(update);
   }
 
-  document.querySelectorAll(".card.tilt").forEach(attachTilt);
 
-  let ticking = false;
-  function onScroll(){
-    if(prefersReduced) return;
-    if(ticking) return;
-    ticking = true;
-    requestAnimationFrame(() => {
-      updateHeroParallax();
-      ticking = false;
-    });
-  }
-  window.addEventListener("scroll", onScroll, {passive:true});
-  window.addEventListener("resize", onScroll, {passive:true});
-  updateHeroParallax();
-
-  // ===========================
-  // Firestore
-  // ===========================
   try{
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
@@ -573,12 +409,10 @@
     $("livePill").textContent = "Live: Connecting…";
     const heroConn = document.getElementById("heroConn"); if(heroConn) heroConn.textContent = "Connecting…";
     const meta = document.getElementById("metaPill"); if(meta) meta.textContent = "Connecting…";
-
     onSnapshot(doc(db, "tournament", "state"), (snap) => {
       dbgOff();
       if(!snap.exists()){
         $("livePill").textContent = "Live: No data";
-        const heroConn = document.getElementById("heroConn"); if(heroConn) heroConn.textContent = "No data";
         const meta = document.getElementById("metaPill"); if(meta) meta.textContent = "No data yet";
         render({ teams:[], matches:[], bracketSize:8, rosters:{} });
         return;
@@ -586,14 +420,12 @@
       render(snap.data() || {});
     }, (e) => {
       $("livePill").textContent = "Live: Error";
-      const heroConn = document.getElementById("heroConn"); if(heroConn) heroConn.textContent = "Error";
       const meta = document.getElementById("metaPill"); if(meta) meta.textContent = "Error";
       dbg("Firestore error: " + (e?.code ? e.code + ": " : "") + (e?.message || String(e)));
     });
   }catch(e){
     $("livePill").textContent = "Live: Error";
-    const heroConn = document.getElementById("heroConn"); if(heroConn) heroConn.textContent = "Error";
-    const meta = document.getElementById("metaPill"); if(meta) meta.textContent = "Error";
+      const meta = document.getElementById("metaPill"); if(meta) meta.textContent = "Error";
     dbg("Init error: " + (e?.message || String(e)));
   }
 </script>
