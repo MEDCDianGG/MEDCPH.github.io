@@ -1,131 +1,240 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>MEDC Invitational — Tournament</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>MEDC Invitational — Tournament</title>
+  <style>
+    :root{
+      --bg:#070A12; --card:rgba(255,255,255,.04); --line:rgba(255,255,255,.10);
+      --text:#EAF0FF; --muted:rgba(234,240,255,.75);
+      --shadow:0 18px 60px rgba(0,0,0,.45); --r:18px;
+      --blue:rgba(59,130,246,.22); --blueb:rgba(59,130,246,.35);
+      --green:rgba(34,197,94,.16); --greenb:rgba(34,197,94,.35);
+      --parY: 0px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:system-ui,Segoe UI,Arial;
+      background:var(--bg);
+      color:var(--text);
+      min-height:100vh;
+    }
 
-<style>
-:root{
-  --bg:#070A12;
-  --text:#EAF0FF;
-}
-body{
-  margin:0;
-  font-family:system-ui,Segoe UI,Arial;
-  background:var(--bg);
-  color:var(--text);
-}
+    /* --- Parallax background (MEDC INV VER 2.png) --- */
+    body::before{
+      content:"";
+      position:fixed;
+      inset:-6vh 0 -6vh 0;
+      z-index:-2;
+      background:
+        radial-gradient(1200px 700px at 12% 10%, rgba(59,130,246,.22), transparent 55%),
+        radial-gradient(1100px 650px at 88% 22%, rgba(34,197,94,.14), transparent 55%),
+        url("MEDC INV VER 2.png");
+      background-size: auto, auto, cover;
+      background-position: center, center, center;
+      background-repeat:no-repeat;
+      transform: translate3d(0, calc(var(--parY) * -1), 0);
+      filter: saturate(1.05) contrast(1.02);
+      opacity:.24;
+      will-change: transform;
+    }
+    body::after{
+      content:"";
+      position:fixed;
+      inset:0;
+      z-index:-1;
+      background: linear-gradient(180deg, rgba(7,10,18,.92), rgba(7,10,18,.78) 40%, rgba(7,10,18,.92));
+      pointer-events:none;
+    }
 
-/* ===== HEADER (same as bracket) ===== */
+    header{
+      position:sticky;top:0;z-index:10;
+      background:rgba(7,10,18,.86);
+      backdrop-filter:blur(10px);
+      border-bottom:1px solid var(--line)
+    }
+    .wrap{max-width:1200px;margin:0 auto;padding:18px}
+    .bar{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .brand{display:flex;align-items:center;gap:12px;font-weight:900}
+    .pill{
+      display:inline-flex;gap:8px;align-items:center;padding:6px 10px;border-radius:999px;border:1px solid var(--line);
+      background:rgba(255,255,255,.04);font-size:12px;color:var(--muted)
+    }
+    .card{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:0 18px 60px rgba(0,0,0,.45);overflow:hidden}
+    .cardPad{padding:16px}
+    .muted{color:var(--muted)}
+    .list{display:flex;flex-direction:column;gap:10px}
+    .item{padding:12px;border-radius:16px;border:1px solid var(--line);background:rgba(0,0,0,.20)}
+    .itemTop{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+    .bracketGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;align-items:start}
+    @media(max-width:1100px){.bracketGrid{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:600px){.bracketGrid{grid-template-columns:1fr}}
+    .match{padding:12px;border-radius:16px;border:1px solid var(--line);background:rgba(0,0,0,.22)}
+    .slot{
+      display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 10px;border-radius:12px;
+      background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.06);margin-bottom:8px
+    }
+
+    /* --- Logo + Cover --- */
+    .brandLogo{width:46px;height:46px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.04);overflow:hidden}
+    .brandLogo img{width:100%;height:100%;object-fit:cover}
+    .coverCardImg{width:100%;display:block}
+
+    /* Timeline (format overview) */
+    .sectionTitle{margin:0 0 12px 0}
+    .sectionTitle h3{margin:0}
+    .timeline{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+      gap:14px;
+      margin-top:14px;
+    }
+    .step{
+      padding:16px;
+      border-radius:18px;
+      border:1px solid var(--line);
+      background:rgba(0,0,0,.25);
+    }
+    .stepHeader{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      margin-bottom:8px;
+    }
+
+    #dbg{
+      position:fixed; right:14px; bottom:14px; z-index:9999;
+      max-width:520px; padding:10px 12px; border-radius:14px;
+      background:rgba(0,0,0,.55); border:1px solid rgba(255,255,255,.14);
+      box-shadow:0 18px 60px rgba(0,0,0,.45);
+      font-size:12px; color:rgba(234,240,255,.9); white-space:pre-wrap
+    }
+    #dbg.hide{display:none}
+
+/* ===== TOP NAV (match bracket/index style) ===== */
 header{
   position:sticky; top:0; z-index:50;
   backdrop-filter: blur(14px);
   background: rgba(7,10,18,.62);
   border-bottom: 1px solid rgba(255,255,255,.08);
 }
-
-.navWrap{
-  width:min(1180px, 92vw);
-  margin:auto;
-}
-
+.navWrap{ width:min(1180px, 92vw); margin-inline:auto; }
 .topbar{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
+  display:flex; align-items:center; justify-content:space-between;
   padding:14px 0;
   gap:14px;
 }
-
 .brand{
-  display:flex;
-  align-items:center;
-  gap:12px;
+  display:flex; align-items:center; gap:12px;
+  min-width: 220px;
 }
-
+.brandText h1{
+  font-size:14px; letter-spacing:.18em;
+  text-transform:uppercase;
+  margin:0;
+  color:rgba(234,240,255,.92);
+  line-height:1.15;
+}
+.brandText small{
+  display:block;
+  margin-top:3px;
+  font-size:12px;
+  letter-spacing:.02em;
+  color: rgba(183,195,230,.85);
+  text-transform:none;
+}
 .headerLogo{
   width:44px;
+  height:auto;
+  object-fit:contain;
+  display:block;
+  filter: drop-shadow(0 10px 28px rgba(0,0,0,.45));
 }
-
-.brandText h1{
-  font-size:14px;
-  margin:0;
-  text-transform:uppercase;
-  letter-spacing:.18em;
-}
-
-.brandText small{
-  font-size:12px;
-  color:rgba(183,195,230,.85);
-}
-
-nav{
-  display:flex;
-  gap:10px;
-  flex:1;
+nav[aria-label="Primary navigation"]{
+  display:flex; align-items:center; gap:10px;
+  flex-wrap:wrap;
   justify-content:center;
+  flex:1;
 }
-
 .navPill{
   padding:10px 12px;
-  border-radius:999px;
-  border:1px solid rgba(255,255,255,.10);
-  background:rgba(13,18,35,.65);
+  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(13,18,35,.65);
+  border-radius: 999px;
+  color: rgba(234,240,255,.92);
   font-size:13px;
-  color:white;
+  letter-spacing:.02em;
+  transition: transform .14s ease, background .14s ease, border-color .14s ease;
+  display:inline-flex; gap:8px; align-items:center;
   text-decoration:none;
 }
-
 .navPill:hover{
-  background:rgba(13,18,35,.85);
+  transform: translateY(-1px);
+  background: rgba(13,18,35,.85);
+  border-color: rgba(255,255,255,.18);
 }
-
+.navPill[aria-current="page"]{
+  border-color: rgba(255,255,255,.22);
+  box-shadow: 0 10px 35px rgba(0,0,0,.35);
+}
 .actions{
+  display:flex; align-items:center; gap:10px;
   margin-left:auto;
+  justify-content:flex-end;
 }
-
 .navBtn{
-  border:1px solid rgba(255,255,255,.10);
-  background:rgba(13,18,35,.65);
+  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(13,18,35,.65);
+  color: rgba(234,240,255,.95);
   padding:10px 14px;
-  border-radius:999px;
-  color:white;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size:13px;
+  letter-spacing:.02em;
+  transition: transform .14s ease, background .14s ease, border-color .14s ease, box-shadow .14s ease;
+  cursor:pointer;
+  display:inline-flex; align-items:center; gap:10px;
   text-decoration:none;
-  font-weight:700;
+}
+.navBtn:hover{
+  transform: translateY(-1px);
+  background: rgba(13,18,35,.85);
+  border-color: rgba(255,255,255,.20);
+  box-shadow: 0 14px 45px rgba(0,0,0,.45);
+}
+@media (max-width: 980px){
+  .brand{ min-width:auto; }
+  .actions{ min-width:auto; }
 }
 
-/* ===== PAGE ===== */
-.main{
-  padding:40px;
-  text-align:center;
-}
 </style>
 </head>
-
 <body>
 
 <header>
   <div class="navWrap topbar">
-
     <div class="brand">
-      <img src="MEDC INVITATIONAL LOGO.gif" class="headerLogo">
+      <img src="MEDC INVITATIONAL LOGO.gif" class="headerLogo" alt="MEDC Invitational Logo">
       <div class="brandText">
         <h1>MEDC Invitational</h1>
         <small>Public Tournament Site</small>
       </div>
     </div>
 
-    <nav>
+    <nav aria-label="Primary navigation">
       <a class="navPill" href="index.html">Home</a>
       <a class="navPill" href="tournament.html" aria-current="page">Tournament</a>
       <a class="navPill" href="bracket.html">Bracket</a>
     </nav>
 
     <div class="actions">
-      <a class="navBtn" href="admin.html">🔐 Admin</a>
+      <a class="navBtn" href="admin.html" title="Admin Login">
+        <span aria-hidden="true">🔐</span> Admin
+      </a>
     </div>
-
   </div>
 </header>
 
