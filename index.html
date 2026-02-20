@@ -524,9 +524,127 @@
   animation: introFadeUp 950ms cubic-bezier(.2,.8,.2,1) 120ms forwards;
 }
 
+
+/* ===== PERFECT COMBO EFFECTS ===== */
+
+/* Animated ambient gradient overlay */
+@keyframes ambientShift{
+  0%   { transform: translate3d(-2%, -2%, 0) scale(1.05) rotate(0deg); filter: hue-rotate(0deg); }
+  50%  { transform: translate3d(2%, 1%, 0) scale(1.08) rotate(0.5deg); filter: hue-rotate(18deg); }
+  100% { transform: translate3d(-2%, -2%, 0) scale(1.05) rotate(0deg); filter: hue-rotate(0deg); }
+}
+.bgAmbient{
+  position:fixed;
+  inset:-10vh -10vw;
+  z-index:-1;
+  pointer-events:none;
+  background:
+    radial-gradient(900px 520px at 18% 18%, rgba(255,196,70,.16), transparent 60%),
+    radial-gradient(980px 560px at 82% 22%, rgba(120,76,255,.14), transparent 62%),
+    radial-gradient(980px 700px at 40% 86%, rgba(59,130,246,.12), transparent 62%);
+  opacity:.95;
+  animation: ambientShift 14s ease-in-out infinite;
+}
+
+/* Cursor-follow spotlight */
+.cursorGlow{
+  position:fixed;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+  background: radial-gradient(260px 260px at var(--mx, 50%) var(--my, 30%),
+    rgba(255,190,70,.16), rgba(120,76,255,.10) 35%, rgba(0,0,0,0) 70%);
+  mix-blend-mode: screen;
+  opacity:.85;
+  transition: opacity 220ms ease;
+}
+@media (max-width: 768px){
+  .cursorGlow{ opacity:.45; }
+}
+
+/* Particles canvas */
+#particles{
+  position:fixed;
+  inset:0;
+  z-index:-1;
+  pointer-events:none;
+  opacity:.9;
+}
+
+/* Light beams behind hero logo */
+.heroBeams{
+  position:relative;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+.heroBeams::before{
+  content:"";
+  position:absolute;
+  width:min(820px, 92vw);
+  height:min(420px, 48vh);
+  border-radius:999px;
+  background:
+    conic-gradient(from 180deg,
+      rgba(255,200,80,.0),
+      rgba(255,200,80,.18),
+      rgba(120,76,255,.14),
+      rgba(255,200,80,.18),
+      rgba(255,200,80,.0));
+  filter: blur(10px);
+  opacity:.55;
+  transform: translateY(10px) rotate(0deg);
+  animation: beamsSpin 10s linear infinite;
+  z-index:-1;
+}
+@keyframes beamsSpin{
+  to{ transform: translateY(10px) rotate(360deg); }
+}
+.heroBeams::after{
+  content:"";
+  position:absolute;
+  width:min(700px, 84vw);
+  height:min(320px, 40vh);
+  border-radius:999px;
+  background: radial-gradient(circle at 50% 50%, rgba(255,200,80,.18), rgba(0,0,0,0) 62%);
+  filter: blur(18px);
+  opacity:.7;
+  z-index:-1;
+}
+
+/* Scroll reveal */
+.reveal{
+  opacity:0;
+  transform: translateY(18px);
+  filter: blur(6px);
+  transition: opacity 700ms cubic-bezier(.2,.8,.2,1),
+              transform 700ms cubic-bezier(.2,.8,.2,1),
+              filter 700ms cubic-bezier(.2,.8,.2,1);
+  will-change: opacity, transform, filter;
+}
+.reveal.isVisible{
+  opacity:1;
+  transform: translateY(0);
+  filter: blur(0);
+}
+
+/* Subtle hover lift on cards/buttons (if present) */
+.card, .pill{
+  transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
+}
+.card:hover{
+  transform: translateY(-2px);
+  border-color: rgba(255,255,255,.14);
+}
+
 </style>
 </head>
 <body>
+
+  <canvas id="particles"></canvas>
+  <div class="bgAmbient" aria-hidden="true"></div>
+  <div class="cursorGlow" aria-hidden="true"></div>
+
   <header>
     <div class="wrap topbar">
       <div class="brand">
@@ -559,7 +677,7 @@
     <div class="wrap hero" id="top">
       <div class="heroGrid">
         <article class="card">
-          <div class="cardInner">
+          <div class="cardInner reveal">
             <div class="kicker"><span class="dot" aria-hidden="true"></span> Season 1 • Road to Champions</div>
             <h2>Built by players. Powered by passion. Made for the community.</h2>
             <p>
@@ -857,8 +975,8 @@
 
         <div style="height:14px"></div>
 
-        <div class="card">
-          <div class="cardInner">
+        <div class="card reveal">
+          <div class="cardInner reveal">
             <div class="sectionTitle" style="margin:0 0 10px;">
               <h3 style="font-size:16px;">Ready to compete?</h3>
             </div>
@@ -928,6 +1046,124 @@ window.addEventListener("scroll", () => {
     document.querySelectorAll('.pageIntro').forEach(el => el.classList.add('isLoaded'));
     document.querySelectorAll('.heroLogo.intro').forEach(el => el.classList.add('isLoaded'));
   });
+</script>
+
+
+<script>
+(() => {
+  // ===== Cursor glow =====
+  const root = document.documentElement;
+  const glow = document.querySelector('.cursorGlow');
+  const setMouse = (x, y) => {
+    root.style.setProperty('--mx', x + 'px');
+    root.style.setProperty('--my', y + 'px');
+  };
+  window.addEventListener('pointermove', (e) => {
+    setMouse(e.clientX, e.clientY);
+    if(glow) glow.style.opacity = '0.90';
+  }, { passive:true });
+
+  window.addEventListener('pointerleave', () => {
+    if(glow) glow.style.opacity = '0.35';
+  });
+
+  // ===== Scroll reveal =====
+  const revealEls = Array.from(document.querySelectorAll('.reveal'));
+  const io = new IntersectionObserver((entries) => {
+    for(const en of entries){
+      if(en.isIntersecting) en.target.classList.add('isVisible');
+    }
+  }, { threshold: 0.12 });
+  revealEls.forEach(el => io.observe(el));
+
+  // ===== Particles =====
+  const canvas = document.getElementById('particles');
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d', { alpha:true });
+
+  const DPR = Math.min(2, window.devicePixelRatio || 1);
+  let W=0,H=0;
+  function resize(){
+    W = Math.max(1, window.innerWidth);
+    H = Math.max(1, window.innerHeight);
+    canvas.width = Math.floor(W * DPR);
+    canvas.height = Math.floor(H * DPR);
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+    ctx.setTransform(DPR,0,0,DPR,0,0);
+  }
+  window.addEventListener('resize', resize, { passive:true });
+  resize();
+
+  const rand = (a,b) => a + Math.random()*(b-a);
+  const colors = [
+    { r:255, g:200, b:90, a:0.65 },   // gold
+    { r:120, g:76,  b:255, a:0.55 },  // purple
+    { r:80,  g:160, b:255, a:0.45 }   // blue
+  ];
+
+  const count = Math.round((W*H)/35000); // adaptive, light
+  const P = Array.from({length: Math.max(24, Math.min(110, count))}, () => {
+    const c = colors[Math.floor(Math.random()*colors.length)];
+    return {
+      x: rand(0,W), y: rand(0,H),
+      vx: rand(-0.08, 0.08), vy: rand(-0.04, 0.10),
+      r: rand(1.1, 2.7),
+      c,
+      tw: rand(0, Math.PI*2)
+    };
+  });
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+
+    // soft vignette
+    const g = ctx.createRadialGradient(W*0.5, H*0.35, 0, W*0.5, H*0.5, Math.max(W,H)*0.8);
+    g.addColorStop(0, 'rgba(0,0,0,0)');
+    g.addColorStop(1, 'rgba(0,0,0,0.35)');
+    ctx.fillStyle = g;
+    ctx.fillRect(0,0,W,H);
+
+    // particles
+    for(const p of P){
+      p.tw += 0.02;
+      p.x += p.vx;
+      p.y += p.vy + Math.sin(p.tw)*0.03;
+
+      if(p.x < -20) p.x = W+20;
+      if(p.x > W+20) p.x = -20;
+      if(p.y < -20) p.y = H+20;
+      if(p.y > H+20) p.y = -20;
+
+      const a = p.c.a * (0.65 + 0.35*Math.sin(p.tw));
+      ctx.beginPath();
+      ctx.fillStyle = `rgba(${p.c.r},${p.c.g},${p.c.b},${a})`;
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+      ctx.fill();
+    }
+
+    // subtle connecting lines (nearby only)
+    for(let i=0;i<P.length;i++){
+      for(let j=i+1;j<P.length;j++){
+        const a = P[i], b = P[j];
+        const dx = a.x-b.x, dy = a.y-b.y;
+        const d2 = dx*dx+dy*dy;
+        if(d2 < 140*140){
+          const alpha = (1 - Math.sqrt(d2)/140) * 0.10;
+          ctx.strokeStyle = `rgba(255,255,255,${alpha})`;
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(a.x,a.y);
+          ctx.lineTo(b.x,b.y);
+          ctx.stroke();
+        }
+      }
+    }
+
+    requestAnimationFrame(draw);
+  }
+  requestAnimationFrame(draw);
+})();
 </script>
 
 </body>
