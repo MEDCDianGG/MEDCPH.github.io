@@ -182,22 +182,22 @@
               <option value="single">Single Elimination</option>
               <option value="double">Double Elimination</option>
             </select>
-            <select id="bracketMax">
-              <option value="8">Up to 8 Teams</option>
-              <option value="16" selected>Up to 16 Teams</option>
-              <option value="32">Up to 32 Teams</option>
+            <select id="bracketMax" title="Maximum bracket size">
+              <option value="8">Max 8</option>
+              <option value="16" selected>Max 16</option>
+              <option value="32">Max 32</option>
             </select>
             <button id="buildBracketBtn" class="btn primary" type="button">Build / Rebuild</button>
-            <button id="autoWireBtn" class="btn" type="button">Auto-Wire / Refresh</button>
             <button id="clearScoresBtn" class="btn" type="button">Clear Scores</button>
             <button id="clearBracketBtn" class="btn danger" type="button">Clear Bracket</button>
           </div>
 
-          <p class="muted" style="margin:10px 0 14px">Assign teams to slots, set scores, pick winners. For double-elimination, use <b>Auto-Wire</b> to place losers into the correct Losers Bracket matches.</p> to slots, set scores, pick winners, advance winners.</p>
+          <p class="muted" style="margin:10px 0 14px">Assign teams to slots, set scores, pick winners, advance winners.</p>
           <div id="bracketArea" class="bracketGrid"></div>
 
           <div class="row" style="margin-top:12px">
-            <button id="advanceAllBtn" class="btn" type="button">Auto-Wire / Refresh</button>
+            <button id="autoWireBtn" class="btn" type="button">Auto-Wire (Double)</button>
+            <button id="advanceAllBtn" class="btn" type="button">Auto-Advance Winners</button>
           </div>
         </div>
       </div>
@@ -253,7 +253,7 @@
   }
 
   // Tournament doc
-  const defaultState = { format:"single", teams:[], bracketSize:8, matches:[], rosters:{} };
+  const defaultState = { teams:[], bracketSize:8, format:"single", matches:[], rosters:{} };
   let state = structuredClone(defaultState);
   let unsubTournament = null;
 
@@ -360,9 +360,9 @@
         if(!state.teams) state.teams = [];
         if(!state.matches) state.matches = [];
         if(!state.bracketSize) state.bracketSize = 8;
-        if(!state.format) state.format = "single";
         normalizeRosters(state);
       }
+      $("bracketMax").value = String(state.bracketSize || 16);
       $("bracketFormat").value = String(state.format || "single");
       renderTeams(); renderTeamSelect(); renderBracket();
     }, (e) => dbg("Tournament snapshot error: " + niceErr(e)));
@@ -588,223 +588,83 @@
     renderRosterList(teamId);
   };
 
-  $("addPlayerBtn"
-  // Bracket helpers (Single + Double elimination)
+  $("addPlayerBtn").onclick = () => {
+    const teamId = $("teamSelect").value;
+    if(!teamId) return alert("Select a team first.");
+    const p = $("playerName").value.trim();
+    if(p.length < 2) return alert("Player name too short.");
+    ensureRoster(teamId);
+    const roster = state.rosters[teamId];
+    if(roster.players.some(x => x.toLowerCase() === p.toLowerCase())) return alert("Player already in this team.");
+    roster.players.push(p);
+    state.rosters[teamId] = roster;
+    $("playerName").value = "";
+    saveState();
+    renderTeams();
+    renderRosterList(teamId);
+  };
+
+  // Bracket helpers (same logic)
   function teamNameById(id) {
     const t = state.teams.find(x => x.id === id);
     return t ? t.name : "";
   }
 
-  const pow2 = (n) => (n & (n-1)) === 0;
-  function nextPow2(n){
-    n = Math.max(2, Number(n)||2);
-    if(pow2(n)) return n;
-    let p = 1;
-    while(p < n) p <<= 1;
-    return p;
-  }
-
-  function teamOptions(selectedId) {
-    const opts = [`<option value="">— Select team —</option>`];
-    state.teams.forEach(t => {
-      opts.push(`<option value="${t.id}" ${t.id===selectedId?"selected":""}>${escapeHtml(t.name)}</option>`);
-    });
-    return opts.join("");
-  }
-
-  function matchBy(bracket, round, pos){
-    return state.matches.find(m => (m.bracket||"S")===bracket && Number(m.round||1)===round && Number(m.pos||1)===pos);
-  }
-
-  function setWinner(match, pick){
-    const chosen = pick === "A" ? match.aTeamId : match.bTeamId;
-    if(!chosen) return alert("Select a team first.");
-    match.winnerTeamId = chosen;
-  }
-
-  function getLoserTeamId(m){
-    if(!m || !m.winnerTeamId) return "";
-    if(m.winnerTeamId === m.aTeamId) return m.bTeamId || "";
-    if(m.winnerTeamId === m.bTeamId) return m.aTeamId || "";
-    return "";
-  }
-
-  function clearWinnerIfInvalid(m){
-    if(m.winnerTeamId && m.winnerTeamId !== m.aTeamId && m.winnerTeamId !== m.bTeamId) m.winnerTeamId = "";
-  }
-
-  function seedSingle(size){
-    // Fill Round 1 slots with current teams in order (no random)
-    const t = [...state.teams];
-    let idx = 0;
-    const r1 = state.matches.filter(m => (m.bracket||"S")==="S" && m.round===1).sort((a,b)=>a.pos-b.pos);
-    r1.forEach(m=>{
-      m.aTeamId = t[idx]?.id || ""; idx++;
-      m.bTeamId = t[idx]?.id || ""; idx++;
-      m.scoreA=""; m.scoreB=""; m.winnerTeamId="";
-    });
-  }
-
-  function buildSingleElimFromTeams(){
-    const count = state.teams.length;
-    if(count < 2) return alert("Need at least 2 teams.");
-    const max = Number($("bracketMax").value || 16);
-    const size = nextPow2(count);
-    if(size > max){
-      alert(`You have ${count} teams. Increase Max Size (current ${max}) to build a proper bracket.`);
-      return;
-    }
-    state.format = "single";
+  function buildSingleBracket(size) {
     state.bracketSize = size;
-
+    state.format = "single";
     const rounds = Math.log2(size);
     const matches = [];
     let matchCount = size / 2;
     for(let r=1; r<=rounds; r++) {
       for(let p=1; p<=matchCount; p++) {
-        matches.push({ id:`R${r}M${p}`, bracket:"S", round:r, pos:p, aTeamId:"", bTeamId:"", scoreA:"", scoreB:"", winnerTeamId:"" });
+        matches.push({ id:`R${r}M${p}`, round:r, pos:p, bracket:"S", aTeamId:"", bTeamId:"", scoreA:"", scoreB:"", winnerTeamId:"" });
       }
       matchCount = matchCount / 2;
     }
     state.matches = matches;
-    seedSingle(size);
     saveState();
     renderBracket();
   }
 
-  function seedWinnersRound1(){
-    const t = [...state.teams];
-    let idx = 0;
-    const w1 = state.matches.filter(m => m.bracket==="W" && m.round===1).sort((a,b)=>a.pos-b.pos);
-    w1.forEach(m=>{
-      m.aTeamId = t[idx]?.id || ""; idx++;
-      m.bTeamId = t[idx]?.id || ""; idx++;
-      m.scoreA=""; m.scoreB=""; m.winnerTeamId="";
-    });
-  }
-
-  function buildDoubleElimFromTeams(){
-    const count = state.teams.length;
-    if(count < 2) return alert("Need at least 2 teams.");
-    const max = Number($("bracketMax").value || 16);
-    const size = nextPow2(count);
-    if(size > max){
-      alert(`You have ${count} teams. Increase Max Size (current ${max}) to build a proper bracket.`);
-      return;
-    }
-
-    state.format = "double";
+  function buildDoubleBracket(size){
     state.bracketSize = size;
-
-    const n = Math.log2(size);                 // winners rounds
-    const losersRounds = 2*n - 2;              // L1..L(2n-2)
-
+    state.format = "double";
+    const k = Math.log2(size);
     const matches = [];
 
     // Winners bracket
-    let matchCount = size/2;
-    for(let r=1; r<=n; r++){
-      for(let p=1; p<=matchCount; p++){
+    let wCount = size/2;
+    for(let r=1;r<=k;r++){
+      for(let p=1;p<=wCount;p++){
         matches.push({ id:`W-R${r}-M${p}`, bracket:"W", round:r, pos:p, aTeamId:"", bTeamId:"", scoreA:"", scoreB:"", winnerTeamId:"" });
       }
-      matchCount/=2;
+      wCount = wCount/2;
     }
 
-    // Losers bracket (counts repeat twice: size/4,size/4,size/8,size/8,...,1,1)
-    for(let lr=1; lr<=losersRounds; lr++){
-      const group = Math.floor((lr+1)/2) + 1; // 2..n
-      const countMatches = size / (2 ** group);
-      for(let p=1; p<=countMatches; p++){
-        matches.push({ id:`L-R${lr}-M${p}`, bracket:"L", round:lr, pos:p, aTeamId:"", bTeamId:"", scoreA:"", scoreB:"", winnerTeamId:"" });
+    // Losers bracket: 2*(k-1) rounds
+    const lbRounds = 2*(k-1);
+    for(let r=1;r<=lbRounds;r++){
+      const stage = Math.ceil(r/2);
+      const mCount = size / Math.pow(2, stage+1);
+      for(let p=1;p<=mCount;p++){
+        matches.push({ id:`L-R${r}-M${p}`, bracket:"L", round:r, pos:p, aTeamId:"", bTeamId:"", scoreA:"", scoreB:"", winnerTeamId:"" });
       }
     }
 
-    // Grand Final
-    matches.push({ id:`GF`, bracket:"GF", round:1, pos:1, aTeamId:"", bTeamId:"", scoreA:"", scoreB:"", winnerTeamId:"" });
+    matches.push({ id:"GF", bracket:"GF", round:1, pos:1, aTeamId:"", bTeamId:"", scoreA:"", scoreB:"", winnerTeamId:"" });
 
     state.matches = matches;
-    seedWinnersRound1();
-    autoWireDoubleElim(); // fills L + GF slots based on current winners/losers
     saveState();
     renderBracket();
   }
 
-  function autoWireDoubleElim(){
-    // Places teams into the correct downstream matches based on current winners/losers.
-    const size = Number(state.bracketSize || 8);
-    const n = Math.log2(size);
-    const losersRounds = 2*n - 2;
-
-    // Clear all non-WR1 slots first? No — only overwrite computed slots, keep WR1 as is.
-    // We DO clear slots in W rounds >1, L rounds all, GF, then repopulate.
-    state.matches.forEach(m=>{
-      if(m.bracket==="W" && m.round===1) return;
-      m.aTeamId = ""; m.bTeamId = "";
-      m.scoreA = m.scoreA ?? ""; m.scoreB = m.scoreB ?? "";
-      clearWinnerIfInvalid(m);
-      // keep scores/winner if teams remain? we clear winner if invalid; leave scores
-    });
-
-    // Wire Winners bracket winners forward
-    for(let r=1; r<n; r++){
-      const thisRound = state.matches.filter(m=>m.bracket==="W" && m.round===r).sort((a,b)=>a.pos-b.pos);
-      const nextRound = state.matches.filter(m=>m.bracket==="W" && m.round===r+1).sort((a,b)=>a.pos-b.pos);
-      thisRound.forEach((m, i)=>{
-        const w = m.winnerTeamId || "";
-        if(!w) return;
-        const target = nextRound[Math.floor(i/2)];
-        if(!target) return;
-        const slot = (i%2===0) ? "A" : "B";
-        if(slot==="A") target.aTeamId = w; else target.bTeamId = w;
-        clearWinnerIfInvalid(target);
-      });
+  function buildBracket(size){ return buildSingleBracket(size); }
+      matchCount = matchCount / 2;
     }
-
-    // Wire Losers bracket
-    // L1 gets losers from WR1 paired: (W1,W2)->L1M1 ; (W3,W4)->L1M2 ; etc
-    const wr1 = state.matches.filter(m=>m.bracket==="W" && m.round===1).sort((a,b)=>a.pos-b.pos);
-    const l1 = state.matches.filter(m=>m.bracket==="L" && m.round===1).sort((a,b)=>a.pos-b.pos);
-    l1.forEach((lm, j)=>{
-      const wA = wr1[2*j];
-      const wB = wr1[2*j+1];
-      lm.aTeamId = getLoserTeamId(wA) || "";
-      lm.bTeamId = getLoserTeamId(wB) || "";
-      clearWinnerIfInvalid(lm);
-    });
-
-    for(let lr=2; lr<=losersRounds; lr++){
-      const cur = state.matches.filter(m=>m.bracket==="L" && m.round===lr).sort((a,b)=>a.pos-b.pos);
-      const prev = state.matches.filter(m=>m.bracket==="L" && m.round===lr-1).sort((a,b)=>a.pos-b.pos);
-
-      if(lr % 2 === 0){
-        // even LR: winner of previous LR match j vs loser of Winners round (wr = lr/2 + 1) match j
-        const wr = (lr/2) + 1;
-        const wRound = state.matches.filter(m=>m.bracket==="W" && m.round===wr).sort((a,b)=>a.pos-b.pos);
-
-        cur.forEach((lm, j)=>{
-          lm.aTeamId = prev[j]?.winnerTeamId || "";
-          lm.bTeamId = getLoserTeamId(wRound[j]) || "";
-          clearWinnerIfInvalid(lm);
-        });
-      } else {
-        // odd LR (>1): consolidation, pair winners from prev round: (1,2)->1, (3,4)->2, ...
-        cur.forEach((lm, j)=>{
-          lm.aTeamId = prev[2*j]?.winnerTeamId || "";
-          lm.bTeamId = prev[2*j+1]?.winnerTeamId || "";
-          clearWinnerIfInvalid(lm);
-        });
-      }
-    }
-
-    // Grand Final: winner of Winners Final vs winner of last Losers round
-    const wFinal = state.matches.find(m=>m.bracket==="W" && m.round===n && m.pos===1);
-    const lFinal = state.matches.find(m=>m.bracket==="L" && m.round===losersRounds && m.pos===1);
-    const gf = state.matches.find(m=>m.bracket==="GF");
-    if(gf){
-      gf.aTeamId = wFinal?.winnerTeamId || "";
-      gf.bTeamId = lFinal?.winnerTeamId || "";
-      clearWinnerIfInvalid(gf);
-    }
+    state.matches = matches;
+    saveState();
+    renderBracket();
   }
 
   function clearScores() {
@@ -820,100 +680,128 @@
     renderBracket();
   }
 
-  function renderMatchCard(m){
-    const div = document.createElement("div");
-    div.className = "match";
-    div.innerHTML = `
+  function teamOptions(selectedId) {
+    const opts = [`<option value="">— Select team —</option>`];
+    state.teams.forEach(t => {
+      opts.push(`<option value="${t.id}" ${t.id===selectedId?"selected":""}>${escapeHtml(t.name)}</option>`);
+    });
+    return opts.join("");
+  }
+
+  function advanceWinner(matchId) {
+    const fmt = String(state.format||"single");
+    const m = state.matches.find(x => x.id === matchId);
+    if(!m || !m.winnerTeamId) return alert("Pick a winner first.");
+    if(fmt === "double" && (m.bracket||"") !== "W") return alert("Use Auto-Wire for double elimination.");
+    const nextRound = m.round + 1;
+    const rounds = Math.log2(state.bracketSize);
+    if(nextRound > rounds) return alert("Final round.");
+    const nextPos = Math.ceil(m.pos / 2);
+    const next = state.matches.find(x => (x.bracket||"S")===(m.bracket||"S") && x.round === nextRound && x.pos === nextPos);
+    if(!next) return alert("Next match not found.");
+    const slot = (m.pos % 2 === 1) ? "A" : "B";
+    if(slot === "A") next.aTeamId = m.winnerTeamId;
+    else next.bTeamId = m.winnerTeamId;
+    if(next.winnerTeamId && next.winnerTeamId !== next.aTeamId && next.winnerTeamId !== next.bTeamId) next.winnerTeamId = "";
+    saveState();
+    renderBracket();
+  }
+
+  function advanceAll() {
+    const sorted = [...state.matches].filter(m => String(state.format||"single")!=="double" || (m.bracket||"")==="W").sort((a,b)=>(a.round-b.round)||(a.pos-b.pos));
+    const rounds = Math.log2(state.bracketSize);
+    sorted.forEach(m => { if(m.winnerTeamId && m.round < rounds) advanceWinner(m.id); });
+  }
+
+  function renderBracket() {
+    $("bracketMeta").textContent = `${state.teams.length} teams • ${state.matches.length} matches • ${String(state.format||"single")} • size ${state.bracketSize}`;
+    const area = $("bracketArea");
+    area.innerHTML = "";
+
+    if(!state.matches || state.matches.length === 0) {
+      area.innerHTML = `<div class="muted">No bracket yet. Build one.</div>`;
+      return;
+    }
+
+    const fmt = String(state.format || "single");
+    const size = Number(state.bracketSize || 8);
+    const k = Math.log2(size);
+
+    const matchEditorHtml = (m) => `
       <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px">
         <b>${escapeHtml(m.id)}</b>
         <span class="pill">${m.winnerTeamId ? "Winner set" : "No winner"}</span>
       </div>
       <div class="slot">
         <select data-mid="${m.id}" data-slot="A">${teamOptions(m.aTeamId)}</select>
-        <div class="scoreBox"><input data-mid="${m.id}" data-score="A" inputmode="numeric" placeholder="0" value="${escapeHtml(m.scoreA)}"></div>
+        <div class="scoreBox"><input data-mid="${m.id}" data-score="A" inputmode="numeric" placeholder="0" value="${escapeHtml(m.scoreA||"")}"></div>
       </div>
       <div class="slot">
         <select data-mid="${m.id}" data-slot="B">${teamOptions(m.bTeamId)}</select>
-        <div class="scoreBox"><input data-mid="${m.id}" data-score="B" inputmode="numeric" placeholder="0" value="${escapeHtml(m.scoreB)}"></div>
+        <div class="scoreBox"><input data-mid="${m.id}" data-score="B" inputmode="numeric" placeholder="0" value="${escapeHtml(m.scoreB||"")}"></div>
       </div>
       <div class="row">
         <button class="btn" type="button" data-win="${m.id}" data-pick="A">Pick A Winner</button>
         <button class="btn" type="button" data-win="${m.id}" data-pick="B">Pick B Winner</button>
+        <button class="btn primary" type="button" data-adv="${m.id}">Advance Winner →</button>
       </div>
       <div class="muted" style="margin-top:8px">Winner: <b>${escapeHtml(teamNameById(m.winnerTeamId) || "—")}</b></div>
     `;
-    return div;
-  }
 
-  function renderBracket() {
-    const fmt = String(state.format || "single");
-    const size = Number(state.bracketSize || nextPow2(Math.max(2, state.teams.length)));
-    $("bracketMeta").textContent = `${state.teams.length} teams • ${state.matches.length} matches • ${fmt} • size ${size}`;
+    const renderBlock = (title, bracketCode, roundsCount, prefix) => {
+      const block = document.createElement("div");
+      block.className = "list";
+      block.innerHTML = `<div class="pill"><b>${escapeHtml(title)}</b></div>`;
+      for(let r=1;r<=roundsCount;r++){
+        const col = document.createElement("div");
+        col.className = "list";
+        col.innerHTML = `<div class="pill">${escapeHtml(prefix)} ${r}</div>`;
+        const arr = state.matches
+          .filter(m => (m.bracket||"S") === bracketCode && Number(m.round||1) === r)
+          .sort((a,b)=>(a.pos-b.pos));
+        arr.forEach(m=>{
+          const div = document.createElement("div");
+          div.className = "match";
+          div.innerHTML = matchEditorHtml(m);
+          col.appendChild(div);
+        });
+        if(!arr.length) col.innerHTML += `<div class="muted">—</div>`;
+        block.appendChild(col);
+      }
+      area.appendChild(block);
+    };
 
-    const area = $("bracketArea");
-    area.innerHTML = "";
-    if(!state.matches || state.matches.length === 0) {
-      area.innerHTML = `<div class="muted">No bracket yet. Build one.</div>`;
-      return;
-    }
-
-    if(fmt === "single"){
-      const rounds = Math.log2(state.bracketSize);
-      for(let r=1; r<=rounds; r++) {
+    if(fmt === "double"){
+      renderBlock("Winners", "W", k, "W-Round");
+      renderBlock("Losers", "L", 2*(k-1), "L-Round");
+      const gf = state.matches.find(m => (m.bracket||"") === "GF" || m.id === "GF");
+      const gfCol = document.createElement("div");
+      gfCol.className = "list";
+      gfCol.innerHTML = `<div class="pill"><b>Grand Final</b></div>`;
+      if(gf){
+        const div = document.createElement("div");
+        div.className = "match";
+        div.innerHTML = matchEditorHtml(gf);
+        gfCol.appendChild(div);
+      } else {
+        gfCol.innerHTML += `<div class="muted">Grand Final not found.</div>`;
+      }
+      area.appendChild(gfCol);
+    } else {
+      for(let r=1;r<=k;r++){
         const col = document.createElement("div");
         col.className = "list";
         col.innerHTML = `<div class="pill"><b>Round ${r}</b></div>`;
-        state.matches
-          .filter(m=> (m.bracket||"S")==="S" && m.round===r)
-          .sort((a,b)=>a.pos-b.pos)
-          .forEach(m=> col.appendChild(renderMatchCard(m)));
+        state.matches.filter(m=>(m.bracket||"S")==="S" && Number(m.round||1)===r).forEach(m=>{
+          const div = document.createElement("div");
+          div.className = "match";
+          div.innerHTML = matchEditorHtml(m);
+          col.appendChild(div);
+        });
         area.appendChild(col);
       }
-    } else {
-      // Double elimination: Winners + Losers + Grand Final
-      const winnersBox = document.createElement("div");
-      winnersBox.className = "list";
-      winnersBox.innerHTML = `<div class="pill"><b>Winners Bracket</b></div>`;
-      const wRounds = Math.log2(state.bracketSize);
-      for(let r=1; r<=wRounds; r++){
-        const col = document.createElement("div");
-        col.className = "item";
-        col.innerHTML = `<div class="pill"><b>W-Round ${r}</b></div>`;
-        state.matches.filter(m=>m.bracket==="W" && m.round===r).sort((a,b)=>a.pos-b.pos)
-          .forEach(m=> col.appendChild(renderMatchCard(m)));
-        winnersBox.appendChild(col);
-      }
-
-      const losersBox = document.createElement("div");
-      losersBox.className = "list";
-      losersBox.innerHTML = `<div class="pill"><b>Losers Bracket</b></div>`;
-      const lRounds = 2*wRounds - 2;
-      for(let r=1; r<=lRounds; r++){
-        const col = document.createElement("div");
-        col.className = "item";
-        col.innerHTML = `<div class="pill"><b>L-Round ${r}</b></div>`;
-        state.matches.filter(m=>m.bracket==="L" && m.round===r).sort((a,b)=>a.pos-b.pos)
-          .forEach(m=> col.appendChild(renderMatchCard(m)));
-        losersBox.appendChild(col);
-      }
-
-      const gfBox = document.createElement("div");
-      gfBox.className = "list";
-      gfBox.innerHTML = `<div class="pill"><b>Grand Final</b></div>`;
-      const gf = state.matches.find(m=>m.bracket==="GF");
-      if(gf) gfBox.appendChild(renderMatchCard(gf));
-
-      // Put them as 3 columns
-      const wrapper = document.createElement("div");
-      wrapper.className = "bracketGrid";
-      wrapper.style.gridTemplateColumns = "repeat(3, 1fr)";
-      wrapper.appendChild(winnersBox);
-      wrapper.appendChild(losersBox);
-      wrapper.appendChild(gfBox);
-      area.appendChild(wrapper);
     }
 
-    // Bind inputs
     area.querySelectorAll("select[data-mid]").forEach(sel => {
       sel.onchange = () => {
         const mid = sel.getAttribute("data-mid");
@@ -922,7 +810,7 @@
         if(!match) return;
         if(slot === "A") match.aTeamId = sel.value;
         if(slot === "B") match.bTeamId = sel.value;
-        clearWinnerIfInvalid(match);
+        if(match.winnerTeamId && match.winnerTeamId !== match.aTeamId && match.winnerTeamId !== match.bTeamId) match.winnerTeamId = "";
         saveState();
         renderBracket();
       };
@@ -948,20 +836,6 @@
         const pick = btn.getAttribute("data-pick");
         const match = state.matches.find(x => x.id === mid);
         if(!match) return;
-        setWinner(match, pick);
-        saveState();
-        // For double-elim, we can auto-wire after winners are set
-        if((state.format||"single")==="double") autoWireDoubleElim();
-        saveState();
-        renderBracket();
-      };
-    });
-  }
-= () => {
-        const mid = btn.getAttribute("data-win");
-        const pick = btn.getAttribute("data-pick");
-        const match = state.matches.find(x => x.id === mid);
-        if(!match) return;
         const chosen = pick === "A" ? match.aTeamId : match.bTeamId;
         if(!chosen) return alert("Select a team first.");
         match.winnerTeamId = chosen;
@@ -975,31 +849,120 @@
     });
   }
 
+  function autoWireDouble(){
+    const fmt = String(state.format||"single");
+    if(fmt !== "double") return alert("Switch Bracket Format to Double first.");
+    const size = Number(state.bracketSize || 8);
+    const k = Math.log2(size);
+    const lbRounds = 2*(k-1);
+
+    const by = (br, r, p) => state.matches.find(m=>(m.bracket||"")===br && Number(m.round||1)===r && Number(m.pos||1)===p);
+    const winnerOf = (m) => m && m.winnerTeamId ? m.winnerTeamId : "";
+    const loserOf = (m) => {
+      if(!m || !m.winnerTeamId) return "";
+      const a = m.aTeamId || ""; const b = m.bTeamId || "";
+      if(!a || !b) return "";
+      return m.winnerTeamId === a ? b : a;
+    };
+
+    // Winners advancement
+    const wMatches = state.matches.filter(m=>(m.bracket||"")==="W").sort((a,b)=>(a.round-b.round)||(a.pos-b.pos));
+    wMatches.forEach(m=>{
+      if(m.round >= k) return;
+      const next = by("W", m.round+1, Math.ceil(m.pos/2));
+      if(!next) return;
+      const slot = (m.pos % 2 === 1) ? "aTeamId" : "bTeamId";
+      const w = winnerOf(m);
+      if(w){
+        next[slot] = w;
+        if(next.winnerTeamId && next.winnerTeamId !== next.aTeamId && next.winnerTeamId !== next.bTeamId) next.winnerTeamId = "";
+      }
+    });
+
+    // W R1 -> L R1
+    for(let p=1;p<=size/2;p++){
+      const wm = by("W", 1, p);
+      const loser = loserOf(wm);
+      if(!loser) continue;
+      const lm = by("L", 1, Math.ceil(p/2));
+      if(!lm) continue;
+      if(p%2===1) lm.aTeamId = loser; else lm.bTeamId = loser;
+      if(lm.winnerTeamId && lm.winnerTeamId !== lm.aTeamId && lm.winnerTeamId !== lm.bTeamId) lm.winnerTeamId = "";
+    }
+
+    // W Rr (r>=2) -> L R(2*(r-1)) slot B
+    for(let r=2;r<=k;r++){
+      const wCount = size / Math.pow(2, r);
+      for(let p=1;p<=wCount;p++){
+        const wm = by("W", r, p);
+        const loser = loserOf(wm);
+        if(!loser) continue;
+        const lm = by("L", 2*(r-1), p);
+        if(!lm) continue;
+        lm.bTeamId = loser;
+        if(lm.winnerTeamId && lm.winnerTeamId !== lm.aTeamId && lm.winnerTeamId !== lm.bTeamId) lm.winnerTeamId = "";
+      }
+    }
+
+    // LB advancement
+    for(let r=1;r<=lbRounds;r++){
+      const stage = Math.ceil(r/2);
+      const mCount = size / Math.pow(2, stage+1);
+      for(let p=1;p<=mCount;p++){
+        const lm = by("L", r, p);
+        const w = winnerOf(lm);
+        if(!w) continue;
+        if(r % 2 === 1){
+          const next = by("L", r+1, p);
+          if(next){
+            next.aTeamId = w;
+            if(next.winnerTeamId && next.winnerTeamId !== next.aTeamId && next.winnerTeamId !== next.bTeamId) next.winnerTeamId = "";
+          }
+        } else {
+          const next = by("L", r+1, Math.ceil(p/2));
+          if(next){
+            if(p%2===1) next.aTeamId = w; else next.bTeamId = w;
+            if(next.winnerTeamId && next.winnerTeamId !== next.aTeamId && next.winnerTeamId !== next.bTeamId) next.winnerTeamId = "";
+          }
+        }
+      }
+    }
+
+    // Grand Final
+    const wf = by("W", k, 1);
+    const lf = by("L", lbRounds, 1);
+    const gf = state.matches.find(m=>(m.bracket||"")==="GF" || m.id==="GF");
+    if(gf){
+      const wW = winnerOf(wf);
+      const wL = winnerOf(lf);
+      if(wW) gf.aTeamId = wW;
+      if(wL) gf.bTeamId = wL;
+      if(gf.winnerTeamId && gf.winnerTeamId !== gf.aTeamId && gf.winnerTeamId !== gf.bTeamId) gf.winnerTeamId = "";
+    }
+
+    saveState();
+    renderBracket();
+  }
+
+  $("autoWireBtn").onclick = autoWireDouble;
+
   $("buildBracketBtn").onclick = () => {
-    const fmt = $("bracketFormat").value || "single";
-    if(fmt === "double") buildDoubleElimFromTeams();
-    else buildSingleElimFromTeams();
+    const fmt = String($("bracketFormat").value || "single");
+    const max = Number($("bracketMax").value || 16);
+
+    const n = (state.teams || []).length;
+    const nextPow2 = (x) => { let p=1; while(p < Math.max(2,x)) p*=2; return p; };
+    const autoSize = Math.min(nextPow2(n), max);
+
+    if(n < 2) return alert("Add at least 2 teams first.");
+    if(autoSize < 2) return alert("Not enough teams to build a bracket.");
+
+    if(fmt === "double") buildDoubleBracket(autoSize);
+    else buildSingleBracket(autoSize);
   };
   $("clearScoresBtn").onclick = clearScores;
   $("clearBracketBtn").onclick = clearBracket;
-  $("autoWireBtn").onclick = () => {
-    if((state.format||"single")==="double"){
-      autoWireDoubleElim();
-      saveState();
-      renderBracket();
-    }else{
-      alert("Auto-Wire is only for double elimination.");
-    }
-  };
-  $("advanceAllBtn").onclick = () => {
-    if((state.format||"single")==="double"){
-      autoWireDoubleElim();
-      saveState();
-      renderBracket();
-    }else{
-      alert("Tip: build single-elim again to re-seed based on teams.");
-    }
-  };
+  $("advanceAllBtn").onclick = advanceAll;
 
   dbg("Firebase loaded. Waiting for auth…\nOwner UID: " + OWNER_UID);
 
