@@ -472,14 +472,66 @@
   opacity:.35;
   will-change: transform;
 }
-  </style>
+  
+/* ===== LOGO SIZING ===== */
+.headerLogo{
+  width:44px;
+  height:auto;
+  object-fit:contain;
+  display:block;
+}
+
+.heroLogo{
+  width:100%;
+  max-width:520px;
+  height:auto;
+  display:block;
+  margin:0 auto;
+}
+
+@media (max-width:768px){
+  .heroLogo{ max-width:340px; }
+}
+
+/* ===== GLOW ANIMATION ===== */
+@keyframes glowPulse{
+  0%   { filter: drop-shadow(0 0 0 rgba(255,180,0,0.0)) drop-shadow(0 0 6px rgba(255,140,0,0.20)); }
+  50%  { filter: drop-shadow(0 0 18px rgba(255,180,0,0.55)) drop-shadow(0 0 36px rgba(255,120,0,0.28)); }
+  100% { filter: drop-shadow(0 0 0 rgba(255,180,0,0.0)) drop-shadow(0 0 6px rgba(255,140,0,0.20)); }
+}
+
+.heroLogo.glow,
+.headerLogo.glow{
+  animation: glowPulse 2.6s ease-in-out infinite;
+}
+
+/* ===== SMOOTH INTRO ANIMATION ===== */
+@keyframes introFadeUp{
+  0%   { opacity:0; transform: translateY(14px) scale(0.98); filter: blur(6px); }
+  100% { opacity:1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+
+.pageIntro{ opacity:0; }
+.pageIntro.isLoaded{
+  animation: introFadeUp 900ms cubic-bezier(.2,.8,.2,1) forwards;
+}
+
+.heroLogo.intro{
+  opacity:0;
+  transform: translateY(10px) scale(0.985);
+}
+.heroLogo.intro.isLoaded{
+  animation: introFadeUp 950ms cubic-bezier(.2,.8,.2,1) 120ms forwards;
+}
+
+</style>
 </head>
 <body>
   <header>
     <div class="wrap topbar">
       <div class="brand">
         <div class="brandLogo">
-        <img src="MEDC INVITATIONAL LOGO.gif" class="heroLogo" alt="MEDC Invitational Logo">
+        <img src="MEDC INVITATIONAL LOGO.gif" class="headerLogo glow" alt="MEDC Invitational Logo">
         <div>
           <h1>MEDC Invitational</h1>
           <small>Road to Champions • Community Esports</small>
@@ -574,7 +626,7 @@
     </div>
 
     <section id="about">
-      <div class="wrap">
+      <div class="wrap pageIntro">
         <div class="sectionTitle">
           <h3>Why We're Doing This</h3>
         </div>
@@ -869,5 +921,14 @@ window.addEventListener("scroll", () => {
   );
 });
 </script>
+
+<script>
+  // Smooth intro + logo glow (no dependencies)
+  window.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.pageIntro').forEach(el => el.classList.add('isLoaded'));
+    document.querySelectorAll('.heroLogo.intro').forEach(el => el.classList.add('isLoaded'));
+  });
+</script>
+
 </body>
 </html>
