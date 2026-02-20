@@ -95,7 +95,7 @@
 
   function loadState(){
     try{
-      const raw = // removed for firebase(KEY);
+      const raw = // removed localStorage(KEY);
       return raw ? JSON.parse(raw) : { teams: [], bracketSize: 8, matches: [], rosters: {} };
     } catch {
       return { teams: [], bracketSize: 8, matches: [], rosters: {} };
@@ -249,10 +249,10 @@
 </script>
 
 
+<!-- Firebase Live Sync -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-
 
 const firebaseConfig = {
   apiKey: "AIzaSyDZAVhuz9SVBHSCPnEvoxwCjaMrZSQOJ6k",
@@ -264,11 +264,8 @@ const firebaseConfig = {
   measurementId: "G-07Z2TFM553"
 };
 
-
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-
-const teamNameById = (teams, id) => (teams.find(t => t.id === id)?.name || "");
 
 function normalizeRosters(s){
   if(!s.rosters) s.rosters = {};
@@ -282,17 +279,20 @@ function normalizeRosters(s){
   }
 }
 
-function render(state){
-  if(window.renderFromState) {
+// This function must exist in your page to update UI
+// It will replace localStorage render
+function updatePublicUI(state){
+  if(window.renderFromState){
     window.renderFromState(state);
   }
 }
 
+// Live Firestore listener
 onSnapshot(doc(db, "tournament", "state"), (snap) => {
   if(!snap.exists()) return;
   const state = snap.data();
   normalizeRosters(state);
-  render(state);
+  updatePublicUI(state);
 });
 </script>
 
