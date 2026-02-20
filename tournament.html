@@ -5,6 +5,33 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>MEDC Invitational — Tournament</title>
   <style>
+      /* ===== MATCH INDEX NAVBAR ===== */
+  .topbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:14px;
+  }
+  
+  .headerLogo{
+    width:44px;
+    height:auto;
+  }
+  
+  .actions{
+    margin-left:auto;
+  }
+  
+  .btn{
+    border:1px solid rgba(255,255,255,.10);
+    background:rgba(13,18,35,.65);
+    color:#fff;
+    padding:10px 14px;
+    border-radius:999px;
+    font-weight:700;
+    font-size:13px;
+    cursor:pointer;
+  }
     :root{
       --bg:#070A12; --card:rgba(255,255,255,.04); --line:rgba(255,255,255,.10);
       --text:#EAF0FF; --muted:rgba(234,240,255,.75);
@@ -118,24 +145,31 @@
 <body>
 
 <header>
-  <div class="wrap bar">
+  <div class="wrap topbar">
+
     <div class="brand">
       <div class="brandLogo">
-        <img src="MEDC INVITATIONAL LOGO.gif" alt="MEDC Invitational Logo">
+        <img src="MEDC INVITATIONAL LOGO.gif" class="headerLogo glow" alt="MEDC Invitational Logo">
+        <div>
+          <h1>MEDC Invitational</h1>
+          <small>Road to Champions • Community Esports</small>
+        </div>
       </div>
-      <div>
-        <div>MEDC INVITATIONAL</div>
-        <div class="muted" style="font-size:12px;margin-top:2px">Public Tournament Site</div>
-      </div>
-      <span class="pill" id="livePill">Live: —</span>
     </div>
 
-    <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end">
-      <a class="pill" href="index.html" style="text-decoration:none;color:inherit">HOME</a>
-      <a class="pill" href="tournament.html" style="text-decoration:none;color:inherit" aria-current="page">TEAMS</a>
-      <a class="pill" href="bracket.html" style="text-decoration:none;color:inherit" >BRACKET</a>
-      <a class="pill" href="admin.html" style="text-decoration:none;color:inherit">ADMIN</a>
+    <nav>
+      <a class="pill" href="index.html#about">About</a>
+      <a class="pill" href="index.html#mission">Our Mission</a>
+      <a class="pill" href="tournament.html">Teams</a>
+      <a class="pill" href="bracket.html">Bracket</a>
+    </nav>
+
+    <div class="actions">
+      <a class="btn" href="admin.html" title="Login / Register">
+        🔐 ADMIN PANEL
+      </a>
     </div>
+
   </div>
 </header>
 
