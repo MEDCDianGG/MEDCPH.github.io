@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MEDC Invitational - Home</title>
+  <meta name="description" content="MEDC Invitational Esports Tournament - built by the community, for the community. Compete, improve, and grow together." />
+  <style>
+    :root{
+      --bg:#070A12;
+      --panel:#0D1223;
+      --panel2:#0A0F1F;
+      --text:#EAF0FF;
+      --muted:#B7C3E6;
+      --line:rgba(255,255,255,.10);
+      --glow:rgba(103, 232, 249, .30);
+      --accent:#5EEAD4;
+      --accent2:#60A5FA; /* blue */
+      --accent3:#F43F5E; /* red */
+      --good:#22C55E;
+      --shadow: 0 18px 60px rgba(0,0,0,.55);
+      --radius: 18px;
+      --radius2: 26px;
+      --max: 1180px;
+    }
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      background:
+        radial-gradient(900px 420px at 18% 12%, rgba(96,165,250,.14), transparent 60%),
+        radial-gradient(850px 420px at 82% 14%, rgba(244,63,94,.13), transparent 60%),
+        radial-gradient(700px 380px at 55% 60%, rgba(94,234,212,.09), transparent 65%),
+        linear-gradient(180deg, #050713, #070A12 35%, #060915 100%);
+      color:var(--text);
+      overflow-x:hidden;
+    }
+    a{ color:inherit; text-decoration:none; }
+    .wrap{ width:min(var(--max), 92vw); margin-inline:auto; }
+    .blurline{
+      position:absolute; inset:auto 0 0 0; height:1px;
+      background:linear-gradient(90deg, transparent, rgba(255,255,255,.25), transparent);
+      opacity:.35;
+    }
+    /* Top bar */
+    header{
+      position:sticky; top:0; z-index:50;
+      backdrop-filter: blur(14px);
+      background: rgba(7,10,18,.62);
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    .topbar{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:14px 0;
+      gap:14px;
+    }
+    .brand{
+      display:flex; align-items:center; gap:12px;
+      min-width: 220px;
+    }
+    .logo{
+      width:40px; height:40px; border-radius:14px;
+      background:
+        radial-gradient(14px 14px at 30% 35%, rgba(255,255,255,.60), transparent 65%),
+        linear-gradient(135deg, rgba(96,165,250,.95), rgba(244,63,94,.95));
+      box-shadow: 0 0 0 1px rgba(255,255,255,.10), 0 18px 50px rgba(0,0,0,.5);
+      position:relative;
+      overflow:hidden;
+    }
+    .logo:after{
+      content:"";
+      position:absolute; inset:-40%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.25), transparent);
+      transform: rotate(25deg);
+      animation: sheen 5.5s linear infinite;
+    }
+    @keyframes sheen{
+      0%{ transform: translateX(-35%) rotate(25deg); opacity:.2; }
+      50%{ opacity:.55; }
+      100%{ transform: translateX(35%) rotate(25deg); opacity:.2; }
+    }
+    .brand h1{
+      font-size:14px; letter-spacing:.18em;
+      text-transform:uppercase;
+      margin:0;
+      color:rgba(234,240,255,.92);
+      line-height:1.15;
+    }
+    .brand small{
+      display:block;
+      margin-top:3px;
+      font-size:12px;
+      letter-spacing:.02em;
+      color: rgba(183,195,230,.85);
+      text-transform:none;
+    }
+    nav{
+      display:flex; align-items:center; gap:10px;
+      flex-wrap:wrap;
+      justify-content:center;
+      flex:1;
+    }
+    .pill{
+      padding:10px 12px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(13,18,35,.65);
+      border-radius: 999px;
+      color: rgba(234,240,255,.92);
+      font-size:13px;
+      letter-spacing:.02em;
+      transition: transform .14s ease, background .14s ease, border-color .14s ease;
+      display:inline-flex; gap:8px; align-items:center;
+    }
+    .pill:hover{
+      transform: translateY(-1px);
+      background: rgba(13,18,35,.85);
+      border-color: rgba(255,255,255,.18);
+    }
+    .actions{
+      display:flex; align-items:center; gap:10px;
+      min-width: 220px;
+      justify-content:flex-end;
+    }
+    .btn{
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(13,18,35,.65);
+      color: rgba(234,240,255,.95);
+      padding:10px 14px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size:13px;
+      letter-spacing:.02em;
+      transition: transform .14s ease, background .14s ease, border-color .14s ease, box-shadow .14s ease;
+      cursor:pointer;
+      display:inline-flex; align-items:center; gap:10px;
+    }
+    .btn:hover{
+      transform: translateY(-1px);
+      background: rgba(13,18,35,.85);
+      border-color: rgba(255,255,255,.20);
+      box-shadow: 0 14px 45px rgba(0,0,0,.45);
+    }
+    .btn.primary{
+      background:
+        linear-gradient(135deg, rgba(96,165,250,.95), rgba(244,63,94,.95));
+      border-color: rgba(255,255,255,.18);
+      box-shadow: 0 18px 55px rgba(0,0,0,.50);
+    }
+    .btn.primary:hover{ box-shadow: 0 22px 70px rgba(0,0,0,.58); }
+    /* Hero */
+    .hero{
+      position:relative;
+      padding: 64px 0 34px;
+    }
+    .heroGrid{
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 24px;
+      align-items:stretch;
+    }
+    .card{
+      background: linear-gradient(180deg, rgba(13,18,35,.88), rgba(10,15,31,.88));
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: var(--radius2);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      position:relative;
+    }
+    .card:before{
+      content:"";
+      position:absolute; inset:-1px;
+      background:
+        radial-gradient(600px 240px at 20% 0%, rgba(96,165,250,.20), transparent 62%),
+        radial-gradient(620px 260px at 90% 0%, rgba(244,63,94,.18), transparent 62%),
+        radial-gradient(520px 220px at 55% 60%, rgba(94,234,212,.10), transparent 70%);
+      pointer-events:none;
+      opacity:.85;
+    }
+    .cardInner{ position:relative; padding: 28px; }
+    .kicker{
+      display:inline-flex; gap:10px; align-items:center;
+      font-size:12px;
+      letter-spacing:.18em;
+      text-transform:uppercase;
+      color: rgba(234,240,255,.85);
+    }
+    .dot{
+      width:10px; height:10px; border-radius:999px;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.7), rgba(255,255,255,.05)),
+                  linear-gradient(135deg, var(--accent2), var(--accent3));
+      box-shadow: 0 0 18px rgba(96,165,250,.35), 0 0 20px rgba(244,63,94,.25);
+    }
+    .hero h2{
+      margin: 12px 0 12px;
+      font-size: clamp(30px, 4vw, 46px);
+      line-height:1.04;
+      letter-spacing:-.02em;
+    }
+    .hero p{
+      margin:0;
+      color: rgba(183,195,230,.92);
+      font-size: 15px;
+      line-height: 1.65;
+      max-width: 60ch;
+    }
+    .heroCTAs{
+      display:flex; gap:12px; flex-wrap:wrap;
+      margin-top:18px;
+      align-items:center;
+    }
+    .mini{
+      display:flex; gap:14px; flex-wrap:wrap;
+      margin-top:18px;
+      color: rgba(183,195,230,.92);
+      font-size:13px;
+    }
+    .badge{
+      display:inline-flex; align-items:center; gap:10px;
+      padding:10px 12px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(7,10,18,.28);
+      border-radius: 999px;
+    }
+    .badge b{ color: rgba(234,240,255,.92); }
+    /* Right hero panel */
+    .side{
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      min-height: 100%;
+    }
+    .sideTop{
+      padding: 18px 18px 10px;
+      display:flex; align-items:center; justify-content:space-between;
+      gap:12px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      background: rgba(7,10,18,.20);
+    }
+    .sideTop h3{
+      margin:0;
+      font-size:14px;
+      text-transform:uppercase;
+      letter-spacing:.16em;
+      color: rgba(234,240,255,.88);
+    }
+    .status{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:8px 10px;
+      border-radius:999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(13,18,35,.55);
+      font-size:12px;
+      color: rgba(234,240,255,.88);
+      white-space:nowrap;
+    }
+    .pulse{
+      width:8px; height:8px; border-radius:999px;
+      background: var(--good);
+      box-shadow: 0 0 0 0 rgba(34,197,94,.55);
+      animation: pulse 1.5s ease-out infinite;
+    }
+    @keyframes pulse{
+      0%{ box-shadow: 0 0 0 0 rgba(34,197,94,.50); }
+      70%{ box-shadow: 0 0 0 10px rgba(34,197,94,0); }
+      100%{ box-shadow: 0 0 0 0 rgba(34,197,94,0); }
+    }
+    .sideInner{ padding: 18px; position:relative; }
+    .sideInner p{
+      margin:0 0 12px;
+      color: rgba(183,195,230,.92);
+      line-height:1.65;
+      font-size: 14px;
+    }
+    .stats{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 12px;
+    }
+    .stat{
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(7,10,18,.28);
+      border-radius: 16px;
+      padding: 14px;
+      position:relative;
+      overflow:hidden;
+    }
+    .stat:before{
+      content:"";
+      position:absolute; inset:-1px;
+      background: radial-gradient(260px 120px at 20% 0%, rgba(96,165,250,.18), transparent 60%),
+                  radial-gradient(260px 120px at 80% 0%, rgba(244,63,94,.14), transparent 60%);
+      opacity:.9;
+      pointer-events:none;
+    }
+    .stat span, .stat b{ position:relative; }
+    .stat span{
+      display:block;
+      font-size:12px;
+      color: rgba(183,195,230,.88);
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      margin-bottom: 6px;
+    }
+    .stat b{
+      font-size: 18px;
+      color: rgba(234,240,255,.94);
+      letter-spacing:-.01em;
+    }
+    /* Sections */
+    section{ padding: 18px 0 34px; }
+    .sectionTitle{
+      display:flex; align-items:flex-end; justify-content:space-between;
+      gap:14px;
+      margin: 18px 0 14px;
+    }
+    .sectionTitle h3{
+      margin:0;
+      font-size: 18px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: rgba(234,240,255,.92);
+    }
+    .sectionTitle p{
+      margin:0;
+      color: rgba(183,195,230,.88);
+      font-size: 13px;
+      max-width: 60ch;
+      line-height: 1.45;
+    }
+    .grid3{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+    .panel{
+      background: linear-gradient(180deg, rgba(13,18,35,.82), rgba(10,15,31,.82));
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: var(--radius);
+      box-shadow: 0 12px 45px rgba(0,0,0,.45);
+      padding: 18px;
+      position:relative;
+      overflow:hidden;
+      min-height: 176px;
+    }
+    .panel:before{
+      content:"";
+      position:absolute; inset:-1px;
+      background: radial-gradient(420px 180px at 20% 0%, rgba(94,234,212,.12), transparent 62%),
+                  radial-gradient(420px 180px at 80% 0%, rgba(96,165,250,.12), transparent 62%);
+      pointer-events:none;
+      opacity:.9;
+    }
+    .panel h4{
+      margin: 0 0 8px;
+      font-size: 16px;
+      letter-spacing:-.01em;
+      position:relative;
+    }
+    .panel p{
+      margin:0;
+      color: rgba(183,195,230,.92);
+      line-height:1.65;
+      font-size: 14px;
+      position:relative;
+    }
+    .iconRow{
+      display:flex; align-items:center; gap:10px;
+      margin-bottom: 10px;
+      position:relative;
+    }
+    .icon{
+      width:38px; height:38px; border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(7,10,18,.30);
+      display:grid; place-items:center;
+      box-shadow: 0 14px 40px rgba(0,0,0,.40);
+    }
+    .icon svg{ width:20px; height:20px; opacity:.95; }
+    /* Timeline */
+    .timeline{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      align-items:stretch;
+    }
+    .step{
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(7,10,18,.26);
+      border-radius: var(--radius);
+      padding: 16px;
+      position:relative;
+      overflow:hidden;
+    }
+    .step:before{
+      content:"";
+      position:absolute; inset:-1px;
+      background: radial-gradient(380px 170px at 15% 0%, rgba(244,63,94,.14), transparent 60%),
+                  radial-gradient(380px 170px at 85% 0%, rgba(96,165,250,.14), transparent 60%);
+      opacity:.85; pointer-events:none;
+    }
+    .stepHeader{ position:relative; display:flex; justify-content:space-between; gap:12px; }
+    .stepHeader b{ font-size:14px; letter-spacing:.06em; text-transform:uppercase; }
+    .stepHeader span{ font-size:12px; color: rgba(183,195,230,.85); white-space:nowrap; }
+    .step p{ position:relative; margin: 10px 0 0; color: rgba(183,195,230,.92); font-size:14px; line-height:1.6; }
+    /* Footer */
+    footer{
+      padding: 34px 0 44px;
+      border-top: 1px solid rgba(255,255,255,.08);
+      background: rgba(7,10,18,.35);
+      backdrop-filter: blur(12px);
+      position:relative;
+    }
+    .footGrid{
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: 16px;
+      align-items:start;
+    }
+    .footGrid p{
+      margin: 10px 0 0;
+      color: rgba(183,195,230,.90);
+      line-height:1.65;
+      font-size: 14px;
+    }
+    .links{
+      display:flex; flex-wrap:wrap; gap:10px;
+      justify-content:flex-end;
+    }
+    .small{
+      margin-top: 16px;
+      color: rgba(183,195,230,.70);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    /* Responsive */
+    @media (max-width: 980px){
+      .heroGrid{ grid-template-columns: 1fr; }
+      .actions{ min-width:auto; }
+      .brand{ min-width:auto; }
+      .grid3{ grid-template-columns: 1fr; }
+      .timeline{ grid-template-columns: 1fr; }
+      .footGrid{ grid-template-columns: 1fr; }
+      .links{ justify-content:flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap topbar">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <h1>MEDC Invitational</h1>
+          <small>Road to Champions • Community Esports</small>
+        </div>
+      </div>
+
+      <nav aria-label="Primary navigation">
+        <a class="pill" href="#about">About</a>
+        <a class="pill" href="#mission">Our Mission</a>
+        <a class="pill" href="#teams">Teams</a>
+        <a class="pill" href="#bracket">Bracket</a>
+      </nav>
+
+      <div class="actions">
+        <!-- Link these to your actual auth page if you have it -->
+        <a class="btn" href="admin.html" title="Login / Register">
+          <span aria-hidden="true">🔐</span> Login
+        </a>
+        <a class="btn primary" href="admin.html#register" title="Join the tournament">
+          <span aria-hidden="true">⚡</span> Join Now
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="wrap hero" id="top">
+      <div class="heroGrid">
+        <article class="card">
+          <div class="cardInner">
+            <div class="kicker"><span class="dot" aria-hidden="true"></span> Season 1 • Road to Champions</div>
+            <h2>Built by players. Powered by passion. Made for the community.</h2>
+            <p>
+              MEDC Invitational is a competitive esports tournament created to give our community a real stage -
+              a place to compete, improve, and be recognized. We're doing this because we love the game and we believe
+              esports can bring people together, create opportunities, and inspire the next generation of players.
+            </p>
+
+            <div class="heroCTAs">
+              <a class="btn primary" href="admin.html#register">
+                <span aria-hidden="true">🏆</span> Register Your Team
+              </a>
+              <a class="btn" href="#mission">
+                <span aria-hidden="true">🎯</span> Our Goal & Passion
+              </a>
+              <a class="btn" href="#format">
+                <span aria-hidden="true">🗂️</span> View Tournament Plan
+              </a>
+            </div>
+
+            <div class="mini">
+              <div class="badge"><span aria-hidden="true">📣</span> <b>High-quality stream</b> production</div>
+              <div class="badge"><span aria-hidden="true">🤝</span> <b>Community-first</b> approach</div>
+              <div class="badge"><span aria-hidden="true">🛡️</span> <b>Fair play</b> & clear rules</div>
+            </div>
+          </div>
+        </article>
+
+        <aside class="card side" aria-label="Event highlights">
+          <div class="sideTop">
+            <h3>Event Snapshot</h3>
+            <div class="status"><span class="pulse" aria-hidden="true"></span> Registration Open</div>
+          </div>
+          <div class="sideInner">
+            <p>
+              Our goal is to create a consistent tournament system where teams can grow season after season.
+              This isn't just a bracket - it's a community project.
+            </p>
+
+            <div class="stats" role="list">
+              <div class="stat" role="listitem">
+                <span>Season</span>
+                <b>01</b>
+              </div>
+              <div class="stat" role="listitem">
+                <span>Mode</span>
+                <b>Online</b>
+              </div>
+              <div class="stat" role="listitem">
+                <span>Focus</span>
+                <b>Competitive + Growth</b>
+              </div>
+              <div class="stat" role="listitem">
+                <span>Community</span>
+                <b>Players • Casters • Staff</b>
+              </div>
+            </div>
+
+            <div style="height:14px"></div>
+
+            <a class="btn primary" href="admin.html#register" style="width:100%; justify-content:center;">
+              <span aria-hidden="true">🚀</span> Start Your Journey
+            </a>
+          </div>
+        </aside>
+      </div>
+    </div>
+
+    <section id="about">
+      <div class="wrap">
+        <div class="sectionTitle">
+          <h3>Why We're Doing This</h3>
+          <p>We want to raise the standard for community tournaments - organized, exciting, and respectful.</p>
+        </div>
+
+        <div class="grid3">
+          <div class="panel">
+            <div class="iconRow">
+              <div class="icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path d="M12 2l3 7 7 3-7 3-3 7-3-7-7-3 7-3 3-7z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <h4>We love the game</h4>
+            </div>
+            <p>
+              This tournament is built from pure passion - the same passion you feel when you clutch a round,
+              coordinate a perfect execute, or support your teammates.
+            </p>
+          </div>
+
+          <div class="panel">
+            <div class="iconRow">
+              <div class="icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path d="M16 11a4 4 0 1 0-8 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                  <path d="M4 21c1.6-4 5-6 8-6s6.4 2 8 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                  <path d="M20 8a3 3 0 1 0-5-2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <h4>We support the community</h4>
+            </div>
+            <p>
+              We're creating a space for teams of all levels - from rising squads to veterans -
+              with clear structure, respectful competition, and real spotlight on talent.
+            </p>
+          </div>
+
+          <div class="panel">
+            <div class="iconRow">
+              <div class="icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path d="M4 12h6l2-3 2 6 2-3h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M4 20h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                  <path d="M4 4h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <h4>We want higher standards</h4>
+            </div>
+            <p>
+              Better graphics, better stream, better scheduling, better communication -
+              so every team feels like they're playing on a real stage.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <section id="teams">
+      <div class="wrap">
+        <div class="sectionTitle">
+          <h3>Teams</h3>
+          <p>Browse approved teams and rosters. (Connect this to your Teams page/table later.)</p>
+        </div>
+
+        <div class="grid3">
+          <div class="panel">
+            <div class="iconRow">
+              <div class="icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path d="M16 11a4 4 0 1 0-8 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                  <path d="M4 21c1.6-4 5-6 8-6s6.4 2 8 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                  <path d="M20 8a3 3 0 1 0-5-2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <h4>Approved Teams</h4>
+            </div>
+            <p>
+              This section can list the teams that are approved to play. If you already have a teams table elsewhere,
+              link it here or embed it later.
+            </p>
+          </div>
+
+          <div class="panel">
+            <div class="iconRow">
+              <div class="icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path d="M12 3l8 6-8 6-8-6 8-6z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+                  <path d="M4 15l8 6 8-6" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <h4>Rosters</h4>
+            </div>
+            <p>
+              Show each team roster (main + subs). Keep it transparent so everyone knows who is eligible.
+            </p>
+          </div>
+
+          <div class="panel">
+            <div class="iconRow">
+              <div class="icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path d="M4 7h16M7 4v6M17 4v6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                  <path d="M6 12h12v8H6v-8z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+                  <path d="M9 16h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <h4>Schedule Links</h4>
+            </div>
+            <p>
+              Add match schedules, check-in info, and lobby/room instructions here so teams always have one place to check.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="bracket">
+      <div class="wrap">
+        <div class="sectionTitle">
+          <h3>Bracket</h3>
+          <p>Quick access to the bracket and match progression. (Embed your bracket later.)</p>
+        </div>
+
+        <div class="timeline">
+          <div class="step">
+            <div class="stepHeader">
+              <b>Qualifiers</b>
+              <span>Round 1</span>
+            </div>
+            <p>
+              Teams compete to secure playoff slots. Update this with your actual format (BO1/BO3) and rules.
+            </p>
+          </div>
+
+          <div class="step">
+            <div class="stepHeader">
+              <b>Playoffs</b>
+              <span>Elimination</span>
+            </div>
+            <p>
+              Higher stakes, stronger opponents, and tighter calls. This is where legends are made.
+            </p>
+          </div>
+
+          <div class="step">
+            <div class="stepHeader">
+              <b>Semi Finals</b>
+              <span>Top 4</span>
+            </div>
+            <p>
+              The best teams prove consistency. Stream coverage and highlights usually focus here.
+            </p>
+          </div>
+
+          <div class="step">
+            <div class="stepHeader">
+              <b>Grand Finals</b>
+              <span>Championship</span>
+            </div>
+            <p>
+              One series to decide it all. Bring the energy - this is the Road to Champions.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="mission">
+      <div class="wrap">
+        <div class="sectionTitle">
+          <h3>Our Goal & Passion</h3>
+          <p>A tournament that grows players, builds leaders, and strengthens the scene.</p>
+        </div>
+
+        <div class="grid3">
+          <div class="panel">
+            <div class="iconRow">
+              <div class="icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path d="M12 3l8 6-8 6-8-6 8-6z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+                  <path d="M4 15l8 6 8-6" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <h4>Develop talent</h4>
+            </div>
+            <p>
+              Give rising players a pathway: structured matches, fair rules, and the pressure of competition -
+              the best way to improve fast.
+            </p>
+          </div>
+
+          <div class="panel">
+            <div class="iconRow">
+              <div class="icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path d="M7 21V10a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                  <path d="M9 7V5a3 3 0 0 1 6 0v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                  <path d="M6 21h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <h4>Build leaders</h4>
+            </div>
+            <p>
+              We're not only supporting players - we're developing casters, observers, admins, editors,
+              and tournament staff from within the community.
+            </p>
+          </div>
+
+          <div class="panel">
+            <div class="iconRow">
+              <div class="icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path d="M12 20s8-4.5 8-10V6l-8-3-8 3v4c0 5.5 8 10 8 10z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+                  <path d="M9.5 12.5l1.8 1.8 3.7-3.7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <h4>Protect fair play</h4>
+            </div>
+            <p>
+              Clear rules, transparent decisions, and respectful enforcement. Competitive integrity is everything -
+              every match must feel fair.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="impact">
+      <div class="wrap">
+        <div class="sectionTitle">
+          <h3>How We Help the Community</h3>
+          <p>We're investing into the scene by creating opportunities and consistent events.</p>
+        </div>
+
+        <div class="timeline">
+          <div class="step">
+            <div class="stepHeader">
+              <b>Opportunity</b>
+              <span>players & teams</span>
+            </div>
+            <p>
+              We give teams a spotlight to prove themselves, attract supporters, and gain experience in a real tournament environment.
+            </p>
+          </div>
+
+          <div class="step">
+            <div class="stepHeader">
+              <b>Production</b>
+              <span>broadcast quality</span>
+            </div>
+            <p>
+              Clean overlays, match coverage, highlights, and better storytelling - so the audience gets a stream worth tuning into.
+            </p>
+          </div>
+
+          <div class="step">
+            <div class="stepHeader">
+              <b>Consistency</b>
+              <span>seasons & rankings</span>
+            </div>
+            <p>
+              We aim to run seasons with a consistent system so the community can track progress and rivalries over time.
+            </p>
+          </div>
+
+          <div class="step">
+            <div class="stepHeader">
+              <b>Community</b>
+              <span>positive culture</span>
+            </div>
+            <p>
+              We promote respect and teamwork. Great competition should build friendships - not toxicity.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="format">
+      <div class="wrap">
+        <div class="sectionTitle">
+          <h3>Tournament Plan</h3>
+          <p>Update these placeholders to match your exact dates, rules, and prize pool.</p>
+        </div>
+
+        <div class="grid3">
+          <div class="panel">
+            <div class="iconRow">
+              <div class="icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path d="M7 3v4M17 3v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                  <path d="M4 7h16v14H4V7z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+                  <path d="M7 11h4M7 15h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <h4>Schedule</h4>
+            </div>
+            <p>
+              <b>Registration:</b> Open Now<br/>
+              <b>Qualifiers:</b> (set date)<br/>
+              <b>Playoffs:</b> (set date)<br/>
+              <b>Grand Finals:</b> (set date)
+            </p>
+          </div>
+
+          <div class="panel">
+            <div class="iconRow">
+              <div class="icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path d="M6 4h12v6H6V4z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+                  <path d="M6 14h12v6H6v-6z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+                  <path d="M9 7h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                  <path d="M9 17h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <h4>Format</h4>
+            </div>
+            <p>
+              <b>Teams:</b> (e.g., 16/32)<br/>
+              <b>Mode:</b> Online<br/>
+              <b>Brackets:</b> Qualifiers -> Playoffs -> Finals<br/>
+              <b>Rules:</b> Clear match rules + admin support
+            </p>
+          </div>
+
+          <div class="panel">
+            <div class="iconRow">
+              <div class="icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path d="M12 2l3 6 7 .8-5.2 4.4 1.7 6.8L12 17l-6.5 3 1.7-6.8L2 8.8 9 8l3-6z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <h4>Prizes & Support</h4>
+            </div>
+            <p>
+              <b>Prize Pool:</b> (set amount)<br/>
+              <b>Community Giveaways:</b> (optional)<br/>
+              <b>Sponsors:</b> (add logos/links)<br/>
+              <b>Goal:</b> Increase rewards each season
+            </p>
+          </div>
+        </div>
+
+        <div style="height:14px"></div>
+
+        <div class="card">
+          <div class="cardInner">
+            <div class="sectionTitle" style="margin:0 0 10px;">
+              <h3 style="font-size:16px;">Ready to compete?</h3>
+              <p style="max-width:none;">Register with your email, build your roster, and join Season 1.</p>
+            </div>
+            <div class="heroCTAs" style="margin-top:10px;">
+              <a class="btn primary" href="admin.html#register"><span aria-hidden="true">📝</span> Register</a>
+              <a class="btn" href="admin.html"><span aria-hidden="true">🔐</span> Login</a>
+              <a class="btn" href="#top"><span aria-hidden="true">⬆️</span> Back to top</a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <div class="footGrid">
+        <div>
+          <div class="kicker"><span class="dot" aria-hidden="true"></span> MEDC Invitational</div>
+          <p>
+            Our mission is simple: elevate the community through competitive esports, consistent events,
+            and a professional experience - while keeping the heart of it all: passion and respect.
+          </p>
+          <div class="small">
+            Tip: Update the links in the header buttons (auth.html) to your real login/register page file.
+          </div>
+        </div>
+        <div class="links" aria-label="Footer links">
+          <a class="pill" href="#about">About</a>
+          <a class="pill" href="#mission">Mission</a>
+          <a class="pill" href="#teams">Teams</a>
+          <a class="pill" href="#bracket">Bracket</a>
+          <!-- Replace # with your socials -->
+          <a class="pill" href="#" title="Facebook">Facebook</a>
+          <a class="pill" href="#" title="Discord">Discord</a>
+        </div>
+      </div>
+      <div class="blurline" aria-hidden="true"></div>
+    </div>
+  </footer>
+
+  <script>
+    // Smooth-scroll for in-page anchors
+    document.addEventListener('click', (e) => {
+      const a = e.target.closest('a[href^="#"]');
+      if (!a) return;
+      const id = a.getAttribute('href');
+      if (!id || id === '#') return;
+      const el = document.querySelector(id);
+      if (!el) return;
+      e.preventDefault();
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      history.replaceState(null, '', id);
+    });
+  </script>
+</body>
+</html>
