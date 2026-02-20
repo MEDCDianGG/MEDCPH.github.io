@@ -3,219 +3,226 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>MEDC Invitational — Bracket & Teams</title>
+  <title>MEDC Invitational — Tournament</title>
   <style>
-    :root{--bg:#070A12;--card:rgba(255,255,255,.04);--line:rgba(255,255,255,.10);--text:#EAF0FF;--muted:rgba(234,240,255,.75);--shadow:0 18px 60px rgba(0,0,0,.45);--r:18px}
+    :root{
+      --bg:#070A12; --card:rgba(255,255,255,.04); --line:rgba(255,255,255,.10);
+      --text:#EAF0FF; --muted:rgba(234,240,255,.75);
+      --shadow:0 18px 60px rgba(0,0,0,.45); --r:18px;
+      --blue:rgba(59,130,246,.22); --blueb:rgba(59,130,246,.35);
+      --green:rgba(34,197,94,.16); --greenb:rgba(34,197,94,.35);
+    }
     *{box-sizing:border-box}
     body{margin:0;font-family:system-ui,Segoe UI,Arial;background:var(--bg);color:var(--text)}
     header{position:sticky;top:0;z-index:10;background:rgba(7,10,18,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
     .wrap{max-width:1200px;margin:0 auto;padding:18px}
     .bar{display:flex;align-items:center;justify-content:space-between;gap:12px}
     .brand{display:flex;align-items:center;gap:12px;font-weight:900}
-    .brandLogo{width:46px;height:46px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.04);overflow:hidden}
-    .brandLogo img{width:100%;height:100%;object-fit:cover}
-    .btn{border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--text);padding:10px 12px;border-radius:999px;cursor:pointer;font-weight:800}
-    .btn.primary{background:rgba(59,130,246,.22);border-color:rgba(59,130,246,.35)}
+    .pill{display:inline-flex;gap:8px;align-items:center;padding:6px 10px;border-radius:999px;border:1px solid var(--line);
+      background:rgba(255,255,255,.04);font-size:12px;color:var(--muted)}
     .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden}
     .cardPad{padding:16px}
-    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .grid2{display:grid;grid-template-columns:420px 1fr;gap:14px}
     @media(max-width:980px){.grid2{grid-template-columns:1fr}}
     .muted{color:var(--muted)}
     .list{display:flex;flex-direction:column;gap:10px}
     .item{padding:12px;border-radius:16px;border:1px solid var(--line);background:rgba(0,0,0,.20)}
+    .itemTop{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
     .bracketGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;align-items:start}
     @media(max-width:1100px){.bracketGrid{grid-template-columns:repeat(2,1fr)}}
     @media(max-width:600px){.bracketGrid{grid-template-columns:1fr}}
     .match{padding:12px;border-radius:16px;border:1px solid var(--line);background:rgba(0,0,0,.22)}
-    .pill{display:inline-flex;gap:8px;align-items:center;padding:6px 10px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.04);font-size:12px;color:var(--muted)}
-    .slot{display:flex;justify-content:space-between;gap:10px;padding:8px 10px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.06);margin-bottom:8px}
+    .slot{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 10px;border-radius:12px;
+      background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.06);margin-bottom:8px}
+    #dbg{
+      position:fixed; right:14px; bottom:14px; z-index:9999;
+      max-width:520px; padding:10px 12px; border-radius:14px;
+      background:rgba(0,0,0,.55); border:1px solid rgba(255,255,255,.14);
+      box-shadow:0 18px 60px rgba(0,0,0,.45);
+      font-size:12px; color:rgba(234,240,255,.9); white-space:pre-wrap
+    }
+    #dbg.hide{display:none}
   </style>
 </head>
 <body>
-    <header>
-        <div class="wrap bar">
-            <div class="brand">
-                <div class="brandLogo">
-                    <img src="MEDC INVITATIONAL LOGO.gif" alt="MEDC Invitational Logo">
-                </div>
-                <div>
-                    <div>MEDC INVITATIONAL</div>
-                    <div class="muted" style="font-size:12px;margin-top:2px">Public Bracket & Team List</div>
-                </div>
-            </div>
-            <button class="btn primary" onclick="location.href='admin.html'">Admin Login</button>
-        </div>
-    </header>
+<header>
+  <div class="wrap bar">
+    <div class="brand">
+      <div>MEDC INVITATIONAL</div>
+      <span class="pill" id="livePill">Live: —</span>
+    </div>
+    <div class="bar" style="justify-content:flex-end">
+      <a class="pill" href="admin.html" style="text-decoration:none;color:inherit">Admin</a>
+    </div>
+  </div>
+</header>
 
-    <div class="wrap">
-        <div class="card" style="margin-bottom:14px">
-            <div class="cardPad">
-                <div class="muted"></div>
-                <div style="margin-top:10px;border-radius:16px;overflow:hidden;border:1px solid rgba(255,255,255,.10)">
-                    <img src="COVER MEDC INV.png" alt="MEDC Invitational Cover" style="width:100%;display:block">
-                </div>
-                <div class="row" style="margin-top:10px"></div>
-                <div class="pill" id="metaPill"></div>
-            </div>
+<div class="wrap">
+  <div class="grid2">
+    <!-- LEFT: TEAMS + ROSTERS -->
+    <div class="card">
+      <div class="cardPad">
+        <div class="itemTop">
+          <div>
+            <h2 style="margin:0">Teams</h2>
+            <div class="muted" id="teamsMeta" style="margin-top:6px">—</div>
+          </div>
         </div>
 
-        <div class="grid2">
-            <div class="card">
-                <div class="cardPad">
-                    <h2 style="margin:0">Teams</h2>
-                    <p class="muted" style="margin:8px 0 12px">Public view (read-only)</p>
-                    <div id="teamsList" class="list"></div>
-
-                    <div class="item" style="margin-top:10px">
-                        <b>Team Players</b>
-                        <div id="teamDetails" class="muted" style="margin-top:6px">Click a team to view players.</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="cardPad">
-                    <h2 style="margin:0">Bracket</h2>
-                    <p class="muted" style="margin:8px 0 12px">Public view (read-only)</p>
-                    <div id="bracketArea" class="bracketGrid"></div>
-                </div>
-            </div>
+        <div class="item" style="margin-top:12px">
+          <div class="muted">All teams</div>
+          <div id="teamsList" class="list" style="margin-top:10px"></div>
         </div>
+
+        <div class="item" style="margin-top:10px">
+          <b>Rosters</b>
+          <div class="muted" style="margin-top:6px">Captain + players per team</div>
+          <div id="rostersList" class="list" style="margin-top:10px"></div>
+        </div>
+      </div>
     </div>
 
-    <script>
-  const KEY = "medc_admin_state_v1";
+    <!-- RIGHT: BRACKET -->
+    <div class="card">
+      <div class="cardPad">
+        <div class="itemTop">
+          <div>
+            <h2 style="margin:0">Bracket</h2>
+            <div class="muted" id="bracketMeta" style="margin-top:6px">—</div>
+          </div>
+        </div>
+        <div id="bracketArea" class="bracketGrid" style="margin-top:12px"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="dbg" class="hide"></div>
+
+<script type="module">
+  /**********************
+   * MEDC Public Page (Read-only)
+   * Connects to the SAME Firestore doc used by admin:
+   *   tournament/state
+   *
+   * ✅ Paste your Firebase web config below.
+   **********************/
+  const dbgEl = document.getElementById("dbg");
+  const dbg = (msg) => { dbgEl.classList.remove("hide"); dbgEl.textContent = msg; };
+  const dbgOff = () => dbgEl.classList.add("hide");
+
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+  import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+	  const firebaseConfig = {
+	  "apiKey": "AIzaSyDZAVhuz9SVBHSCPnEvoxwCjaMrZSQOJ6k",
+	  "authDomain": "medcesport.firebaseapp.com",
+	  "projectId": "medcesport",
+	  "storageBucket": "medcesport.firebasestorage.app",
+	  "messagingSenderId": "7933255333",
+	  "appId": "1:7933255333:web:cfe776ebb79f607cdd774c",
+	  "measurementId": "G-07Z2TFM553"
+	};
+
+  // UI helpers
   const $ = (id) => document.getElementById(id);
+  function escapeHtml(s=""){ return (""+s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+  const teamNameById = (teams, id) => (teams.find(t => t.id === id)?.name || "");
 
-  function escapeHtml(s=""){
-    return (""+s).replace(/[&<>"']/g, m => ({
-      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-    }[m]));
-  }
-
-  function loadState(){
-    try{
-      const raw = // removed localStorage(KEY);
-      return raw ? JSON.parse(raw) : { teams: [], bracketSize: 8, matches: [], rosters: {} };
-    } catch {
-      return { teams: [], bracketSize: 8, matches: [], rosters: {} };
-    }
-  }
-
-  // Supports BOTH formats:
-  // 1) rosters[teamId] = ["p1","p2"] (old)
-  // 2) rosters[teamId] = { captain:"", players:[...] } (new)
-  function normalizeRosters(state){
-    if(!state.rosters) state.rosters = {};
-    for(const tid in state.rosters){
-      const v = state.rosters[tid];
-      if(Array.isArray(v)){
-        state.rosters[tid] = { captain:"", players: v };
-      } else {
+  function normalizeRosters(s){
+    if(!s.rosters) s.rosters = {};
+    for(const tid in s.rosters){
+      const v = s.rosters[tid];
+      if(Array.isArray(v)) s.rosters[tid] = { captain:"", players:v };
+      else {
         if(!v.players) v.players = [];
         if(typeof v.captain !== "string") v.captain = "";
       }
     }
   }
 
-  function teamNameById(state, id){
-    const t = (state.teams || []).find(x => x.id === id);
-    return t ? t.name : "";
-  }
+  function render(state){
+    const teams = Array.isArray(state.teams) ? state.teams : [];
+    const matches = Array.isArray(state.matches) ? state.matches : [];
+    const bracketSize = Number(state.bracketSize || 8);
+    normalizeRosters(state);
 
-  // PUBLIC TEAMS + ROSTER VIEW (click a team)
-  function renderTeamsPublic(state){
-    const teamsList = $("teamsList");
-    const teamDetails = $("teamDetails");
+    $("livePill").textContent = "Live: Connected";
+    $("teamsMeta").textContent = `${teams.length} teams`;
+    $("bracketMeta").textContent = `${teams.length} teams • ${matches.length} matches • bracket ${bracketSize}`;
 
-    if(!teamsList) return;
-    teamsList.innerHTML = "";
-
-    if(!state.teams || state.teams.length === 0){
-      teamsList.innerHTML = `<div class="muted">No teams yet. Check back later.</div>`;
-      if(teamDetails) teamDetails.innerHTML = `<div class="muted">No team selected.</div>`;
-      return;
-    }
-
-    if(teamDetails){
-      teamDetails.innerHTML = `<div class="muted">Click a team to view captain and players.</div>`;
-    }
-
-    state.teams.forEach(t => {
-      const roster = state.rosters?.[t.id] || { captain:"", players:[] };
-      const captain = roster.captain || "";
-      const players = Array.isArray(roster.players) ? roster.players : [];
-
-      const div = document.createElement("div");
-      div.className = "item";
-      div.style.cursor = "pointer";
-      div.innerHTML = `
-        <b>${escapeHtml(t.name)}</b>
-        <div class="muted">${players.length} players${captain ? " • Captain set" : ""}</div>
-      `;
-
-      div.onclick = () => {
-        if(!teamDetails) return;
-
-        const captainHtml = captain
-          ? `<div class="pill"><b>Captain:</b> ${escapeHtml(captain)}</div>`
-          : `<div class="muted">Captain not set yet.</div>`;
-
-        const playersHtml = players.length
-          ? players.map(p => `<div class="pill">${escapeHtml(p)}</div>`).join(" ")
-          : `<div class="muted">No players listed yet.</div>`;
-
-        teamDetails.innerHTML = `
-          <div><b style="font-size:18px">${escapeHtml(t.name)}</b></div>
-
-          <div class="muted" style="margin-top:10px">Team Captain</div>
-          <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">${captainHtml}</div>
-
-          <div class="muted" style="margin-top:12px">Players</div>
-          <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">${playersHtml}</div>
+    // Teams list
+    const tl = $("teamsList");
+    tl.innerHTML = "";
+    if(teams.length === 0){
+      tl.innerHTML = `<div class="muted">No teams yet.</div>`;
+    } else {
+      teams.forEach(t => {
+        const roster = state.rosters?.[t.id] || { captain:"", players:[] };
+        const count = (roster.players || []).length;
+        const div = document.createElement("div");
+        div.className = "item";
+        div.innerHTML = `
+          <div class="itemTop">
+            <div>
+              <b>${escapeHtml(t.name)}</b>
+              <div class="muted">Players: ${count}</div>
+            </div>
+          </div>
         `;
-      };
-
-      teamsList.appendChild(div);
-    });
-  }
-
-  function renderBracketPublic(state){
-    const area = $("bracketArea");
-    if(!area) return;
-
-    area.innerHTML = "";
-
-    if(!state.matches || state.matches.length === 0){
-      area.innerHTML = `<div class="muted">Bracket not created yet.</div>`;
-      return;
+        tl.appendChild(div);
+      });
     }
 
-    const size = Number(state.bracketSize || 8);
-    const rounds = Math.log2(size);
+    // Rosters list
+    const rl = $("rostersList");
+    rl.innerHTML = "";
+    if(teams.length === 0){
+      rl.innerHTML = `<div class="muted">No rosters yet.</div>`;
+    } else {
+      teams.forEach(t => {
+        const roster = state.rosters?.[t.id] || { captain:"", players:[] };
+        const captain = roster.captain || "";
+        const players = Array.isArray(roster.players) ? roster.players : [];
+        const div = document.createElement("div");
+        div.className = "item";
+        div.innerHTML = `
+          <b>${escapeHtml(t.name)}</b>
+          <div class="muted" style="margin-top:6px">Captain: <b>${escapeHtml(captain || "—")}</b></div>
+          <div class="muted" style="margin-top:6px">Players: ${players.length ? "" : "<b>—</b>"}</div>
+          ${players.length ? `<div style="margin-top:6px">${players.map(p => `<div class="pill" style="margin:4px 6px 0 0;display:inline-flex">${escapeHtml(p)}</div>`).join("")}</div>` : ""}
+        `;
+        rl.appendChild(div);
+      });
+    }
 
+    // Bracket
+    const area = $("bracketArea");
+    area.innerHTML = "";
+    if(!matches.length){
+      area.innerHTML = `<div class="muted">No bracket yet.</div>`;
+      return;
+    }
+    const rounds = Math.log2(bracketSize);
     for(let r=1; r<=rounds; r++){
       const col = document.createElement("div");
       col.className = "list";
       col.innerHTML = `<div class="pill"><b>Round ${r}</b></div>`;
 
-      state.matches.filter(m=>m.round===r).forEach(m=>{
+      matches.filter(m=>m.round===r).forEach(m=>{
+        const a = teamNameById(teams, m.aTeamId || "");
+        const b = teamNameById(teams, m.bTeamId || "");
+        const w = teamNameById(teams, m.winnerTeamId || "");
         const div = document.createElement("div");
-        div.className="match";
+        div.className = "match";
         div.innerHTML = `
-          <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px">
-            <b>${escapeHtml(m.id)}</b>
-            <span class="pill">${m.winnerTeamId ? "Winner set" : "No winner"}</span>
+          <div class="itemTop" style="margin-bottom:10px">
+            <b>${escapeHtml(m.id || "")}</b>
+            <span class="pill">${w ? "Winner set" : "No winner"}</span>
           </div>
-          <div class="slot">
-            <span>${escapeHtml(teamNameById(state,m.aTeamId) || "TBD")}</span>
-            <b>${escapeHtml(m.scoreA ?? "")}</b>
-          </div>
-          <div class="slot">
-            <span>${escapeHtml(teamNameById(state,m.bTeamId) || "TBD")}</span>
-            <b>${escapeHtml(m.scoreB ?? "")}</b>
-          </div>
-          <div class="muted">Winner: <b>${escapeHtml(teamNameById(state,m.winnerTeamId) || "—")}</b></div>
+          <div class="slot"><div>${escapeHtml(a || "—")}</div><div class="pill">${escapeHtml(m.scoreA ?? "") || " "}</div></div>
+          <div class="slot"><div>${escapeHtml(b || "—")}</div><div class="pill">${escapeHtml(m.scoreB ?? "") || " "}</div></div>
+          <div class="muted" style="margin-top:8px">Winner: <b>${escapeHtml(w || "—")}</b></div>
         `;
         col.appendChild(div);
       });
@@ -224,77 +231,27 @@
     }
   }
 
-  function render(){
-    const state = loadState();
-    normalizeRosters(state);
+  try{
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-    const meta = $("metaPill");
-    if(meta){
-      meta.textContent = `${state.teams?.length || 0} teams • ${state.matches?.length || 0} matches • bracket ${state.bracketSize || 8}`;
-    }
-
-    renderTeamsPublic(state);
-    renderBracketPublic(state);
+    $("livePill").textContent = "Live: Connecting…";
+    onSnapshot(doc(db, "tournament", "state"), (snap) => {
+      dbgOff();
+      if(!snap.exists()){
+        $("livePill").textContent = "Live: No data";
+        render({ teams:[], matches:[], bracketSize:8, rosters:{} });
+        return;
+      }
+      render(snap.data() || {});
+    }, (e) => {
+      $("livePill").textContent = "Live: Error";
+      dbg("Firestore error: " + (e?.code ? e.code + ": " : "") + (e?.message || String(e)));
+    });
+  }catch(e){
+    $("livePill").textContent = "Live: Error";
+    dbg("Init error: " + (e?.message || String(e)));
   }
-
-  render();
-
-  // refresh when admin updates in another tab
-  window.addEventListener("storage", (e) => {
-    if(e.key === KEY) render();
-  });
-
-  // fallback refresh
-  setInterval(render, 2000);
 </script>
-
-
-<!-- Firebase Live Sync -->
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyDZAVhuz9SVBHSCPnEvoxwCjaMrZSQOJ6k",
-  authDomain: "medcesport.firebaseapp.com",
-  projectId: "medcesport",
-  storageBucket: "medcesport.firebasestorage.app",
-  messagingSenderId: "7933255333",
-  appId: "1:7933255333:web:cfe776ebb79f607cdd774c",
-  measurementId: "G-07Z2TFM553"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-function normalizeRosters(s){
-  if(!s.rosters) s.rosters = {};
-  for(const tid in s.rosters){
-    const v = s.rosters[tid];
-    if(Array.isArray(v)) s.rosters[tid] = { captain:"", players:v };
-    else {
-      if(!v.players) v.players = [];
-      if(typeof v.captain !== "string") v.captain = "";
-    }
-  }
-}
-
-// This function must exist in your page to update UI
-// It will replace localStorage render
-function updatePublicUI(state){
-  if(window.renderFromState){
-    window.renderFromState(state);
-  }
-}
-
-// Live Firestore listener
-onSnapshot(doc(db, "tournament", "state"), (snap) => {
-  if(!snap.exists()) return;
-  const state = snap.data();
-  normalizeRosters(state);
-  updatePublicUI(state);
-});
-</script>
-
 </body>
 </html>
