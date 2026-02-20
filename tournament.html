@@ -1,108 +1,426 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>MEDC Invitational — Tournament</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>MEDC Invitational — Tournament</title>
+  <style>
+    :root{
+      --bg:#070A12; --card:rgba(255,255,255,.04); --line:rgba(255,255,255,.10);
+      --text:#EAF0FF; --muted:rgba(234,240,255,.75);
+      --shadow:0 18px 60px rgba(0,0,0,.45); --r:18px;
+      --blue:rgba(59,130,246,.22); --blueb:rgba(59,130,246,.35);
+      --green:rgba(34,197,94,.16); --greenb:rgba(34,197,94,.35);
+      --parY: 0px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:system-ui,Segoe UI,Arial;
+      background:var(--bg);
+      color:var(--text);
+      min-height:100vh;
+    }
 
-<style>
-/* ===== INDEX NAVBAR STYLE ===== */
-body{margin:0;font-family:system-ui,Segoe UI,Arial;background:#070A12;color:#EAF0FF}
+    /* --- Parallax background (MEDC INV VER 2.png) --- */
+    body::before{
+      content:"";
+      position:fixed;
+      inset:-6vh 0 -6vh 0;
+      z-index:-2;
+      background:
+        radial-gradient(1200px 700px at 12% 10%, rgba(59,130,246,.22), transparent 55%),
+        radial-gradient(1100px 650px at 88% 22%, rgba(34,197,94,.14), transparent 55%),
+        url("MEDC INV VER 2.png");
+      background-size: auto, auto, cover;
+      background-position: center, center, center;
+      background-repeat:no-repeat;
+      transform: translate3d(0, calc(var(--parY) * -1), 0);
+      filter: saturate(1.05) contrast(1.02);
+      opacity:.24;
+      will-change: transform;
+    }
+    body::after{
+      content:"";
+      position:fixed;
+      inset:0;
+      z-index:-1;
+      background: linear-gradient(180deg, rgba(7,10,18,.92), rgba(7,10,18,.78) 40%, rgba(7,10,18,.92));
+      pointer-events:none;
+    }
 
-header{
-  position:sticky;
-  top:0;
-  z-index:50;
-  backdrop-filter:blur(14px);
-  background:rgba(7,10,18,.62);
-  border-bottom:1px solid rgba(255,255,255,.08);
-}
+    header{
+      position:sticky;top:0;z-index:10;
+      background:rgba(7,10,18,.86);
+      backdrop-filter:blur(10px);
+      border-bottom:1px solid var(--line)
+    }
+    .wrap{max-width:1200px;margin:0 auto;padding:18px}
+    .bar{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .brand{display:flex;align-items:center;gap:12px;font-weight:900}
+    .pill{
+      display:inline-flex;gap:8px;align-items:center;padding:6px 10px;border-radius:999px;border:1px solid var(--line);
+      background:rgba(255,255,255,.04);font-size:12px;color:var(--muted)
+    }
+    .card{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:0 18px 60px rgba(0,0,0,.45);overflow:hidden}
+    .cardPad{padding:16px}
+    .muted{color:var(--muted)}
+    .list{display:flex;flex-direction:column;gap:10px}
+    .item{padding:12px;border-radius:16px;border:1px solid var(--line);background:rgba(0,0,0,.20)}
+    .itemTop{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+    .bracketGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;align-items:start}
+    @media(max-width:1100px){.bracketGrid{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:600px){.bracketGrid{grid-template-columns:1fr}}
+    .match{padding:12px;border-radius:16px;border:1px solid var(--line);background:rgba(0,0,0,.22)}
+    .slot{
+      display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 10px;border-radius:12px;
+      background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.06);margin-bottom:8px
+    }
 
-.wrap{max-width:1180px;margin:auto;padding:14px}
+    /* --- Logo + Cover --- */
+    .brandLogo{width:46px;height:46px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.04);overflow:hidden}
+    .brandLogo img{width:100%;height:100%;object-fit:cover}
+    .coverCardImg{width:100%;display:block}
 
-.topbar{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:14px;
-}
+    /* Timeline (format overview) */
+    .sectionTitle{margin:0 0 12px 0}
+    .sectionTitle h3{margin:0}
+    .timeline{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+      gap:14px;
+      margin-top:14px;
+    }
+    .step{
+      padding:16px;
+      border-radius:18px;
+      border:1px solid var(--line);
+      background:rgba(0,0,0,.25);
+    }
+    .stepHeader{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      margin-bottom:8px;
+    }
 
-.brand{
-  display:flex;
-  align-items:center;
-  gap:12px;
-}
-
-.headerLogo{
-  width:44px;
-  height:auto;
-}
-
-nav{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-}
-
-.pill{
-  padding:10px 12px;
-  border:1px solid rgba(255,255,255,.10);
-  background:rgba(13,18,35,.65);
-  border-radius:999px;
-  font-size:13px;
-  text-decoration:none;
-  color:#fff;
-}
-
-.actions{margin-left:auto}
-
-.btn{
-  border:1px solid rgba(255,255,255,.10);
-  background:rgba(13,18,35,.65);
-  color:#fff;
-  padding:10px 14px;
-  border-radius:999px;
-  font-weight:700;
-  font-size:13px;
-  text-decoration:none;
-}
-
-/* ===== PAGE ===== */
-.main{padding:40px;text-align:center}
+    #dbg{
+      position:fixed; right:14px; bottom:14px; z-index:9999;
+      max-width:520px; padding:10px 12px; border-radius:14px;
+      background:rgba(0,0,0,.55); border:1px solid rgba(255,255,255,.14);
+      box-shadow:0 18px 60px rgba(0,0,0,.45);
+      font-size:12px; color:rgba(234,240,255,.9); white-space:pre-wrap
+    }
+    #dbg.hide{display:none}
 </style>
 </head>
-
 <body>
 
 <header>
-  <div class="wrap topbar">
-
+  <div class="wrap bar">
     <div class="brand">
-      <img src="MEDC INVITATIONAL LOGO.gif" class="headerLogo">
-      <div>
-        <b>MEDC Invitational</b><br>
-        <small>Road to Champions • Community Esports</small>
+      <div class="brandLogo">
+        <img src="MEDC INVITATIONAL LOGO.gif" alt="MEDC Invitational Logo">
       </div>
+      <div>
+        <div>MEDC INVITATIONAL</div>
+        <div class="muted" style="font-size:12px;margin-top:2px">Public Tournament Site</div>
+      </div>
+      <span class="pill" id="livePill">Live: —</span>
     </div>
 
-    <nav>
-      <a class="pill" href="index.html#about">About</a>
-      <a class="pill" href="index.html#mission">Our Mission</a>
-      <a class="pill" href="tournament.html">Teams</a>
-      <a class="pill" href="bracket.html">Bracket</a>
-    </nav>
-
-    <div class="actions">
-      <a class="btn" href="admin.html">🔐 ADMIN PANEL</a>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end">
+      <a class="pill" href="index.html" style="text-decoration:none;color:inherit">HOME</a>
+      <a class="pill" href="tournament.html" style="text-decoration:none;color:inherit" aria-current="page">TEAMS</a>
+      <a class="pill" href="bracket.html" style="text-decoration:none;color:inherit" >BRACKET</a>
+      <a class="pill" href="admin.html" style="text-decoration:none;color:inherit">ADMIN</a>
     </div>
-
   </div>
 </header>
 
-<div class="main">
-<h2>Tournament Page</h2>
-<p>Your existing tournament content can stay below this navbar.</p>
+
+<div class="wrap">
+  
+  <div class="card" style="margin-bottom:14px">
+    <div class="cardPad">
+      <div style="margin-top:10px;border-radius:16px;overflow:hidden;border:1px solid rgba(255,255,255,.10)">
+        <img src="COVER MEDC INV.png" alt="MEDC Invitational Cover" class="coverCardImg">
+      </div>
+      <div class="pill" id="metaPill" style="margin-top:10px">Loading…</div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px">
+    <div class="cardPad">
+      <div class="sectionTitle">
+        <h3>Teams — How to Join (Approval Required)</h3>
+        <p class="muted" style="margin:6px 0 0">
+          All teams/players must be reviewed and approved by MEDC staff before they are officially entered into the tournament.
+        </p>
+      </div>
+
+      <div class="timeline">
+        <div class="step">
+          <div class="stepHeader">
+            <b>1) Submit Team + Roster</b>
+            <span class="pill">Registration</span>
+          </div>
+          <p class="muted" style="margin:0">
+            Create your team name and submit your full roster (Captain + Players). Use the exact IGN spelling — this will be used for bracket and stream graphics.
+          </p>
+        </div>
+
+        <div class="step">
+          <div class="stepHeader">
+            <b>2) Status: PENDING</b>
+            <span class="pill">Review</span>
+          </div>
+          <p class="muted" style="margin:0">
+            Your request stays <b>PENDING</b> while staff checks eligibility, duplicate names, roster limits, and rule compliance.
+          </p>
+        </div>
+
+        <div class="step">
+          <div class="stepHeader">
+            <b>3) Approved = Official Entry</b>
+            <span class="pill" style="border-color:var(--greenb)">APPROVED</span>
+          </div>
+          <p class="muted" style="margin:0">
+            Once approved, your team becomes official and can be seeded into the bracket. Only approved teams will appear on the public bracket.
+          </p>
+        </div>
+
+        <div class="step">
+          <div class="stepHeader">
+            <b>4) Fix Needed</b>
+            <span class="pill">Update</span>
+          </div>
+          <p class="muted" style="margin:0">
+            If anything is missing (wrong IGN, incomplete roster, conflicts), staff will ask you to correct it. Update your roster and resubmit for approval.
+          </p>
+        </div>
+
+        <div class="step">
+          <div class="stepHeader">
+            <b>Roster Lock</b>
+            <span class="pill">Before Match</span>
+          </div>
+          <p class="muted" style="margin:0">
+            Rosters may be locked before the tournament starts. Last‑minute changes are only allowed if staff approves (subs/rules apply).
+          </p>
+        </div>
+
+        <div class="step">
+          <div class="stepHeader">
+            <b>Check‑In & No‑Show</b>
+            <span class="pill">On Time</span>
+          </div>
+          <p class="muted" style="margin:0">
+            Teams must be ready at match time. Late check‑ins may result in a forfeit depending on the grace period set by staff.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<div class="card">
+    <div class="cardPad">
+      <div class="itemTop">
+        <div>
+          <h2 style="margin:0">Teams</h2>
+          <div class="muted" id="teamsMeta" style="margin-top:6px">—</div>
+        </div>
+      </div>
+
+      <div class="item" style="margin-top:12px">
+        <div class="muted">All teams</div>
+        <div id="teamsList" class="list" style="margin-top:10px"></div>
+      </div>
+
+      <div class="item" style="margin-top:10px">
+        <b>Rosters</b>
+        <div class="muted" style="margin-top:6px">Captain + players per team</div>
+        <div id="rostersList" class="list" style="margin-top:10px"></div>
+      </div>
+    </div>
+  </div>
 </div>
+
+<div id="dbg" class="hide"></div>
+
+<script type="module">
+  // MEDC Public Pages (Read-only) — Firestore doc: tournament/state
+  const dbgEl = document.getElementById("dbg");
+  const dbg = (msg) => { dbgEl.classList.remove("hide"); dbgEl.textContent = msg; };
+  const dbgOff = () => dbgEl.classList.add("hide");
+
+  // Parallax
+  const parallaxTick = () => {
+    document.documentElement.style.setProperty("--parY", (window.scrollY * 0.18).toFixed(2) + "px");
+    requestAnimationFrame(parallaxTick);
+  };
+  requestAnimationFrame(parallaxTick);
+
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+  import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    "apiKey": "AIzaSyDZAVhuz9SVBHSCPnEvoxwCjaMrZSQOJ6k",
+    "authDomain": "medcesport.firebaseapp.com",
+    "projectId": "medcesport",
+    "storageBucket": "medcesport.firebasestorage.app",
+    "messagingSenderId": "7933255333",
+    "appId": "1:7933255333:web:cfe776ebb79f607cdd774c",
+    "measurementId": "G-07Z2TFM553"
+  };
+
+  const $ = (id) => document.getElementById(id);
+  function escapeHtml(s=""){ return (""+s).replace(/[&<>\"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+  const teamNameById = (teams, id) => (teams.find(t => t.id === id)?.name || "");
+
+  function normalizeRosters(s){
+    if(!s.rosters) s.rosters = {};
+    for(const tid in s.rosters){
+      const v = s.rosters[tid];
+      if(Array.isArray(v)) s.rosters[tid] = { captain:"", players:v };
+      else {
+        if(!v.players) v.players = [];
+        if(typeof v.captain !== "string") v.captain = "";
+      }
+    }
+  }
+
+  function renderMeta(state){
+    const teams = Array.isArray(state.teams) ? state.teams : [];
+    const matches = Array.isArray(state.matches) ? state.matches : [];
+    const bracketSize = Number(state.bracketSize || 8);
+    const meta = document.getElementById("metaPill");
+    if(meta) meta.textContent = `${teams.length} teams • ${matches.length} matches • bracket ${bracketSize}`;
+    const live = document.getElementById("livePill");
+    if(live) live.textContent = "Live: Connected";
+    return { teams, matches, bracketSize };
+  }
+
+  function renderTeams(state){
+    const { teams } = renderMeta(state);
+    normalizeRosters(state);
+
+    const teamsMeta = document.getElementById("teamsMeta");
+    if(teamsMeta) teamsMeta.textContent = `${teams.length} teams`;
+
+    const tl = document.getElementById("teamsList");
+    const rl = document.getElementById("rostersList");
+    if(tl) tl.innerHTML = "";
+    if(rl) rl.innerHTML = "";
+    if(!tl || !rl) return;
+
+    if(teams.length === 0){
+      tl.innerHTML = `<div class="muted">No teams yet.</div>`;
+      rl.innerHTML = `<div class="muted">No rosters yet.</div>`;
+      return;
+    }
+
+    teams.forEach(t => {
+      const roster = state.rosters?.[t.id] || { captain:"", players:[] };
+      const count = (roster.players || []).length;
+      const div = document.createElement("div");
+      div.className = "item";
+      div.innerHTML = `
+        <div class="itemTop">
+          <div>
+            <b>${escapeHtml(t.name)}</b>
+            <div class="muted">Players: ${count}</div>
+          </div>
+        </div>
+      `;
+      tl.appendChild(div);
+    });
+
+    teams.forEach(t => {
+      const roster = state.rosters?.[t.id] || { captain:"", players:[] };
+      const captain = roster.captain || "";
+      const players = Array.isArray(roster.players) ? roster.players : [];
+      const div = document.createElement("div");
+      div.className = "item";
+      div.innerHTML = `
+        <b>${escapeHtml(t.name)}</b>
+        <div class="muted" style="margin-top:6px">Captain: <b>${escapeHtml(captain || "—")}</b></div>
+        <div class="muted" style="margin-top:6px">Players: ${players.length ? "" : "<b>—</b>"}</div>
+        ${players.length ? `<div style="margin-top:6px">${players.map(p => `<div class="pill" style="margin:4px 6px 0 0;display:inline-flex">${escapeHtml(p)}</div>`).join("")}</div>` : ""}
+      `;
+      rl.appendChild(div);
+    });
+  }
+
+  function renderBracket(state){
+    const { teams, matches, bracketSize } = renderMeta(state);
+    const bracketMeta = document.getElementById("bracketMeta");
+    if(bracketMeta) bracketMeta.textContent = `${teams.length} teams • ${matches.length} matches • bracket ${bracketSize}`;
+
+    const area = document.getElementById("bracketArea");
+    if(!area) return;
+
+    area.innerHTML = "";
+    if(!matches.length){
+      area.innerHTML = `<div class="muted">No bracket yet.</div>`;
+      return;
+    }
+
+    const rounds = Math.log2(bracketSize);
+    for(let r=1; r<=rounds; r++){
+      const col = document.createElement("div");
+      col.className = "list";
+      col.innerHTML = `<div class="pill"><b>Round ${r}</b></div>`;
+
+      matches.filter(m=>m.round===r).forEach(m=>{
+        const a = teamNameById(teams, m.aTeamId || "");
+        const b = teamNameById(teams, m.bTeamId || "");
+        const w = teamNameById(teams, m.winnerTeamId || "");
+        const div = document.createElement("div");
+        div.className = "match";
+        div.innerHTML = `
+          <div class="itemTop" style="margin-bottom:10px">
+            <b>${escapeHtml(m.id || "")}</b>
+            <span class="pill">${w ? "Winner set" : "No winner"}</span>
+          </div>
+          <div class="slot"><div>${escapeHtml(a || "—")}</div><div class="pill">${escapeHtml(m.scoreA ?? "") || " "}</div></div>
+          <div class="slot"><div>${escapeHtml(b || "—")}</div><div class="pill">${escapeHtml(m.scoreB ?? "") || " "}</div></div>
+          <div class="muted" style="margin-top:8px">Winner: <b>${escapeHtml(w || "—")}</b></div>
+        `;
+        col.appendChild(div);
+      });
+
+      area.appendChild(col);
+    }
+  }
+
+  try{
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const live = document.getElementById("livePill");
+    if(live) live.textContent = "Live: Connecting…";
+    const meta = document.getElementById("metaPill"); if(meta) meta.textContent = "Connecting…";
+
+    onSnapshot(doc(db, "tournament", "state"), (snap) => {
+      dbgOff();
+      const data = snap.exists() ? (snap.data() || {}) : { teams:[], matches:[], bracketSize:8, rosters:{} };
+      renderTeams(data);
+      renderBracket(data);
+    }, (e) => {
+      const live = document.getElementById("livePill");
+      if(live) live.textContent = "Live: Error";
+      const meta = document.getElementById("metaPill"); if(meta) meta.textContent = "Error";
+      dbg("Firestore error: " + (e?.code ? e.code + ": " : "") + (e?.message || String(e)));
+    });
+  }catch(e){
+    const live = document.getElementById("livePill");
+    if(live) live.textContent = "Live: Error";
+    const meta = document.getElementById("metaPill"); if(meta) meta.textContent = "Error";
+    dbg("Init error: " + (e?.message || String(e)));
+  }
+</script>
 
 </body>
 </html>
