@@ -6,6 +6,21 @@
   <title>MEDC Invitational - Home</title>
   <meta name="description" content="MEDC Invitational Esports Tournament - built by the community, for the community. Compete, improve, and grow together." />
   <style>
+    /* ===== ADMIN LINK (Clean + Minimal) ===== */
+.adminLink{
+  font-size:12px;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color: rgba(183,195,230,.75);
+  padding:6px 10px;
+  border-radius:6px;
+  transition: all .2s ease;
+}
+
+.adminLink:hover{
+  color: #fff;
+  background: rgba(255,255,255,.08);
+}
     /* ===== HERO LOGO SIZE ===== */
 .heroLogo{
   width:100%;
@@ -664,12 +679,10 @@
       </nav>
 
       <div class="actions">
-        <!-- Link these to your actual auth page if you have it -->
-        <a class="btn" href="admin.html" title="Login / Register">
-          <span aria-hidden="true">🔐</span> ADMIN PANEL
-        </a>
-        </a>
-      </div>
+  <a class="adminLink" href="admin.html" title="Admin Login">
+    🔐 Admin
+  </a>
+</div>
     </div>
   </header>
 
