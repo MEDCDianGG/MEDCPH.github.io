@@ -148,9 +148,10 @@
       border-color: rgba(255,255,255,.18);
     }
     .actions{
-      display:flex; align-items:center; gap:10px;
-      min-width: 220px;
-      justify-content:flex-end;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      margin-left:auto; /* THIS pushes it fully right */
     }
     .btn{
       border: 1px solid rgba(255,255,255,.10);
@@ -663,13 +664,14 @@
   <header>
     <div class="wrap topbar">
       <div class="brand">
-        <div class="brandLogo">
-        <img src="MEDC INVITATIONAL LOGO.gif" class="headerLogo glow" alt="MEDC Invitational Logo">
-        <div>
-          <h1>MEDC Invitational</h1>
-          <small>Road to Champions • Community Esports</small>
-        </div>
-      </div>
+  <div class="brandLogo">
+    <img src="MEDC INVITATIONAL LOGO.gif" class="headerLogo glow" alt="MEDC Invitational Logo">
+    <div>
+      <h1>MEDC Invitational</h1>
+      <small>Road to Champions • Community Esports</small>
+    </div>
+  </div>
+</div>
 
       <nav aria-label="Primary navigation">
         <a class="pill" href="#about">About</a>
