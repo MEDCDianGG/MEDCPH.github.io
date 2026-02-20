@@ -3,247 +3,277 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>MEDC Invitational — Bracket</title>
+  <title>MEDC Invitational — ADMIN PANEL</title>
   <style>
     :root{
       --bg:#070A12; --card:rgba(255,255,255,.04); --line:rgba(255,255,255,.10);
       --text:#EAF0FF; --muted:rgba(234,240,255,.75);
       --shadow:0 18px 60px rgba(0,0,0,.45); --r:18px;
       --blue:rgba(59,130,246,.22); --blueb:rgba(59,130,246,.35);
+      --red:rgba(239,68,68,.18); --redb:rgba(239,68,68,.35);
       --green:rgba(34,197,94,.16); --greenb:rgba(34,197,94,.35);
-      --parY: 0px;
     }
     *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family:system-ui,Segoe UI,Arial;
-      background:var(--bg);
-      color:var(--text);
-      min-height:100vh;
-    }
-
-    /* --- Parallax background (MEDC INV VER 2.png) --- */
-    body::before{
-      content:"";
-      position:fixed;
-      inset:-6vh 0 -6vh 0;
-      z-index:-2;
-      background:
-        radial-gradient(1200px 700px at 12% 10%, rgba(59,130,246,.22), transparent 55%),
-        radial-gradient(1100px 650px at 88% 22%, rgba(34,197,94,.14), transparent 55%),
-        url("MEDC INV VER 2.png");
-      background-size: auto, auto, cover;
-      background-position: center, center, center;
-      background-repeat:no-repeat;
-      transform: translate3d(0, calc(var(--parY) * -1), 0);
-      filter: saturate(1.05) contrast(1.02);
-      opacity:.24;
-      will-change: transform;
-    }
-    body::after{
-      content:"";
-      position:fixed;
-      inset:0;
-      z-index:-1;
-      background: linear-gradient(180deg, rgba(7,10,18,.92), rgba(7,10,18,.78) 40%, rgba(7,10,18,.92));
-      pointer-events:none;
-    }
-
-    header{
-      position:sticky;top:0;z-index:10;
-      background:rgba(7,10,18,.86);
-      backdrop-filter:blur(10px);
-      border-bottom:1px solid var(--line)
-    }
+    body{margin:0;font-family:system-ui,Segoe UI,Arial;background:var(--bg);color:var(--text)}
+    header{position:sticky;top:0;z-index:10;background:rgba(7,10,18,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
     .wrap{max-width:1200px;margin:0 auto;padding:18px}
     .bar{display:flex;align-items:center;justify-content:space-between;gap:12px}
     .brand{display:flex;align-items:center;gap:12px;font-weight:900}
-    .pill{
-      display:inline-flex;gap:8px;align-items:center;padding:6px 10px;border-radius:999px;border:1px solid var(--line);
-      background:rgba(255,255,255,.04);font-size:12px;color:var(--muted)
-    }
-    .card{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:0 18px 60px rgba(0,0,0,.45);overflow:hidden}
+    .pill{display:inline-flex;gap:8px;align-items:center;padding:6px 10px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.04);font-size:12px;color:var(--muted)}
+    .btn{border:1px solid var(--line); background:rgba(255,255,255,.06); color:var(--text); padding:10px 12px; border-radius:999px; cursor:pointer; font-weight:800;}
+    .btn.primary{background:var(--blue);border-color:var(--blueb)}
+    .btn.good{background:var(--green);border-color:var(--greenb)}
+    .btn.danger{background:var(--red);border-color:var(--redb)}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden}
     .cardPad{padding:16px}
+    .grid2{display:grid;grid-template-columns:420px 1fr;gap:14px}
+    @media(max-width:980px){.grid2{grid-template-columns:1fr}}
     .muted{color:var(--muted)}
+    input,select,button{border-radius:12px;border:1px solid var(--line);background:rgba(0,0,0,.22);color:var(--text);padding:10px 12px;outline:none}
+    input{width:100%}
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
     .list{display:flex;flex-direction:column;gap:10px}
     .item{padding:12px;border-radius:16px;border:1px solid var(--line);background:rgba(0,0,0,.20)}
     .itemTop{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+    .hide{display:none !important}
     .bracketGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;align-items:start}
     @media(max-width:1100px){.bracketGrid{grid-template-columns:repeat(2,1fr)}}
     @media(max-width:600px){.bracketGrid{grid-template-columns:1fr}}
     .match{padding:12px;border-radius:16px;border:1px solid var(--line);background:rgba(0,0,0,.22)}
-    .slot{
-      display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 10px;border-radius:12px;
-      background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.06);margin-bottom:8px
-    }
-
-    /* --- Logo + Cover --- */
-    .brandLogo{width:46px;height:46px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.04);overflow:hidden}
-    .brandLogo img{width:100%;height:100%;object-fit:cover}
-    .coverCardImg{width:100%;display:block}
-
-    /* Timeline (format overview) */
-    .sectionTitle{margin:0 0 12px 0}
-    .sectionTitle h3{margin:0}
-    .timeline{
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-      gap:14px;
-      margin-top:14px;
-    }
-    .step{
-      padding:16px;
-      border-radius:18px;
-      border:1px solid var(--line);
-      background:rgba(0,0,0,.25);
-    }
-    .stepHeader{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:10px;
-      margin-bottom:8px;
-    }
-
-    #dbg{
-      position:fixed; right:14px; bottom:14px; z-index:9999;
-      max-width:520px; padding:10px 12px; border-radius:14px;
-      background:rgba(0,0,0,.55); border:1px solid rgba(255,255,255,.14);
-      box-shadow:0 18px 60px rgba(0,0,0,.45);
-      font-size:12px; color:rgba(234,240,255,.9); white-space:pre-wrap
-    }
+    .slot{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 10px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.06);margin-bottom:8px}
+    .scoreBox{display:flex;gap:8px;align-items:center}
+    .scoreBox input{width:64px;text-align:center}
+    #dbg{position:fixed;right:14px;bottom:14px;z-index:9999;max-width:520px;padding:10px 12px;border-radius:14px;
+      background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.14);box-shadow:0 18px 60px rgba(0,0,0,.45);
+      font-size:12px;color:rgba(234,240,255,.9);white-space:pre-wrap}
     #dbg.hide{display:none}
-</style>
+  </style>
 </head>
 <body>
-
 <header>
   <div class="wrap bar">
     <div class="brand">
-      <div class="brandLogo">
-        <img src="MEDC INVITATIONAL LOGO.gif" alt="MEDC Invitational Logo">
-      </div>
-      <div>
-        <div>MEDC INVITATIONAL</div>
-        <div class="muted" style="font-size:12px;margin-top:2px">Public Tournament Site</div>
-      </div>
-      <span class="pill" id="livePill">Live: —</span>
+      <div>MEDC ESPORT ADMIN PANEL</div>
+      <span class="pill" id="authPill">Locked</span>
+      <span class="pill" id="rolePill">Role: —</span>
     </div>
-
-    <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end">
-      <a class="pill" href="index.html" style="text-decoration:none;color:inherit">HOME</a>
-      <a class="pill" href="tournament.html" style="text-decoration:none;color:inherit" >TOURNAMENT</a>
-      <a class="pill" href="bracket.html" style="text-decoration:none;color:inherit" aria-current="page">BRACKET</a>
-      <a class="pill" href="admin.html" style="text-decoration:none;color:inherit">ADMIN</a>
+    <div class="row">
+      <button class="btn" type="button" onclick="location.href='index.html'">HOME PAGE</button>
+      <button id="logoutBtn" class="btn hide" type="button">Logout</button>
     </div>
   </div>
 </header>
 
-
 <div class="wrap">
-  
-  <div class="card" style="margin-bottom:14px">
+  <!-- AUTH VIEW -->
+  <section id="authView" class="card">
     <div class="cardPad">
-      <div style="margin-top:10px;border-radius:16px;overflow:hidden;border:1px solid rgba(255,255,255,.10)">
-        <img src="COVER MEDC INV.png" alt="MEDC Invitational Cover" class="coverCardImg">
-      </div>
-      <div class="pill" id="metaPill" style="margin-top:10px">Loading…</div>
-    </div>
-  </div>
+      <h2>Login</h2>
+      <p class="muted" style="margin:8px 0 14px">
+        Users can register and will be <b>PENDING</b> until approved by owner.
+      </p>
 
-  
-  <div class="card" style="margin-bottom:14px">
-    <div class="cardPad">
-      <div class="sectionTitle">
-        <h3>Bracket Flow</h3>
-        <p class="muted" style="margin:6px 0 0">Quick access to the bracket and match progression.</p>
-      </div>
+      <div class="grid2">
+        <!-- Login -->
+        <div class="item">
+          <div class="muted">Email</div>
+          <div style="margin-top:8px"><input id="loginEmail" type="email" placeholder="email@example.com" autocomplete="email"></div>
+          <div class="muted" style="margin-top:12px">Password</div>
+          <div style="margin-top:8px"><input id="loginPass" type="password" placeholder="password" autocomplete="current-password"></div>
 
-      <div class="timeline">
-        <div class="step">
-          <div class="stepHeader">
-            <b>Qualifiers</b>
-            <span class="pill">Round 1</span>
+          <div class="row" style="margin-top:12px">
+            <button id="loginBtn" class="btn primary" type="button">Login</button>
           </div>
-          <p class="muted" style="margin:0">Teams compete to secure playoff slots. Update format (BO1/BO3) later.</p>
+
+          <p class="muted" style="margin:10px 0 0">
+            Accounts use <b>Firebase Authentication</b>. After you register, the owner must approve you before you can access admin tools.
+          </p>
+          <div class="muted" id="loginMsg" style="margin-top:10px"></div>
         </div>
 
-        <div class="step">
-          <div class="stepHeader">
-            <b>Playoffs</b>
-            <span class="pill">Elimination</span>
-          </div>
-          <p class="muted" style="margin:0">Higher stakes, stronger opponents, and tighter calls.</p>
-        </div>
+        <!-- Register -->
+        <div class="item">
+          <h3 style="margin:0">Request Admin Access</h3>
+          <p class="muted" style="margin:8px 0 12px">Create an email/password account. Owner must approve you.</p>
 
-        <div class="step">
-          <div class="stepHeader">
-            <b>Semi Finals</b>
-            <span class="pill">Top 4</span>
-          </div>
-          <p class="muted" style="margin:0">The best teams prove consistency. Highlights usually focus here.</p>
-        </div>
+          <div class="muted">Email</div>
+          <div style="margin-top:8px"><input id="regEmail" type="email" placeholder="email@example.com" autocomplete="email"></div>
 
-        <div class="step">
-          <div class="stepHeader">
-            <b>Grand Finals</b>
-            <span class="pill">Championship</span>
+          <div class="muted" style="margin-top:12px">New password</div>
+          <div style="margin-top:8px"><input id="regPass" type="password" placeholder="create password (min 6)" autocomplete="new-password"></div>
+
+          <div class="row" style="margin-top:12px">
+            <button id="registerBtn" class="btn good" type="button">Register (Request)</button>
           </div>
-          <p class="muted" style="margin:0">One series to decide it all — Road to Champions.</p>
+
+          <div class="muted" id="regMsg" style="margin-top:10px"></div>
         </div>
       </div>
     </div>
-  </div>
+  </section>
 
+  <!-- ADMIN VIEW -->
+  <section id="adminView" class="hide">
+    <div class="grid2">
+      <!-- LEFT -->
+      <div class="card">
+        <div class="cardPad">
+          <div class="row" style="justify-content:space-between">
+            <h2 style="margin:0">Teams</h2>
+            <span class="pill" id="teamCountPill">0 teams</span>
+          </div>
 
-  <div class="card">
-    <div class="cardPad">
-      <div class="itemTop">
-        <div>
-          <h2 style="margin:0">Live Bracket</h2>
-          <div class="muted" id="bracketMeta" style="margin-top:6px">—</div>
+          <div class="item" style="margin-top:12px">
+            <div class="muted">Add a team</div>
+            <div class="row" style="margin-top:8px">
+              <input id="teamName" placeholder="Team name...">
+              <button id="addTeamBtn" class="btn primary" type="button">Add</button>
+            </div>
+          </div>
+
+          <div class="item" style="margin-top:10px">
+            <div class="muted">All teams</div>
+            <div id="teamsList" class="list" style="margin-top:8px"></div>
+          </div>
+
+          <div class="item" style="margin-top:10px">
+            <b>Roster Manager</b>
+            <div class="muted" style="margin-top:6px">Select team → set captain → add/remove players.</div>
+
+            <div style="margin-top:10px">
+              <select id="teamSelect"></select>
+            </div>
+
+            <div class="muted" style="margin-top:10px">Team Captain IGN</div>
+            <div class="row" style="margin-top:8px">
+              <input id="captainName" placeholder="Captain IGN">
+              <button id="setCaptainBtn" class="btn good" type="button">Set Captain</button>
+            </div>
+
+            <div class="muted" style="margin-top:10px">Add Player IGN</div>
+            <div class="row" style="margin-top:8px">
+              <input id="playerName" placeholder="Player IGN">
+              <button id="addPlayerBtn" class="btn primary" type="button">Add Player</button>
+            </div>
+
+            <div class="muted" style="margin-top:10px">Players</div>
+            <div id="rosterList" class="list" style="margin-top:8px"></div>
+          </div>
+
+          <!-- OWNER ONLY -->
+          <div id="ownerUsersBox" class="item hide" style="margin-top:10px">
+            <b>User Approvals</b>
+            <div class="muted" style="margin-top:6px">Approve/disable/delete admin accounts.</div>
+            <div id="usersList" class="list" style="margin-top:10px"></div>
+          </div>
         </div>
       </div>
-      <div id="bracketArea" class="bracketGrid" style="margin-top:12px"></div>
+
+      <!-- RIGHT -->
+      <div class="card">
+        <div class="cardPad">
+          <div class="row" style="justify-content:space-between">
+            <h2 style="margin:0">Bracket Control</h2>
+            <span class="pill" id="bracketMeta">—</span>
+          </div>
+
+          <div class="row" style="margin-top:10px">
+            <select id="bracketFormat">
+              <option value="single">Single Elimination</option>
+              <option value="double">Double Elimination</option>
+            </select>
+            <select id="bracketMax" title="Maximum bracket size">
+              <option value="8">Max 8</option>
+              <option value="16" selected>Max 16</option>
+              <option value="32">Max 32</option>
+            </select>
+            <button id="buildBracketBtn" class="btn primary" type="button">Build / Rebuild</button>
+            <button id="clearScoresBtn" class="btn" type="button">Clear Scores</button>
+            <button id="clearBracketBtn" class="btn danger" type="button">Clear Bracket</button>
+          </div>
+
+          <p class="muted" style="margin:10px 0 14px">Assign teams to slots, set scores, pick winners, advance winners.</p>
+          <div id="bracketArea" class="bracketGrid"></div>
+
+          <div class="row" style="margin-top:12px">
+            <button id="autoWireBtn" class="btn" type="button">Auto-Wire (Double)</button>
+            <button id="advanceAllBtn" class="btn" type="button">Auto-Advance Winners</button>
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
+  </section>
 </div>
 
 <div id="dbg" class="hide"></div>
 
 <script type="module">
-  // MEDC Public Pages (Read-only) — Firestore doc: tournament/state
+  // ✅ FIXED VERSION
+  // - Uses Firebase v10.13.0 CDN (stable on GitHub Pages)
+  // - Fixes isOwner() (your old file had Firestore RULES code in JS which breaks the whole script)
+  // - Adds debug box (bottom-right) so you always see the real error
+
   const dbgEl = document.getElementById("dbg");
   const dbg = (msg) => { dbgEl.classList.remove("hide"); dbgEl.textContent = msg; };
-  const dbgOff = () => dbgEl.classList.add("hide");
-
-  // Parallax
-  const parallaxTick = () => {
-    document.documentElement.style.setProperty("--parY", (window.scrollY * 0.18).toFixed(2) + "px");
-    requestAnimationFrame(parallaxTick);
-  };
-  requestAnimationFrame(parallaxTick);
+  const dbgAppend = (msg) => { dbgEl.classList.remove("hide"); dbgEl.textContent = (dbgEl.textContent?dbgEl.textContent+"\n":"") + msg; };
 
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-  import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+  import {
+    getAuth, onAuthStateChanged,
+    createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut
+  } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+  import {
+    getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc,
+    collection, getDocs, serverTimestamp, onSnapshot, query, orderBy
+  } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
   const firebaseConfig = {
-    "apiKey": "AIzaSyDZAVhuz9SVBHSCPnEvoxwCjaMrZSQOJ6k",
-    "authDomain": "medcesport.firebaseapp.com",
-    "projectId": "medcesport",
-    "storageBucket": "medcesport.firebasestorage.app",
-    "messagingSenderId": "7933255333",
-    "appId": "1:7933255333:web:cfe776ebb79f607cdd774c",
-    "measurementId": "G-07Z2TFM553"
-  };
+  "apiKey": "AIzaSyDZAVhuz9SVBHSCPnEvoxwCjaMrZSQOJ6k",
+  "authDomain": "medcesport.firebaseapp.com",
+  "projectId": "medcesport",
+  "storageBucket": "medcesport.firebasestorage.app",
+  "messagingSenderId": "7933255333",
+  "appId": "1:7933255333:web:cfe776ebb79f607cdd774c",
+  "measurementId": "G-07Z2TFM553"
+};
+  const OWNER_UID = "bXZ3bSYPakQXEJGwtmkJjctD6Os1";
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
 
   const $ = (id) => document.getElementById(id);
-  function escapeHtml(s=""){ return (""+s).replace(/[&<>\"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
-  const teamNameById = (teams, id) => (teams.find(t => t.id === id)?.name || "");
+  const uid = () => Math.random().toString(36).slice(2,10);
+  function escapeHtml(s=""){ return (""+s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+  function show(el, yes){ el.classList.toggle("hide", !yes); }
 
-  function normalizeRosters(s){
+  // === DEBUG: surface any JS errors in the UI (so "buttons do nothing" is visible) ===
+  const logBox = document.createElement('div');
+  logBox.id = 'debugLog';
+  logBox.style.cssText = 'position:fixed;left:12px;bottom:12px;max-width:520px;max-height:220px;overflow:auto;z-index:99999;background:rgba(0,0,0,.82);color:#fff;padding:10px 12px;border:1px solid rgba(255,255,255,.18);border-radius:12px;font:12px/1.4 system-ui,Segoe UI,Arial;display:none;white-space:pre-wrap';
+  document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(logBox));
+  function debug(msg){
+    logBox.style.display='block';
+    const t = new Date().toLocaleTimeString();
+    logBox.textContent += `[${t}] ${msg}\n`;
+    logBox.scrollTop = logBox.scrollHeight;
+  }
+  window.addEventListener('error', (e)=> debug(`JS Error: ${e.message} @ ${e.filename}:${e.lineno}:${e.colno}`));
+  window.addEventListener('unhandledrejection', (e)=> debug(`Promise Rejection: ${e.reason?.code||''} ${e.reason?.message||e.reason}`));
+  const niceErr = (e) => (e?.code ? e.code + ": " : "") + (e?.message || String(e));
+
+  function isOwner(user) {
+    return !!user && user.uid === OWNER_UID;
+  }
+
+  // Tournament doc
+  const defaultState = { teams:[], bracketSize:8, format:"single", matches:[], rosters:{} };
+  let state = structuredClone(defaultState);
+  let unsubTournament = null;
+
+  function normalizeRosters(s) {
     if(!s.rosters) s.rosters = {};
-    for(const tid in s.rosters){
+    for(const tid in s.rosters) {
       const v = s.rosters[tid];
       if(Array.isArray(v)) s.rosters[tid] = { captain:"", players:v };
       else {
@@ -252,137 +282,747 @@
       }
     }
   }
-
-  function renderMeta(state){
-    const teams = Array.isArray(state.teams) ? state.teams : [];
-    const matches = Array.isArray(state.matches) ? state.matches : [];
-    const bracketSize = Number(state.bracketSize || 8);
-    const meta = document.getElementById("metaPill");
-    if(meta) meta.textContent = `${teams.length} teams • ${matches.length} matches • bracket ${bracketSize}`;
-    const live = document.getElementById("livePill");
-    if(live) live.textContent = "Live: Connected";
-    return { teams, matches, bracketSize };
+  function ensureRoster(teamId) {
+    if(!state.rosters) state.rosters = {};
+    if(!state.rosters[teamId]) state.rosters[teamId] = { captain:"", players:[] };
+    if(Array.isArray(state.rosters[teamId])) state.rosters[teamId] = { captain:"", players: state.rosters[teamId] };
   }
 
-  function renderTeams(state){
-    const { teams } = renderMeta(state);
-    normalizeRosters(state);
-
-    const teamsMeta = document.getElementById("teamsMeta");
-    if(teamsMeta) teamsMeta.textContent = `${teams.length} teams`;
-
-    const tl = document.getElementById("teamsList");
-    const rl = document.getElementById("rostersList");
-    if(tl) tl.innerHTML = "";
-    if(rl) rl.innerHTML = "";
-    if(!tl || !rl) return;
-
-    if(teams.length === 0){
-      tl.innerHTML = `<div class="muted">No teams yet.</div>`;
-      rl.innerHTML = `<div class="muted">No rosters yet.</div>`;
-      return;
+  async function ensureUserProfile(user, emailOverride="") {
+    const ref = doc(db,"users",user.uid);
+    const snap = await getDoc(ref);
+    const email = emailOverride || user.email || "";
+    if(!snap.exists()) {
+      await setDoc(ref, {
+        email,
+        status: isOwner(user) ? "approved" : "pending",
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      }, { merge:true });
+    } else {
+      await updateDoc(ref, { email, updatedAt: serverTimestamp() }).catch(()=>{});
     }
+  }
 
-    teams.forEach(t => {
-      const roster = state.rosters?.[t.id] || { captain:"", players:[] };
-      const count = (roster.players || []).length;
+  async function myApprovalStatus(user) {
+    if(isOwner(user)) return "approved";
+    const snap = await getDoc(doc(db,"users",user.uid));
+    return snap.exists() ? (snap.data()?.status || "pending") : "pending";
+  }
+
+  function setRole(role) {
+    $("authPill").textContent = role === "none" ? "Locked" : "Unlocked";
+    $("rolePill").textContent = "Role: " + (role === "owner" ? "Owner" : role === "admin" ? "Admin" : "—");
+    show($("logoutBtn"), role !== "none");
+    show($("authView"), role === "none");
+    show($("adminView"), role !== "none");
+    show($("ownerUsersBox"), role === "owner");
+  }
+
+  $("logoutBtn").onclick = () => signOut(auth);
+
+  $("registerBtn").onclick = async () => {
+      const msgEl = $("authMsg");
+      if (msgEl) msgEl.textContent = "";
+
+    const email = $("regEmail").value.trim();
+    const p = $("regPass").value;
+    $("regMsg").textContent = "";
+
+    if(!email) return $("regMsg").textContent = "Enter your email.";
+    if(!/^\S+@\S+\.\S+$/.test(email)) return $("regMsg").textContent = "Enter a valid email.";
+    if(p.length < 6) return $("regMsg").textContent = "Password must be at least 6 characters.";
+
+    try {
+      const cred = await createUserWithEmailAndPassword(auth, email, p);
+      await ensureUserProfile(cred.user, email);
+      $("regEmail").value = "";
+      $("regPass").value = "";
+      $("regMsg").textContent = "Request sent! Wait for owner approval.";
+      alert("Registered! Your account is pending approval.");
+      await signOut(auth);
+    } catch(e) {
+      console.error(e);
+      $("regMsg").textContent = niceErr(e);
+      dbg("Register error: " + niceErr(e));
+    }
+  };
+
+  $("loginBtn").onclick = async () => {
+      const msgEl = $("authMsg");
+      if (msgEl) msgEl.textContent = "";
+
+    const email = $("loginEmail").value.trim();
+    const p = $("loginPass").value;
+    $("loginMsg").textContent = "";
+
+    if(!email) return $("loginMsg").textContent = "Enter your email.";
+    if(!/^\S+@\S+\.\S+$/.test(email)) return $("loginMsg").textContent = "Enter a valid email.";
+
+    try {
+      await signInWithEmailAndPassword(auth, email, p);
+    } catch(e) {
+      console.error(e);
+      $("loginMsg").textContent = niceErr(e);
+      dbg("Login error: " + niceErr(e));
+    }
+  };
+
+  async function hookTournament() {
+    if(unsubTournament) { unsubTournament(); unsubTournament = null; }
+    unsubTournament = onSnapshot(doc(db,"tournament","state"), async (snap) => {
+      if(!snap.exists()) {
+        state = structuredClone(defaultState);
+        normalizeRosters(state);
+        await setDoc(doc(db,"tournament","state"), {...state, updatedAt: serverTimestamp()}, {merge:true});
+      } else {
+        state = snap.data() || structuredClone(defaultState);
+        if(!state.teams) state.teams = [];
+        if(!state.matches) state.matches = [];
+        if(!state.bracketSize) state.bracketSize = 8;
+        normalizeRosters(state);
+      }
+      $("bracketMax").value = String(state.bracketSize || 16);
+      $("bracketFormat").value = String(state.format || "single");
+      renderTeams(); renderTeamSelect(); renderBracket();
+    }, (e) => dbg("Tournament snapshot error: " + niceErr(e)));
+  }
+
+  // Save (debounced)
+  let saveTimer = null;
+  function saveState() {
+    if(saveTimer) clearTimeout(saveTimer);
+    saveTimer = setTimeout(async () => {
+      try {
+        normalizeRosters(state);
+        await setDoc(doc(db,"tournament","state"), {...state, updatedAt: serverTimestamp()}, {merge:true});
+      } catch(e) {
+        console.error(e);
+        dbg("Save failed: " + niceErr(e));
+        alert("Save failed. Check Firestore Rules.");
+      }
+    }, 200);
+  }
+
+  // Owner users list
+  async function renderUsers() {
+    const box = $("usersList");
+    box.innerHTML = `<div class="muted">Loading users…</div>`;
+    try {
+      const qs = await getDocs(query(collection(db,"users"), orderBy("createdAt","desc")));
+      const users = [];
+      qs.forEach(d => users.push({ uid:d.id, ...d.data() }));
+      if(users.length === 0) { box.innerHTML = `<div class="muted">No user requests yet.</div>`; return; }
+      box.innerHTML = "";
+      users.sort((a,b)=> (a.status===b.status?0 : a.status==="pending"?-1:1)).forEach(u => {
+        const div = document.createElement("div");
+        div.className = "item";
+        const statusPill =
+          u.status === "approved" ? `<span class="pill" style="border-color:var(--greenb)">APPROVED</span>` :
+          u.status === "disabled" ? `<span class="pill" style="border-color:var(--redb)">DISABLED</span>` :
+          `<span class="pill">PENDING</span>`;
+        div.innerHTML = `
+          <div class="itemTop">
+            <div>
+              <b>${escapeHtml(u.email || u.uid)}</b>
+              <div class="muted">Status: ${statusPill}</div>
+            </div>
+            <div class="row" style="justify-content:flex-end">
+              <button class="btn good" type="button" data-act="approve">Approve</button>
+              <button class="btn danger" type="button" data-act="disable">Disable</button>
+              <button class="btn" type="button" data-act="delete">Delete</button>
+            </div>
+          </div>`;
+        div.querySelector('[data-act="approve"]').onclick = () => updateUser(u.uid,"approved");
+        div.querySelector('[data-act="disable"]').onclick = () => updateUser(u.uid,"disabled");
+        div.querySelector('[data-act="delete"]').onclick = () => deleteUser(u.uid);
+        box.appendChild(div);
+      });
+    } catch(e) {
+      console.error(e);
+      box.innerHTML = `<div class="muted">Failed: ${escapeHtml(niceErr(e))}</div>`;
+    }
+  }
+
+  async function updateUser(userUid, status) {
+    try {
+      await updateDoc(doc(db,"users",userUid), { status, updatedAt: serverTimestamp() });
+      await renderUsers();
+    } catch(e) {
+      dbg("Update user failed: " + niceErr(e));
+      alert("Update user failed. Check Firestore Rules.");
+    }
+  }
+
+  async function deleteUser(userUid) {
+    if(userUid === OWNER_UID) return alert("Can't delete owner.");
+    if(!confirm("Delete this user profile?")) return;
+    try {
+      await deleteDoc(doc(db,"users",userUid));
+      await renderUsers();
+    } catch(e) {
+      dbg("Delete user failed: " + niceErr(e));
+      alert("Delete user failed. Check Firestore Rules.");
+    }
+  }
+
+  // Teams + Rosters (same as your original)
+  function renderTeams() {
+    $("teamCountPill").textContent = `${state.teams.length} teams`;
+    const list = $("teamsList");
+    list.innerHTML = "";
+    if(state.teams.length === 0) { list.innerHTML = `<div class="muted">No teams yet. Add teams to begin.</div>`; return; }
+    state.teams.forEach(t => {
+      ensureRoster(t.id);
+      const count = (state.rosters[t.id]?.players || []).length;
       const div = document.createElement("div");
       div.className = "item";
       div.innerHTML = `
         <div class="itemTop">
           <div>
             <b>${escapeHtml(t.name)}</b>
-            <div class="muted">Players: ${count}</div>
+            <div class="muted">ID: ${t.id} • ${count} players</div>
           </div>
-        </div>
-      `;
-      tl.appendChild(div);
+          <button class="btn danger" type="button">Remove</button>
+        </div>`;
+      div.querySelector("button").onclick = () => removeTeam(t.id);
+      list.appendChild(div);
     });
+  }
 
-    teams.forEach(t => {
-      const roster = state.rosters?.[t.id] || { captain:"", players:[] };
-      const captain = roster.captain || "";
-      const players = Array.isArray(roster.players) ? roster.players : [];
+  function addTeam() {
+    const name = $("teamName").value.trim();
+    if(name.length < 2) return alert("Team name too short.");
+    if(state.teams.some(t => t.name.toLowerCase() === name.toLowerCase())) return alert("Team already exists.");
+    const newTeam = { id: uid(), name };
+    state.teams.push(newTeam);
+    ensureRoster(newTeam.id);
+    $("teamName").value = "";
+    saveState();
+    renderTeams();
+    renderTeamSelect(newTeam.id);
+    renderBracket();
+  }
+
+  function removeTeam(teamId) {
+    if(!confirm("Remove this team?")) return;
+    state.teams = state.teams.filter(t => t.id !== teamId);
+    if(state.rosters && state.rosters[teamId]) delete state.rosters[teamId];
+    state.matches.forEach(m => {
+      if(m.aTeamId === teamId) m.aTeamId = "";
+      if(m.bTeamId === teamId) m.bTeamId = "";
+      if(m.winnerTeamId === teamId) m.winnerTeamId = "";
+    });
+    saveState();
+    renderTeams();
+    renderTeamSelect();
+    renderBracket();
+  }
+
+  $("addTeamBtn").onclick = addTeam;
+
+  function renderTeamSelect(preferredId="") {
+    const sel = $("teamSelect");
+    sel.innerHTML = "";
+    if(state.teams.length === 0) {
+      sel.innerHTML = `<option value="">No teams</option>`;
+      $("captainName").value = "";
+      $("playerName").value = "";
+      $("rosterList").innerHTML = `<div class="muted">Create a team first.</div>`;
+      return;
+    }
+    state.teams.forEach(t => {
+      const opt = document.createElement("option");
+      opt.value = t.id; opt.textContent = t.name;
+      sel.appendChild(opt);
+    });
+    const prev = sel.getAttribute("data-prev") || "";
+    const prevOk = state.teams.some(t => t.id === prev);
+    let pick = "";
+    if(preferredId && state.teams.some(t => t.id === preferredId)) pick = preferredId;
+    else if(prevOk) pick = prev;
+    else pick = state.teams[0].id;
+    sel.value = pick;
+    sel.setAttribute("data-prev", pick);
+    renderRosterList(pick);
+  }
+
+  $("teamSelect").onchange = () => {
+    const tid = $("teamSelect").value;
+    $("teamSelect").setAttribute("data-prev", tid);
+    renderRosterList(tid);
+  };
+
+  function renderRosterList(teamId) {
+    const list = $("rosterList");
+    if(!teamId) {
+      $("captainName").value = "";
+      list.innerHTML = `<div class="muted">Select a team first.</div>`;
+      return;
+    }
+    ensureRoster(teamId);
+    const roster = state.rosters[teamId];
+    const players = roster.players || [];
+    $("captainName").value = roster.captain || "";
+    if(players.length === 0) { list.innerHTML = `<div class="muted">No players yet.</div>`; return; }
+    list.innerHTML = "";
+    players.forEach((p, idx) => {
       const div = document.createElement("div");
       div.className = "item";
       div.innerHTML = `
-        <b>${escapeHtml(t.name)}</b>
-        <div class="muted" style="margin-top:6px">Captain: <b>${escapeHtml(captain || "—")}</b></div>
-        <div class="muted" style="margin-top:6px">Players: ${players.length ? "" : "<b>—</b>"}</div>
-        ${players.length ? `<div style="margin-top:6px">${players.map(p => `<div class="pill" style="margin:4px 6px 0 0;display:inline-flex">${escapeHtml(p)}</div>`).join("")}</div>` : ""}
-      `;
-      rl.appendChild(div);
+        <div class="itemTop">
+          <div>
+            <b>${escapeHtml(p)}</b>
+            <div class="muted">${roster.captain && p.toLowerCase() === roster.captain.toLowerCase() ? "Captain" : "Player"}</div>
+          </div>
+          <button class="btn danger" type="button">Remove</button>
+        </div>`;
+      div.querySelector("button").onclick = () => {
+        players.splice(idx, 1);
+        roster.players = players;
+        if(roster.captain && roster.captain.toLowerCase() === p.toLowerCase()) {
+          roster.captain = "";
+          $("captainName").value = "";
+        }
+        state.rosters[teamId] = roster;
+        saveState();
+        renderTeams();
+        renderRosterList(teamId);
+      };
+      list.appendChild(div);
     });
   }
 
-  function renderBracket(state){
-    const { teams, matches, bracketSize } = renderMeta(state);
-    const bracketMeta = document.getElementById("bracketMeta");
-    if(bracketMeta) bracketMeta.textContent = `${teams.length} teams • ${matches.length} matches • bracket ${bracketSize}`;
+  $("setCaptainBtn").onclick = () => {
+    const teamId = $("teamSelect").value;
+    if(!teamId) return alert("Select a team first.");
+    const cap = $("captainName").value.trim();
+    if(cap.length < 2) return alert("Captain IGN too short.");
+    ensureRoster(teamId);
+    const roster = state.rosters[teamId];
+    roster.captain = cap;
+    if(!roster.players.some(x => x.toLowerCase() === cap.toLowerCase())) roster.players.unshift(cap);
+    state.rosters[teamId] = roster;
+    saveState();
+    renderTeams();
+    renderRosterList(teamId);
+  };
 
-    const area = document.getElementById("bracketArea");
-    if(!area) return;
+  $("addPlayerBtn").onclick = () => {
+    const teamId = $("teamSelect").value;
+    if(!teamId) return alert("Select a team first.");
+    const p = $("playerName").value.trim();
+    if(p.length < 2) return alert("Player name too short.");
+    ensureRoster(teamId);
+    const roster = state.rosters[teamId];
+    if(roster.players.some(x => x.toLowerCase() === p.toLowerCase())) return alert("Player already in this team.");
+    roster.players.push(p);
+    state.rosters[teamId] = roster;
+    $("playerName").value = "";
+    saveState();
+    renderTeams();
+    renderRosterList(teamId);
+  };
 
+  // Bracket helpers (same logic)
+  function teamNameById(id) {
+    const t = state.teams.find(x => x.id === id);
+    return t ? t.name : "";
+  }
+
+  function buildSingleBracket(size) {
+    state.bracketSize = size;
+    state.format = "single";
+    const rounds = Math.log2(size);
+    const matches = [];
+    let matchCount = size / 2;
+    for(let r=1; r<=rounds; r++) {
+      for(let p=1; p<=matchCount; p++) {
+        matches.push({ id:`R${r}M${p}`, round:r, pos:p, bracket:"S", aTeamId:"", bTeamId:"", scoreA:"", scoreB:"", winnerTeamId:"" });
+      }
+      matchCount = matchCount / 2;
+    }
+    state.matches = matches;
+    saveState();
+    renderBracket();
+  }
+
+  function buildDoubleBracket(size){
+    state.bracketSize = size;
+    state.format = "double";
+    const k = Math.log2(size);
+    const matches = [];
+
+    // Winners bracket
+    let wCount = size/2;
+    for(let r=1;r<=k;r++){
+      for(let p=1;p<=wCount;p++){
+        matches.push({ id:`W-R${r}-M${p}`, bracket:"W", round:r, pos:p, aTeamId:"", bTeamId:"", scoreA:"", scoreB:"", winnerTeamId:"" });
+      }
+      wCount = wCount/2;
+    }
+
+    // Losers bracket: 2*(k-1) rounds
+    const lbRounds = 2*(k-1);
+    for(let r=1;r<=lbRounds;r++){
+      const stage = Math.ceil(r/2);
+      const mCount = size / Math.pow(2, stage+1);
+      for(let p=1;p<=mCount;p++){
+        matches.push({ id:`L-R${r}-M${p}`, bracket:"L", round:r, pos:p, aTeamId:"", bTeamId:"", scoreA:"", scoreB:"", winnerTeamId:"" });
+      }
+    }
+
+    matches.push({ id:"GF", bracket:"GF", round:1, pos:1, aTeamId:"", bTeamId:"", scoreA:"", scoreB:"", winnerTeamId:"" });
+
+    state.matches = matches;
+    saveState();
+    renderBracket();
+  }
+
+  function buildBracket(size){ return buildSingleBracket(size); }
+      matchCount = matchCount / 2;
+    }
+    state.matches = matches;
+    saveState();
+    renderBracket();
+  }
+
+  function clearScores() {
+    state.matches.forEach(m => { m.scoreA=""; m.scoreB=""; m.winnerTeamId=""; });
+    saveState();
+    renderBracket();
+  }
+
+  function clearBracket() {
+    if(!confirm("Clear bracket slots + scores?")) return;
+    state.matches.forEach(m => { m.aTeamId=""; m.bTeamId=""; m.scoreA=""; m.scoreB=""; m.winnerTeamId=""; });
+    saveState();
+    renderBracket();
+  }
+
+  function teamOptions(selectedId) {
+    const opts = [`<option value="">— Select team —</option>`];
+    state.teams.forEach(t => {
+      opts.push(`<option value="${t.id}" ${t.id===selectedId?"selected":""}>${escapeHtml(t.name)}</option>`);
+    });
+    return opts.join("");
+  }
+
+  function advanceWinner(matchId) {
+    const fmt = String(state.format||"single");
+    const m = state.matches.find(x => x.id === matchId);
+    if(!m || !m.winnerTeamId) return alert("Pick a winner first.");
+    if(fmt === "double" && (m.bracket||"") !== "W") return alert("Use Auto-Wire for double elimination.");
+    const nextRound = m.round + 1;
+    const rounds = Math.log2(state.bracketSize);
+    if(nextRound > rounds) return alert("Final round.");
+    const nextPos = Math.ceil(m.pos / 2);
+    const next = state.matches.find(x => (x.bracket||"S")===(m.bracket||"S") && x.round === nextRound && x.pos === nextPos);
+    if(!next) return alert("Next match not found.");
+    const slot = (m.pos % 2 === 1) ? "A" : "B";
+    if(slot === "A") next.aTeamId = m.winnerTeamId;
+    else next.bTeamId = m.winnerTeamId;
+    if(next.winnerTeamId && next.winnerTeamId !== next.aTeamId && next.winnerTeamId !== next.bTeamId) next.winnerTeamId = "";
+    saveState();
+    renderBracket();
+  }
+
+  function advanceAll() {
+    const sorted = [...state.matches].filter(m => String(state.format||"single")!=="double" || (m.bracket||"")==="W").sort((a,b)=>(a.round-b.round)||(a.pos-b.pos));
+    const rounds = Math.log2(state.bracketSize);
+    sorted.forEach(m => { if(m.winnerTeamId && m.round < rounds) advanceWinner(m.id); });
+  }
+
+  function renderBracket() {
+    $("bracketMeta").textContent = `${state.teams.length} teams • ${state.matches.length} matches • ${String(state.format||"single")} • size ${state.bracketSize}`;
+    const area = $("bracketArea");
     area.innerHTML = "";
-    if(!matches.length){
-      area.innerHTML = `<div class="muted">No bracket yet.</div>`;
+
+    if(!state.matches || state.matches.length === 0) {
+      area.innerHTML = `<div class="muted">No bracket yet. Build one.</div>`;
       return;
     }
 
-    const rounds = Math.log2(bracketSize);
-    for(let r=1; r<=rounds; r++){
-      const col = document.createElement("div");
-      col.className = "list";
-      col.innerHTML = `<div class="pill"><b>Round ${r}</b></div>`;
+    const fmt = String(state.format || "single");
+    const size = Number(state.bracketSize || 8);
+    const k = Math.log2(size);
 
-      matches.filter(m=>m.round===r).forEach(m=>{
-        const a = teamNameById(teams, m.aTeamId || "");
-        const b = teamNameById(teams, m.bTeamId || "");
-        const w = teamNameById(teams, m.winnerTeamId || "");
+    const matchEditorHtml = (m) => `
+      <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px">
+        <b>${escapeHtml(m.id)}</b>
+        <span class="pill">${m.winnerTeamId ? "Winner set" : "No winner"}</span>
+      </div>
+      <div class="slot">
+        <select data-mid="${m.id}" data-slot="A">${teamOptions(m.aTeamId)}</select>
+        <div class="scoreBox"><input data-mid="${m.id}" data-score="A" inputmode="numeric" placeholder="0" value="${escapeHtml(m.scoreA||"")}"></div>
+      </div>
+      <div class="slot">
+        <select data-mid="${m.id}" data-slot="B">${teamOptions(m.bTeamId)}</select>
+        <div class="scoreBox"><input data-mid="${m.id}" data-score="B" inputmode="numeric" placeholder="0" value="${escapeHtml(m.scoreB||"")}"></div>
+      </div>
+      <div class="row">
+        <button class="btn" type="button" data-win="${m.id}" data-pick="A">Pick A Winner</button>
+        <button class="btn" type="button" data-win="${m.id}" data-pick="B">Pick B Winner</button>
+        <button class="btn primary" type="button" data-adv="${m.id}">Advance Winner →</button>
+      </div>
+      <div class="muted" style="margin-top:8px">Winner: <b>${escapeHtml(teamNameById(m.winnerTeamId) || "—")}</b></div>
+    `;
+
+    const renderBlock = (title, bracketCode, roundsCount, prefix) => {
+      const block = document.createElement("div");
+      block.className = "list";
+      block.innerHTML = `<div class="pill"><b>${escapeHtml(title)}</b></div>`;
+      for(let r=1;r<=roundsCount;r++){
+        const col = document.createElement("div");
+        col.className = "list";
+        col.innerHTML = `<div class="pill">${escapeHtml(prefix)} ${r}</div>`;
+        const arr = state.matches
+          .filter(m => (m.bracket||"S") === bracketCode && Number(m.round||1) === r)
+          .sort((a,b)=>(a.pos-b.pos));
+        arr.forEach(m=>{
+          const div = document.createElement("div");
+          div.className = "match";
+          div.innerHTML = matchEditorHtml(m);
+          col.appendChild(div);
+        });
+        if(!arr.length) col.innerHTML += `<div class="muted">—</div>`;
+        block.appendChild(col);
+      }
+      area.appendChild(block);
+    };
+
+    if(fmt === "double"){
+      renderBlock("Winners", "W", k, "W-Round");
+      renderBlock("Losers", "L", 2*(k-1), "L-Round");
+      const gf = state.matches.find(m => (m.bracket||"") === "GF" || m.id === "GF");
+      const gfCol = document.createElement("div");
+      gfCol.className = "list";
+      gfCol.innerHTML = `<div class="pill"><b>Grand Final</b></div>`;
+      if(gf){
         const div = document.createElement("div");
         div.className = "match";
-        div.innerHTML = `
-          <div class="itemTop" style="margin-bottom:10px">
-            <b>${escapeHtml(m.id || "")}</b>
-            <span class="pill">${w ? "Winner set" : "No winner"}</span>
-          </div>
-          <div class="slot"><div>${escapeHtml(a || "—")}</div><div class="pill">${escapeHtml(m.scoreA ?? "") || " "}</div></div>
-          <div class="slot"><div>${escapeHtml(b || "—")}</div><div class="pill">${escapeHtml(m.scoreB ?? "") || " "}</div></div>
-          <div class="muted" style="margin-top:8px">Winner: <b>${escapeHtml(w || "—")}</b></div>
-        `;
-        col.appendChild(div);
-      });
-
-      area.appendChild(col);
+        div.innerHTML = matchEditorHtml(gf);
+        gfCol.appendChild(div);
+      } else {
+        gfCol.innerHTML += `<div class="muted">Grand Final not found.</div>`;
+      }
+      area.appendChild(gfCol);
+    } else {
+      for(let r=1;r<=k;r++){
+        const col = document.createElement("div");
+        col.className = "list";
+        col.innerHTML = `<div class="pill"><b>Round ${r}</b></div>`;
+        state.matches.filter(m=>(m.bracket||"S")==="S" && Number(m.round||1)===r).forEach(m=>{
+          const div = document.createElement("div");
+          div.className = "match";
+          div.innerHTML = matchEditorHtml(m);
+          col.appendChild(div);
+        });
+        area.appendChild(col);
+      }
     }
-  }
 
-  try{
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-
-    const live = document.getElementById("livePill");
-    if(live) live.textContent = "Live: Connecting…";
-    const meta = document.getElementById("metaPill"); if(meta) meta.textContent = "Connecting…";
-
-    onSnapshot(doc(db, "tournament", "state"), (snap) => {
-      dbgOff();
-      const data = snap.exists() ? (snap.data() || {}) : { teams:[], matches:[], bracketSize:8, rosters:{} };
-      renderTeams(data);
-      renderBracket(data);
-    }, (e) => {
-      const live = document.getElementById("livePill");
-      if(live) live.textContent = "Live: Error";
-      const meta = document.getElementById("metaPill"); if(meta) meta.textContent = "Error";
-      dbg("Firestore error: " + (e?.code ? e.code + ": " : "") + (e?.message || String(e)));
+    area.querySelectorAll("select[data-mid]").forEach(sel => {
+      sel.onchange = () => {
+        const mid = sel.getAttribute("data-mid");
+        const slot = sel.getAttribute("data-slot");
+        const match = state.matches.find(x => x.id === mid);
+        if(!match) return;
+        if(slot === "A") match.aTeamId = sel.value;
+        if(slot === "B") match.bTeamId = sel.value;
+        if(match.winnerTeamId && match.winnerTeamId !== match.aTeamId && match.winnerTeamId !== match.bTeamId) match.winnerTeamId = "";
+        saveState();
+        renderBracket();
+      };
     });
-  }catch(e){
-    const live = document.getElementById("livePill");
-    if(live) live.textContent = "Live: Error";
-    const meta = document.getElementById("metaPill"); if(meta) meta.textContent = "Error";
-    dbg("Init error: " + (e?.message || String(e)));
-  }
-</script>
 
+    area.querySelectorAll("input[data-mid][data-score]").forEach(inp => {
+      inp.oninput = () => {
+        const mid = inp.getAttribute("data-mid");
+        const which = inp.getAttribute("data-score");
+        const match = state.matches.find(x => x.id === mid);
+        if(!match) return;
+        const v = inp.value.trim();
+        if(v !== "" && !/^\d+$/.test(v)) return;
+        if(which === "A") match.scoreA = v;
+        if(which === "B") match.scoreB = v;
+        saveState();
+      };
+    });
+
+    area.querySelectorAll("button[data-win]").forEach(btn => {
+      btn.onclick = () => {
+        const mid = btn.getAttribute("data-win");
+        const pick = btn.getAttribute("data-pick");
+        const match = state.matches.find(x => x.id === mid);
+        if(!match) return;
+        const chosen = pick === "A" ? match.aTeamId : match.bTeamId;
+        if(!chosen) return alert("Select a team first.");
+        match.winnerTeamId = chosen;
+        saveState();
+        renderBracket();
+      };
+    });
+
+    area.querySelectorAll("button[data-adv]").forEach(btn => {
+      btn.onclick = () => advanceWinner(btn.getAttribute("data-adv"));
+    });
+  }
+
+  function autoWireDouble(){
+    const fmt = String(state.format||"single");
+    if(fmt !== "double") return alert("Switch Bracket Format to Double first.");
+    const size = Number(state.bracketSize || 8);
+    const k = Math.log2(size);
+    const lbRounds = 2*(k-1);
+
+    const by = (br, r, p) => state.matches.find(m=>(m.bracket||"")===br && Number(m.round||1)===r && Number(m.pos||1)===p);
+    const winnerOf = (m) => m && m.winnerTeamId ? m.winnerTeamId : "";
+    const loserOf = (m) => {
+      if(!m || !m.winnerTeamId) return "";
+      const a = m.aTeamId || ""; const b = m.bTeamId || "";
+      if(!a || !b) return "";
+      return m.winnerTeamId === a ? b : a;
+    };
+
+    // Winners advancement
+    const wMatches = state.matches.filter(m=>(m.bracket||"")==="W").sort((a,b)=>(a.round-b.round)||(a.pos-b.pos));
+    wMatches.forEach(m=>{
+      if(m.round >= k) return;
+      const next = by("W", m.round+1, Math.ceil(m.pos/2));
+      if(!next) return;
+      const slot = (m.pos % 2 === 1) ? "aTeamId" : "bTeamId";
+      const w = winnerOf(m);
+      if(w){
+        next[slot] = w;
+        if(next.winnerTeamId && next.winnerTeamId !== next.aTeamId && next.winnerTeamId !== next.bTeamId) next.winnerTeamId = "";
+      }
+    });
+
+    // W R1 -> L R1
+    for(let p=1;p<=size/2;p++){
+      const wm = by("W", 1, p);
+      const loser = loserOf(wm);
+      if(!loser) continue;
+      const lm = by("L", 1, Math.ceil(p/2));
+      if(!lm) continue;
+      if(p%2===1) lm.aTeamId = loser; else lm.bTeamId = loser;
+      if(lm.winnerTeamId && lm.winnerTeamId !== lm.aTeamId && lm.winnerTeamId !== lm.bTeamId) lm.winnerTeamId = "";
+    }
+
+    // W Rr (r>=2) -> L R(2*(r-1)) slot B
+    for(let r=2;r<=k;r++){
+      const wCount = size / Math.pow(2, r);
+      for(let p=1;p<=wCount;p++){
+        const wm = by("W", r, p);
+        const loser = loserOf(wm);
+        if(!loser) continue;
+        const lm = by("L", 2*(r-1), p);
+        if(!lm) continue;
+        lm.bTeamId = loser;
+        if(lm.winnerTeamId && lm.winnerTeamId !== lm.aTeamId && lm.winnerTeamId !== lm.bTeamId) lm.winnerTeamId = "";
+      }
+    }
+
+    // LB advancement
+    for(let r=1;r<=lbRounds;r++){
+      const stage = Math.ceil(r/2);
+      const mCount = size / Math.pow(2, stage+1);
+      for(let p=1;p<=mCount;p++){
+        const lm = by("L", r, p);
+        const w = winnerOf(lm);
+        if(!w) continue;
+        if(r % 2 === 1){
+          const next = by("L", r+1, p);
+          if(next){
+            next.aTeamId = w;
+            if(next.winnerTeamId && next.winnerTeamId !== next.aTeamId && next.winnerTeamId !== next.bTeamId) next.winnerTeamId = "";
+          }
+        } else {
+          const next = by("L", r+1, Math.ceil(p/2));
+          if(next){
+            if(p%2===1) next.aTeamId = w; else next.bTeamId = w;
+            if(next.winnerTeamId && next.winnerTeamId !== next.aTeamId && next.winnerTeamId !== next.bTeamId) next.winnerTeamId = "";
+          }
+        }
+      }
+    }
+
+    // Grand Final
+    const wf = by("W", k, 1);
+    const lf = by("L", lbRounds, 1);
+    const gf = state.matches.find(m=>(m.bracket||"")==="GF" || m.id==="GF");
+    if(gf){
+      const wW = winnerOf(wf);
+      const wL = winnerOf(lf);
+      if(wW) gf.aTeamId = wW;
+      if(wL) gf.bTeamId = wL;
+      if(gf.winnerTeamId && gf.winnerTeamId !== gf.aTeamId && gf.winnerTeamId !== gf.bTeamId) gf.winnerTeamId = "";
+    }
+
+    saveState();
+    renderBracket();
+  }
+
+  $("autoWireBtn").onclick = autoWireDouble;
+
+  $("buildBracketBtn").onclick = () => {
+    const fmt = String($("bracketFormat").value || "single");
+    const max = Number($("bracketMax").value || 16);
+
+    const n = (state.teams || []).length;
+    const nextPow2 = (x) => { let p=1; while(p < Math.max(2,x)) p*=2; return p; };
+    const autoSize = Math.min(nextPow2(n), max);
+
+    if(n < 2) return alert("Add at least 2 teams first.");
+    if(autoSize < 2) return alert("Not enough teams to build a bracket.");
+
+    if(fmt === "double") buildDoubleBracket(autoSize);
+    else buildSingleBracket(autoSize);
+  };
+  $("clearScoresBtn").onclick = clearScores;
+  $("clearBracketBtn").onclick = clearBracket;
+  $("advanceAllBtn").onclick = advanceAll;
+
+  dbg("Firebase loaded. Waiting for auth…\nOwner UID: " + OWNER_UID);
+
+  onAuthStateChanged(auth, async (user) => {
+    if(!user) {
+      setRole("none");
+      dbg("Not signed in.");
+      return;
+    }
+
+    try {
+      await ensureUserProfile(user);
+      const status = await myApprovalStatus(user);
+
+      if(isOwner(user)) {
+        setRole("owner");
+        dbg("Signed in as OWNER: " + (user.email||""));
+        await hookTournament();
+        await renderUsers();
+        return;
+      }
+
+      if(status !== "approved") {
+        setRole("none");
+        dbg("Signed in as " + (user.email||"") + " but NOT approved (" + status + ").\nOwner must approve in User Approvals.");
+        alert("Your account is not approved yet (or disabled).");
+        await signOut(auth);
+        return;
+      }
+
+      setRole("admin");
+      dbg("Signed in as ADMIN: " + (user.email||""));
+      await hookTournament();
+    } catch(e) {
+      dbg("Auth check failed: " + niceErr(e));
+      console.error(e);
+      alert("Auth check failed: " + niceErr(e));
+      await signOut(auth);
+    }
+  });
+</script>
 </body>
 </html>
