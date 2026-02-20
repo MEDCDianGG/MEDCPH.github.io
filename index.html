@@ -380,3 +380,384 @@
 </script>
 </body>
 </html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>MEDC Invitational — Tournament</title>
+  <style>
+    :root{
+      --bg:#070A12; --card:rgba(255,255,255,.04); --line:rgba(255,255,255,.10);
+      --text:#EAF0FF; --muted:rgba(234,240,255,.75);
+      --shadow:0 18px 60px rgba(0,0,0,.45); --r:18px;
+      --blue:rgba(59,130,246,.22); --blueb:rgba(59,130,246,.35);
+      --green:rgba(34,197,94,.16); --greenb:rgba(34,197,94,.35);
+      --parY: 0px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:system-ui,Segoe UI,Arial;
+      background:var(--bg);
+      color:var(--text);
+      min-height:100vh;
+    }
+
+    /* --- Parallax background (MEDC INV VER 2.png) --- */
+    body::before{
+      content:"";
+      position:fixed;
+      inset:-6vh 0 -6vh 0;
+      z-index:-2;
+      background:
+        radial-gradient(1200px 700px at 12% 10%, rgba(59,130,246,.22), transparent 55%),
+        radial-gradient(1100px 650px at 88% 22%, rgba(34,197,94,.14), transparent 55%),
+        url("MEDC INV VER 2.png");
+      background-size: auto, auto, cover;
+      background-position: center, center, center;
+      background-repeat:no-repeat;
+      transform: translate3d(0, calc(var(--parY) * -1), 0);
+      filter: saturate(1.05) contrast(1.02);
+      opacity:.24;
+      will-change: transform;
+    }
+    body::after{
+      content:"";
+      position:fixed;
+      inset:0;
+      z-index:-1;
+      background: linear-gradient(180deg, rgba(7,10,18,.92), rgba(7,10,18,.78) 40%, rgba(7,10,18,.92));
+      pointer-events:none;
+    }
+
+    header{
+      position:sticky;top:0;z-index:10;
+      background:rgba(7,10,18,.86);
+      backdrop-filter:blur(10px);
+      border-bottom:1px solid var(--line)
+    }
+    .wrap{max-width:1200px;margin:0 auto;padding:18px}
+    .bar{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .brand{display:flex;align-items:center;gap:12px;font-weight:900}
+    .pill{
+      display:inline-flex;gap:8px;align-items:center;padding:6px 10px;border-radius:999px;border:1px solid var(--line);
+      background:rgba(255,255,255,.04);font-size:12px;color:var(--muted)
+    }
+    .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden}
+    .cardPad{padding:16px}
+    .muted{color:var(--muted)}
+    .list{display:flex;flex-direction:column;gap:10px}
+    .item{padding:12px;border-radius:16px;border:1px solid var(--line);background:rgba(0,0,0,.20)}
+    .itemTop{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+    .bracketGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;align-items:start}
+    @media(max-width:1100px){.bracketGrid{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:600px){.bracketGrid{grid-template-columns:1fr}}
+    .match{padding:12px;border-radius:16px;border:1px solid var(--line);background:rgba(0,0,0,.22)}
+    .slot{
+      display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 10px;border-radius:12px;
+      background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.06);margin-bottom:8px
+    }
+
+    /* --- Top nav buttons (Teams / Bracket) --- */
+    .topNav{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+    .tabBtn{
+      cursor:pointer;
+      user-select:none;
+      text-decoration:none;
+      color:inherit;
+      font-weight:800;
+    }
+    .tabBtn[aria-current="page"]{
+      border-color: rgba(59,130,246,.55);
+      background: rgba(59,130,246,.14);
+      color: rgba(234,240,255,.95);
+    }
+
+    /* --- Sections --- */
+    .section{display:none}
+    .section.active{display:block}
+
+    /* --- Logo + Cover (from your old design) --- */
+    .brandLogo{width:46px;height:46px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.04);overflow:hidden}
+    .brandLogo img{width:100%;height:100%;object-fit:cover}
+    .coverCardImg{width:100%;display:block}
+
+    #dbg{
+      position:fixed; right:14px; bottom:14px; z-index:9999;
+      max-width:520px; padding:10px 12px; border-radius:14px;
+      background:rgba(0,0,0,.55); border:1px solid rgba(255,255,255,.14);
+      box-shadow:0 18px 60px rgba(0,0,0,.45);
+      font-size:12px; color:rgba(234,240,255,.9); white-space:pre-wrap
+    }
+    #dbg.hide{display:none}
+  </style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <div class="brand">
+      <div class="brandLogo">
+        <img src="MEDC INVITATIONAL LOGO.gif" alt="MEDC Invitational Logo">
+      </div>
+      <div>
+        <div>MEDC INVITATIONAL</div>
+        <div class="muted" style="font-size:12px;margin-top:2px">Public Bracket & Team List</div>
+      </div>
+      <span class="pill" id="livePill">Live: —</span>
+    </div>
+
+    <div class="topNav">
+      <a class="pill tabBtn" id="btnTeams" href="#teams" aria-current="page">TEAMS</a>
+      <a class="pill tabBtn" id="btnBracket" href="#bracket">BRACKET</a>
+      <a class="pill" href="admin.html" style="text-decoration:none;color:inherit">Admin</a>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="card" style="margin-bottom:14px">
+    <div class="cardPad">
+      <div style="margin-top:15px;border-radius:18px;overflow:hidden;border:1px solid rgba(255,255,255,.10)">
+        <img src="COVER MEDC INV.png" alt="MEDC Invitational Cover" class="coverCardImg">
+      </div>
+      <div class="pill" id="metaPill" style="margin-top:10px">Loading…</div>
+    </div>
+  </div>
+
+  <!-- TEAMS SECTION -->
+  <section id="teams" class="section active">
+    <div class="card">
+      <div class="cardPad">
+        <div class="itemTop">
+          <div>
+            <h2 style="margin:0">Teams</h2>
+            <div class="muted" id="teamsMeta" style="margin-top:6px">—</div>
+          </div>
+        </div>
+
+        <div class="item" style="margin-top:12px">
+          <div class="muted">All teams</div>
+          <div id="teamsList" class="list" style="margin-top:10px"></div>
+        </div>
+
+        <div class="item" style="margin-top:10px">
+          <b>Rosters</b>
+          <div class="muted" style="margin-top:6px">Captain + players per team</div>
+          <div id="rostersList" class="list" style="margin-top:10px"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BRACKET SECTION -->
+  <section id="bracket" class="section">
+    <div class="card">
+      <div class="cardPad">
+        <div class="itemTop">
+          <div>
+            <h2 style="margin:0">Bracket</h2>
+            <div class="muted" id="bracketMeta" style="margin-top:6px">—</div>
+          </div>
+        </div>
+        <div id="bracketArea" class="bracketGrid" style="margin-top:12px"></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div id="dbg" class="hide"></div>
+
+<script type="module">
+  /**********************
+   * MEDC Public Page (Read-only)
+   * Connects to the SAME Firestore doc used by admin:
+   *   tournament/state
+   **********************/
+  const dbgEl = document.getElementById("dbg");
+  const dbg = (msg) => { dbgEl.classList.remove("hide"); dbgEl.textContent = msg; };
+  const dbgOff = () => dbgEl.classList.add("hide");
+
+  // --- Tabs (Teams / Bracket) ---
+  const btnTeams = document.getElementById("btnTeams");
+  const btnBracket = document.getElementById("btnBracket");
+  const secTeams = document.getElementById("teams");
+  const secBracket = document.getElementById("bracket");
+
+  function setTab(which){
+    const isTeams = which === "teams";
+    secTeams.classList.toggle("active", isTeams);
+    secBracket.classList.toggle("active", !isTeams);
+
+    btnTeams.setAttribute("aria-current", isTeams ? "page" : "false");
+    btnBracket.setAttribute("aria-current", !isTeams ? "page" : "false");
+
+    // keep URL hash clean for sharing
+    history.replaceState(null, "", "#" + (isTeams ? "teams" : "bracket"));
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function syncFromHash(){
+    const h = (location.hash || "#teams").replace("#","").toLowerCase();
+    setTab(h === "bracket" ? "bracket" : "teams");
+  }
+  window.addEventListener("hashchange", syncFromHash);
+  syncFromHash();
+
+  // --- Parallax scroll effect ---
+  const parallaxTick = () => {
+    document.documentElement.style.setProperty("--parY", (window.scrollY * 0.18).toFixed(2) + "px");
+    requestAnimationFrame(parallaxTick);
+  };
+  requestAnimationFrame(parallaxTick);
+
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+  import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    "apiKey": "AIzaSyDZAVhuz9SVBHSCPnEvoxwCjaMrZSQOJ6k",
+    "authDomain": "medcesport.firebaseapp.com",
+    "projectId": "medcesport",
+    "storageBucket": "medcesport.firebasestorage.app",
+    "messagingSenderId": "7933255333",
+    "appId": "1:7933255333:web:cfe776ebb79f607cdd774c",
+    "measurementId": "G-07Z2TFM553"
+  };
+
+  // UI helpers
+  const $ = (id) => document.getElementById(id);
+  function escapeHtml(s=""){ return (""+s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+  const teamNameById = (teams, id) => (teams.find(t => t.id === id)?.name || "");
+
+  function normalizeRosters(s){
+    if(!s.rosters) s.rosters = {};
+    for(const tid in s.rosters){
+      const v = s.rosters[tid];
+      if(Array.isArray(v)) s.rosters[tid] = { captain:"", players:v };
+      else {
+        if(!v.players) v.players = [];
+        if(typeof v.captain !== "string") v.captain = "";
+      }
+    }
+  }
+
+  function render(state){
+    const teams = Array.isArray(state.teams) ? state.teams : [];
+    const matches = Array.isArray(state.matches) ? state.matches : [];
+    const bracketSize = Number(state.bracketSize || 8);
+    normalizeRosters(state);
+
+    $("livePill").textContent = "Live: Connected";
+    $("teamsMeta").textContent = `${teams.length} teams`;
+    $("bracketMeta").textContent = `${teams.length} teams • ${matches.length} matches • bracket ${bracketSize}`;
+    const meta = document.getElementById("metaPill");
+    if(meta) meta.textContent = `${teams.length} teams • ${matches.length} matches • bracket ${bracketSize}`;
+
+    // Teams list
+    const tl = $("teamsList");
+    tl.innerHTML = "";
+    if(teams.length === 0){
+      tl.innerHTML = `<div class="muted">No teams yet.</div>`;
+    } else {
+      teams.forEach(t => {
+        const roster = state.rosters?.[t.id] || { captain:"", players:[] };
+        const count = (roster.players || []).length;
+        const div = document.createElement("div");
+        div.className = "item";
+        div.innerHTML = `
+          <div class="itemTop">
+            <div>
+              <b>${escapeHtml(t.name)}</b>
+              <div class="muted">Players: ${count}</div>
+            </div>
+          </div>
+        `;
+        tl.appendChild(div);
+      });
+    }
+
+    // Rosters list
+    const rl = $("rostersList");
+    rl.innerHTML = "";
+    if(teams.length === 0){
+      rl.innerHTML = `<div class="muted">No rosters yet.</div>`;
+    } else {
+      teams.forEach(t => {
+        const roster = state.rosters?.[t.id] || { captain:"", players:[] };
+        const captain = roster.captain || "";
+        const players = Array.isArray(roster.players) ? roster.players : [];
+        const div = document.createElement("div");
+        div.className = "item";
+        div.innerHTML = `
+          <b>${escapeHtml(t.name)}</b>
+          <div class="muted" style="margin-top:6px">Captain: <b>${escapeHtml(captain || "—")}</b></div>
+          <div class="muted" style="margin-top:6px">Players: ${players.length ? "" : "<b>—</b>"}</div>
+          ${players.length ? `<div style="margin-top:6px">${players.map(p => `<div class="pill" style="margin:4px 6px 0 0;display:inline-flex">${escapeHtml(p)}</div>`).join("")}</div>` : ""}
+        `;
+        rl.appendChild(div);
+      });
+    }
+
+    // Bracket
+    const area = $("bracketArea");
+    area.innerHTML = "";
+    if(!matches.length){
+      area.innerHTML = `<div class="muted">No bracket yet.</div>`;
+      return;
+    }
+    const rounds = Math.log2(bracketSize);
+    for(let r=1; r<=rounds; r++){
+      const col = document.createElement("div");
+      col.className = "list";
+      col.innerHTML = `<div class="pill"><b>Round ${r}</b></div>`;
+
+      matches.filter(m=>m.round===r).forEach(m=>{
+        const a = teamNameById(teams, m.aTeamId || "");
+        const b = teamNameById(teams, m.bTeamId || "");
+        const w = teamNameById(teams, m.winnerTeamId || "");
+        const div = document.createElement("div");
+        div.className = "match";
+        div.innerHTML = `
+          <div class="itemTop" style="margin-bottom:10px">
+            <b>${escapeHtml(m.id || "")}</b>
+            <span class="pill">${w ? "Winner set" : "No winner"}</span>
+          </div>
+          <div class="slot"><div>${escapeHtml(a || "—")}</div><div class="pill">${escapeHtml(m.scoreA ?? "") || " "}</div></div>
+          <div class="slot"><div>${escapeHtml(b || "—")}</div><div class="pill">${escapeHtml(m.scoreB ?? "") || " "}</div></div>
+          <div class="muted" style="margin-top:8px">Winner: <b>${escapeHtml(w || "—")}</b></div>
+        `;
+        col.appendChild(div);
+      });
+
+      area.appendChild(col);
+    }
+  }
+
+  try{
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    $("livePill").textContent = "Live: Connecting…";
+    const meta = document.getElementById("metaPill"); if(meta) meta.textContent = "Connecting…";
+    onSnapshot(doc(db, "tournament", "state"), (snap) => {
+      dbgOff();
+      if(!snap.exists()){
+        $("livePill").textContent = "Live: No data";
+        const meta = document.getElementById("metaPill"); if(meta) meta.textContent = "No data yet";
+        render({ teams:[], matches:[], bracketSize:8, rosters:{} });
+        return;
+      }
+      render(snap.data() || {});
+    }, (e) => {
+      $("livePill").textContent = "Live: Error";
+      const meta = document.getElementById("metaPill"); if(meta) meta.textContent = "Error";
+      dbg("Firestore error: " + (e?.code ? e.code + ": " : "") + (e?.message || String(e)));
+    });
+  }catch(e){
+    $("livePill").textContent = "Live: Error";
+    const meta = document.getElementById("metaPill"); if(meta) meta.textContent = "Error";
+    dbg("Init error: " + (e?.message || String(e)));
+  }
+</script>
+</body>
+</html>
