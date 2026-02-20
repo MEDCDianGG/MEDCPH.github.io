@@ -9,17 +9,9 @@
       --bg:#070A12; --card:rgba(255,255,255,.04); --line:rgba(255,255,255,.10);
       --text:#EAF0FF; --muted:rgba(234,240,255,.75);
       --shadow:0 18px 60px rgba(0,0,0,.45); --r:18px;
+      --blue:rgba(59,130,246,.22); --blueb:rgba(59,130,246,.35);
+      --green:rgba(34,197,94,.16); --greenb:rgba(34,197,94,.35);
       --parY: 0px;
-
-      /* Bracket */
-      --node: rgba(0,0,0,.26);
-      --node2: rgba(255,255,255,.06);
-      --nodeLine: rgba(255,255,255,.12);
-      --accent: rgba(59,130,246,.95);
-      --accent2: rgba(34,197,94,.9);
-      --svgLine: rgba(234,240,255,.18);
-      --svgLineWin: rgba(34,197,94,.38);
-      --svgLineLose: rgba(255,255,255,.10);
     }
     *{box-sizing:border-box}
     body{
@@ -73,14 +65,24 @@
     .card{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:0 18px 60px rgba(0,0,0,.45);overflow:hidden}
     .cardPad{padding:16px}
     .muted{color:var(--muted)}
+    .list{display:flex;flex-direction:column;gap:10px}
+    .item{padding:12px;border-radius:16px;border:1px solid var(--line);background:rgba(0,0,0,.20)}
     .itemTop{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+    .bracketGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;align-items:start}
+    @media(max-width:1100px){.bracketGrid{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:600px){.bracketGrid{grid-template-columns:1fr}}
+    .match{padding:12px;border-radius:16px;border:1px solid var(--line);background:rgba(0,0,0,.22)}
+    .slot{
+      display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 10px;border-radius:12px;
+      background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.06);margin-bottom:8px
+    }
 
     /* --- Logo + Cover --- */
     .brandLogo{width:46px;height:46px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.04);overflow:hidden}
     .brandLogo img{width:100%;height:100%;object-fit:cover}
     .coverCardImg{width:100%;display:block}
 
-    /* Timeline */
+    /* Timeline (format overview) */
     .sectionTitle{margin:0 0 12px 0}
     .sectionTitle h3{margin:0}
     .timeline{
@@ -103,231 +105,6 @@
       margin-bottom:8px;
     }
 
-    /* ---------- NEW BRACKET DESIGN ---------- */
-    .bracketTopBar{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      align-items:center;
-      justify-content:space-between;
-      margin-top:12px;
-    }
-    .bracketTools{
-      display:flex;
-      gap:8px;
-      flex-wrap:wrap;
-      align-items:center;
-      justify-content:flex-end;
-    }
-    .btn{
-      cursor:pointer;
-      user-select:none;
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.04);
-      color:var(--text);
-      border-radius:14px;
-      padding:8px 10px;
-      font-weight:700;
-      font-size:12px;
-      transition: transform .08s ease, border-color .2s ease, background .2s ease;
-    }
-    .btn:active{ transform: translateY(1px) }
-    .btn:hover{ border-color: rgba(255,255,255,.18); background: rgba(255,255,255,.06); }
-
-    .input{
-      border:1px solid var(--line);
-      background:rgba(0,0,0,.25);
-      color:var(--text);
-      border-radius:14px;
-      padding:8px 10px;
-      font-weight:600;
-      font-size:12px;
-      outline:none;
-      min-width:240px;
-    }
-    .input::placeholder{ color: rgba(234,240,255,.55) }
-
-    .bracketViewport{
-      margin-top:12px;
-      border-radius:18px;
-      border:1px solid rgba(255,255,255,.12);
-      background: rgba(0,0,0,.18);
-      overflow:auto;
-      position:relative;
-      padding:14px;
-    }
-
-    /* Zoom via scale() on inner */
-    .bracketInner{
-      position:relative;
-      transform-origin: 0 0;
-      width: max-content;
-      min-width: 100%;
-    }
-
-    .rounds{
-      display:flex;
-      gap:18px;
-      align-items:flex-start;
-      padding-right:18px;
-    }
-
-    .roundCol{
-      width: 320px;
-      min-width: 320px;
-      display:flex;
-      flex-direction:column;
-      gap:14px;
-    }
-
-    .roundHeader{
-      position:sticky;
-      top:0; /* inside scroll container */
-      z-index:2;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      padding:10px 12px;
-      border-radius:16px;
-      border:1px solid rgba(255,255,255,.14);
-      background: rgba(7,10,18,.78);
-      backdrop-filter: blur(10px);
-      box-shadow: 0 10px 40px rgba(0,0,0,.35);
-    }
-
-    .roundName{
-      font-weight:900;
-      letter-spacing:.2px;
-    }
-
-    .roundCount{
-      font-size:12px;
-      color: var(--muted);
-    }
-
-    .matchNode{
-      border-radius:18px;
-      border:1px solid var(--nodeLine);
-      background: var(--node);
-      box-shadow: 0 12px 40px rgba(0,0,0,.35);
-      overflow:hidden;
-      position:relative;
-    }
-
-    .matchNode[data-highlight="1"]{
-      outline: 2px solid rgba(59,130,246,.5);
-      box-shadow: 0 18px 60px rgba(59,130,246,.10), 0 12px 40px rgba(0,0,0,.35);
-    }
-
-    .matchTop{
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap:10px;
-      padding:10px 12px;
-      border-bottom:1px solid rgba(255,255,255,.10);
-      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
-    }
-
-    .matchId{
-      font-weight:900;
-    }
-    .matchTag{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:6px 10px;
-      border-radius:999px;
-      border:1px solid rgba(255,255,255,.14);
-      background: rgba(0,0,0,.22);
-      color: var(--muted);
-      font-size:12px;
-      white-space:nowrap;
-    }
-
-    .slots{
-      padding:10px 12px 12px;
-      display:flex;
-      flex-direction:column;
-      gap:8px;
-    }
-
-    .slotRow{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      padding:9px 10px;
-      border-radius:14px;
-      border:1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.04);
-    }
-
-    .team{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      min-width:0;
-    }
-    .dot{
-      width:10px;height:10px;border-radius:999px;
-      border:1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.08);
-      flex: 0 0 auto;
-    }
-    .teamName{
-      font-weight:800;
-      overflow:hidden;
-      text-overflow:ellipsis;
-      white-space:nowrap;
-      max-width: 210px;
-    }
-    .score{
-      font-weight:900;
-      padding:4px 10px;
-      border-radius:999px;
-      border:1px solid rgba(255,255,255,.12);
-      background: rgba(0,0,0,.22);
-      color: rgba(234,240,255,.92);
-      min-width: 44px;
-      text-align:center;
-    }
-
-    .slotRow.win{
-      border-color: rgba(34,197,94,.35);
-      background: rgba(34,197,94,.10);
-    }
-    .slotRow.win .dot{ background: rgba(34,197,94,.65); border-color: rgba(34,197,94,.55) }
-
-    .slotRow.lose{
-      opacity:.9;
-      border-color: rgba(255,255,255,.10);
-    }
-
-    .winnerLine{
-      padding: 0 12px 12px;
-      color: var(--muted);
-      font-size:12px;
-    }
-    .winnerLine b{ color: var(--text); }
-
-    /* Connectors (SVG overlay) */
-    .bracketSvg{
-      position:absolute;
-      inset:0;
-      pointer-events:none;
-      z-index:0;
-    }
-    .rounds, .matchNode{ position:relative; z-index:1; }
-
-    /* Small screens */
-    @media(max-width:700px){
-      .input{ min-width: 100%; width: 100%; }
-      .roundCol{ width: 280px; min-width: 280px; }
-      .teamName{ max-width: 170px; }
-    }
-
-    /* Debug */
     #dbg{
       position:fixed; right:14px; bottom:14px; z-index:9999;
       max-width:520px; padding:10px 12px; border-radius:14px;
@@ -336,7 +113,7 @@
       font-size:12px; color:rgba(234,240,255,.9); white-space:pre-wrap
     }
     #dbg.hide{display:none}
-  </style>
+</style>
 </head>
 <body>
 
@@ -355,14 +132,16 @@
 
     <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end">
       <a class="pill" href="index.html" style="text-decoration:none;color:inherit">HOME</a>
-      <a class="pill" href="tournament.html" style="text-decoration:none;color:inherit" >TEAMS</a>
+      <a class="pill" href="tournament.html" style="text-decoration:none;color:inherit" >TOURNAMENT</a>
       <a class="pill" href="bracket.html" style="text-decoration:none;color:inherit" aria-current="page">BRACKET</a>
       <a class="pill" href="admin.html" style="text-decoration:none;color:inherit">ADMIN</a>
     </div>
   </div>
 </header>
 
+
 <div class="wrap">
+  
   <div class="card" style="margin-bottom:14px">
     <div class="cardPad">
       <div style="margin-top:10px;border-radius:16px;overflow:hidden;border:1px solid rgba(255,255,255,.10)">
@@ -372,6 +151,7 @@
     </div>
   </div>
 
+  
   <div class="card" style="margin-bottom:14px">
     <div class="cardPad">
       <div class="sectionTitle">
@@ -415,6 +195,7 @@
     </div>
   </div>
 
+
   <div class="card">
     <div class="cardPad">
       <div class="itemTop">
@@ -423,48 +204,7 @@
           <div class="muted" id="bracketMeta" style="margin-top:6px">—</div>
         </div>
       </div>
-
-      <div class="bracketTopBar">
-        <div class="pill" id="hintPill">Tip: scroll sideways • use search to highlight a match/team</div>
-        <div class="bracketTools">
-          <input id="searchBox" class="input" placeholder="Search match id or team name (ex: R1, Team A)"/>
-          <button class="btn" id="zoomOutBtn">− Zoom</button>
-          <button class="btn" id="zoomInBtn">+ Zoom</button>
-          <button class="btn" id="zoomResetBtn">Reset</button>
-        </div>
-      </div>
-
-      
-      <div id="singleWrap">
-        <div id="bracketViewport" class="bracketViewport">
-          <div id="bracketInner" class="bracketInner">
-            <svg id="bracketSvg" class="bracketSvg"></svg>
-            <div id="rounds" class="rounds"></div>
-          </div>
-        </div>
-      </div>
-
-      <div id="doubleWrap" class="hide" style="margin-top:14px">
-        <div class="pill" style="margin-bottom:10px">Winners Bracket</div>
-        <div id="wViewport" class="bracketViewport">
-          <div id="wInner" class="bracketInner">
-            <svg id="wSvg" class="bracketSvg"></svg>
-            <div id="wRounds" class="rounds"></div>
-          </div>
-        </div>
-
-        <div class="pill" style="margin:14px 0 10px">Losers Bracket</div>
-        <div id="lViewport" class="bracketViewport">
-          <div id="lInner" class="bracketInner">
-            <svg id="lSvg" class="bracketSvg"></svg>
-            <div id="lRounds" class="rounds"></div>
-          </div>
-        </div>
-
-        <div class="pill" style="margin:14px 0 10px">Grand Final</div>
-        <div id="gfBox"></div>
-      </div>
-
+      <div id="bracketArea" class="bracketGrid" style="margin-top:12px"></div>
     </div>
   </div>
 </div>
@@ -473,7 +213,6 @@
 
 <script type="module">
   // MEDC Public Pages (Read-only) — Firestore doc: tournament/state
-
   const dbgEl = document.getElementById("dbg");
   const dbg = (msg) => { dbgEl.classList.remove("hide"); dbgEl.textContent = msg; };
   const dbgOff = () => dbgEl.classList.add("hide");
@@ -499,7 +238,7 @@
   };
 
   const $ = (id) => document.getElementById(id);
-  function escapeHtml(s=""){ return (""+s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+  function escapeHtml(s=""){ return (""+s).replace(/[&<>\"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
   const teamNameById = (teams, id) => (teams.find(t => t.id === id)?.name || "");
 
   function normalizeRosters(s){
@@ -525,354 +264,99 @@
     return { teams, matches, bracketSize };
   }
 
-  
-  // ---------- BRACKET RENDERER (Single + Double) ----------
-  const singleWrap = document.getElementById("singleWrap");
-  const doubleWrap = document.getElementById("doubleWrap");
+  function renderTeams(state){
+    const { teams } = renderMeta(state);
+    normalizeRosters(state);
 
-  // Single DOM
-  const viewport = document.getElementById("bracketViewport");
-  const inner = document.getElementById("bracketInner");
-  const roundsEl = document.getElementById("rounds");
-  const svg = document.getElementById("bracketSvg");
+    const teamsMeta = document.getElementById("teamsMeta");
+    if(teamsMeta) teamsMeta.textContent = `${teams.length} teams`;
 
-  // Double DOM
-  const wViewport = document.getElementById("wViewport");
-  const wInner = document.getElementById("wInner");
-  const wRoundsEl = document.getElementById("wRounds");
-  const wSvg = document.getElementById("wSvg");
+    const tl = document.getElementById("teamsList");
+    const rl = document.getElementById("rostersList");
+    if(tl) tl.innerHTML = "";
+    if(rl) rl.innerHTML = "";
+    if(!tl || !rl) return;
 
-  const lViewport = document.getElementById("lViewport");
-  const lInner = document.getElementById("lInner");
-  const lRoundsEl = document.getElementById("lRounds");
-  const lSvg = document.getElementById("lSvg");
-
-  const gfBox = document.getElementById("gfBox");
-
-  let zoom = 1;
-
-  function setZoom(z){
-    zoom = Math.max(0.6, Math.min(1.5, z));
-    // apply to whichever view(s) are visible
-    if(!doubleWrap.classList.contains("hide")){
-      wInner.style.transform = `scale(${zoom})`;
-      lInner.style.transform = `scale(${zoom})`;
-      requestAnimationFrame(() => requestAnimationFrame(() => { drawConnectors(wViewport, wInner, wSvg); drawConnectors(lViewport, lInner, lSvg); }));
-    }else{
-      inner.style.transform = `scale(${zoom})`;
-      requestAnimationFrame(() => requestAnimationFrame(() => drawConnectors(viewport, inner, svg)));
-    }
-  }
-
-  document.getElementById("zoomInBtn").addEventListener("click", () => setZoom(zoom + 0.1));
-  document.getElementById("zoomOutBtn").addEventListener("click", () => setZoom(zoom - 0.1));
-  document.getElementById("zoomResetBtn").addEventListener("click", () => setZoom(1));
-
-  const searchBox = document.getElementById("searchBox");
-  function applySearchHighlight(){
-    const q = (searchBox.value || "").trim().toLowerCase();
-    document.querySelectorAll(".matchNode").forEach(n => {
-      const hay = (n.getAttribute("data-hay") || "");
-      n.dataset.highlight = (q && hay.includes(q)) ? "1" : "0";
-    });
-  }
-  searchBox.addEventListener("input", () => {
-    applySearchHighlight();
-    redrawAllConnectors();
-  });
-
-  function redrawAllConnectors(){
-    if(!doubleWrap.classList.contains("hide")){
-      drawConnectors(wViewport, wInner, wSvg);
-      drawConnectors(lViewport, lInner, lSvg);
-    }else{
-      drawConnectors(viewport, inner, svg);
-    }
-  }
-
-  window.addEventListener("resize", () => redrawAllConnectors());
-  viewport?.addEventListener("scroll", () => redrawAllConnectors());
-  wViewport?.addEventListener("scroll", () => redrawAllConnectors());
-  lViewport?.addEventListener("scroll", () => redrawAllConnectors());
-
-  function parseOrderFromId(id){
-    const nums = (id || "").match(/\d+/g)?.map(n => parseInt(n,10)) || [];
-    if(!nums.length) return 999999;
-    const a = nums[0] ?? 0, b = nums[1] ?? 0, c = nums[2] ?? 0;
-    return a*10000 + b*100 + c;
-  }
-
-  function matchSort(a,b){
-    const ao = (typeof a.order === "number") ? a.order : parseOrderFromId(a.id);
-    const bo = (typeof b.order === "number") ? b.order : parseOrderFromId(b.id);
-    if(ao !== bo) return ao - bo;
-    return String(a.id||"").localeCompare(String(b.id||""));
-  }
-
-  function roundLabel(r, roundsTotal){
-    if(roundsTotal === 1) return "Final";
-    if(r === roundsTotal) return "Final";
-    if(r === roundsTotal - 1) return "Semi Finals";
-    if(r === roundsTotal - 2) return "Quarter Finals";
-    return `Round ${r}`;
-  }
-
-  function nodeHtml({id, bestOf, a, b, w, scoreA, scoreB}){
-    const aWin = w && a && (w === a);
-    const bWin = w && b && (w === b);
-    const hay = `${id||""} ${a||""} ${b||""} ${w||""}`.toLowerCase();
-
-    const node = document.createElement("div");
-    node.className = "matchNode";
-    node.setAttribute("data-hay", hay);
-    node.dataset.matchid = String(id || "");
-
-    node.innerHTML = `
-      <div class="matchTop">
-        <div>
-          <div class="matchId">${escapeHtml(id || "")}</div>
-          <div class="muted" style="font-size:12px;margin-top:2px">${escapeHtml(bestOf ? ("BO" + bestOf) : " ")}</div>
-        </div>
-        <div class="matchTag">${w ? "Winner set" : "No winner"}</div>
-      </div>
-
-      <div class="slots">
-        <div class="slotRow ${aWin ? "win" : (w ? "lose" : "")}">
-          <div class="team">
-            <span class="dot"></span>
-            <span class="teamName" title="${escapeHtml(a||"—")}">${escapeHtml(a || "—")}</span>
-          </div>
-          <span class="score">${escapeHtml(String(scoreA ?? "").trim() || " ")}</span>
-        </div>
-        <div class="slotRow ${bWin ? "win" : (w ? "lose" : "")}">
-          <div class="team">
-            <span class="dot"></span>
-            <span class="teamName" title="${escapeHtml(b||"—")}">${escapeHtml(b || "—")}</span>
-          </div>
-          <span class="score">${escapeHtml(String(scoreB ?? "").trim() || " ")}</span>
-        </div>
-      </div>
-
-      <div class="winnerLine">Winner: <b>${escapeHtml(w || "—")}</b></div>
-    `;
-    return node;
-  }
-
-  function renderSingle(teams, matches, bracketSize){
-    singleWrap.classList.remove("hide");
-    doubleWrap.classList.add("hide");
-
-    roundsEl.innerHTML = "";
-    svg.innerHTML = "";
-    gfBox.innerHTML = "";
-
-    if(!matches.length){
-      roundsEl.innerHTML = `<div class="muted">No bracket yet.</div>`;
+    if(teams.length === 0){
+      tl.innerHTML = `<div class="muted">No teams yet.</div>`;
+      rl.innerHTML = `<div class="muted">No rosters yet.</div>`;
       return;
     }
 
-    const roundsTotal = Math.max(1, Math.round(Math.log2(bracketSize)));
-    const byRound = new Map();
-    for(let r=1;r<=roundsTotal;r++) byRound.set(r, []);
-    matches.forEach(m => {
-      const r = Number(m.round || 1);
-      if(!byRound.has(r)) byRound.set(r, []);
-      byRound.get(r).push(m);
-    });
-    for(const [r, arr] of byRound) arr.sort(matchSort);
-
-    for(let r=1; r<=roundsTotal; r++){
-      const arr = byRound.get(r) || [];
-      const col = document.createElement("div");
-      col.className = "roundCol";
-      col.dataset.round = String(r);
-
-      col.innerHTML = `
-        <div class="roundHeader">
-          <div class="roundName">${escapeHtml(roundLabel(r, roundsTotal))}</div>
-          <div class="roundCount">${arr.length} match${arr.length===1?"":"es"}</div>
+    teams.forEach(t => {
+      const roster = state.rosters?.[t.id] || { captain:"", players:[] };
+      const count = (roster.players || []).length;
+      const div = document.createElement("div");
+      div.className = "item";
+      div.innerHTML = `
+        <div class="itemTop">
+          <div>
+            <b>${escapeHtml(t.name)}</b>
+            <div class="muted">Players: ${count}</div>
+          </div>
         </div>
       `;
-
-      if(!arr.length){
-        const empty = document.createElement("div");
-        empty.className = "muted";
-        empty.style.padding = "10px 2px";
-        empty.textContent = "—";
-        col.appendChild(empty);
-      }else{
-        arr.forEach((m, idx) => {
-          const a = teamNameById(teams, m.aTeamId || "");
-          const b = teamNameById(teams, m.bTeamId || "");
-          const w = teamNameById(teams, m.winnerTeamId || "");
-          col.appendChild(nodeHtml({
-            id: m.id || `R${r}-M${idx+1}`,
-            bestOf: m.bestOf,
-            a, b, w,
-            scoreA: m.scoreA, scoreB: m.scoreB
-          }));
-        });
-      }
-      roundsEl.appendChild(col);
-    }
-
-    applySearchHighlight();
-    requestAnimationFrame(() => requestAnimationFrame(() => drawConnectors(viewport, inner, svg)));
-  }
-
-  function renderByBracket(bracketCode, teams, matches, bracketSize, roundsTargetEl, viewportEl, innerEl, svgEl, titlePrefix){
-    roundsTargetEl.innerHTML = "";
-    svgEl.innerHTML = "";
-    const filtered = matches.filter(m => (m.bracket||"S") === bracketCode);
-    if(!filtered.length){
-      roundsTargetEl.innerHTML = `<div class="muted">—</div>`;
-      return;
-    }
-
-    // Determine max round number for this bracket
-    const maxRound = Math.max(...filtered.map(m=>Number(m.round||1)));
-    const byRound = new Map();
-    for(let r=1;r<=maxRound;r++) byRound.set(r, []);
-    filtered.forEach(m=>{
-      const r = Number(m.round||1);
-      if(!byRound.has(r)) byRound.set(r, []);
-      byRound.get(r).push(m);
+      tl.appendChild(div);
     });
-    for(const [r, arr] of byRound) arr.sort(matchSort);
 
-    for(let r=1;r<=maxRound;r++){
-      const arr = byRound.get(r) || [];
-      const col = document.createElement("div");
-      col.className = "roundCol";
-      col.dataset.round = String(r);
-
-      col.innerHTML = `
-        <div class="roundHeader">
-          <div class="roundName">${escapeHtml(titlePrefix ? `${titlePrefix} ${r}` : `Round ${r}`)}</div>
-          <div class="roundCount">${arr.length} match${arr.length===1?"":"es"}</div>
-        </div>
+    teams.forEach(t => {
+      const roster = state.rosters?.[t.id] || { captain:"", players:[] };
+      const captain = roster.captain || "";
+      const players = Array.isArray(roster.players) ? roster.players : [];
+      const div = document.createElement("div");
+      div.className = "item";
+      div.innerHTML = `
+        <b>${escapeHtml(t.name)}</b>
+        <div class="muted" style="margin-top:6px">Captain: <b>${escapeHtml(captain || "—")}</b></div>
+        <div class="muted" style="margin-top:6px">Players: ${players.length ? "" : "<b>—</b>"}</div>
+        ${players.length ? `<div style="margin-top:6px">${players.map(p => `<div class="pill" style="margin:4px 6px 0 0;display:inline-flex">${escapeHtml(p)}</div>`).join("")}</div>` : ""}
       `;
-
-      arr.forEach((m, idx)=>{
-        const a = teamNameById(teams, m.aTeamId || "");
-        const b = teamNameById(teams, m.bTeamId || "");
-        const w = teamNameById(teams, m.winnerTeamId || "");
-        col.appendChild(nodeHtml({
-          id: m.id || `${bracketCode}-R${r}-M${idx+1}`,
-          bestOf: m.bestOf,
-          a, b, w,
-          scoreA: m.scoreA, scoreB: m.scoreB
-        }));
-      });
-
-      roundsTargetEl.appendChild(col);
-    }
-
-    requestAnimationFrame(() => requestAnimationFrame(() => drawConnectors(viewportEl, innerEl, svgEl)));
-  }
-
-  function renderDouble(teams, matches, bracketSize){
-    singleWrap.classList.add("hide");
-    doubleWrap.classList.remove("hide");
-
-    // Winners + Losers
-    renderByBracket("W", teams, matches, bracketSize, wRoundsEl, wViewport, wInner, wSvg, "W-Round");
-    renderByBracket("L", teams, matches, bracketSize, lRoundsEl, lViewport, lInner, lSvg, "L-Round");
-
-    // Grand Final
-    gfBox.innerHTML = "";
-    const gf = matches.find(m => (m.bracket||"") === "GF") || matches.find(m => (m.id||"") === "GF");
-    if(gf){
-      const a = teamNameById(teams, gf.aTeamId || "");
-      const b = teamNameById(teams, gf.bTeamId || "");
-      const w = teamNameById(teams, gf.winnerTeamId || "");
-      const node = nodeHtml({ id: gf.id || "GF", bestOf: gf.bestOf, a, b, w, scoreA: gf.scoreA, scoreB: gf.scoreB });
-      gfBox.appendChild(node);
-    }else{
-      gfBox.innerHTML = `<div class="muted">Grand Final not created yet.</div>`;
-    }
-
-    applySearchHighlight();
-    requestAnimationFrame(() => requestAnimationFrame(() => { drawConnectors(wViewport, wInner, wSvg); drawConnectors(lViewport, lInner, lSvg); }));
-  }
-
-  function drawConnectors(viewportEl, innerEl, svgEl){
-    if(!viewportEl || !innerEl || !svgEl) return;
-    svgEl.innerHTML = "";
-
-    const cols = [...innerEl.querySelectorAll(".roundCol")];
-    if(!cols.length) return;
-
-    const innerRect = innerEl.getBoundingClientRect();
-
-    const width = viewportEl.scrollWidth;
-    const height = viewportEl.scrollHeight;
-    svgEl.setAttribute("width", String(width));
-    svgEl.setAttribute("height", String(height));
-    svgEl.setAttribute("viewBox", `0 0 ${width} ${height}`);
-
-    const pt = (el, side) => {
-      const r = el.getBoundingClientRect();
-      const x = (side === "right" ? r.right : r.left) - innerRect.left + viewportEl.scrollLeft;
-      const y = (r.top + r.height/2) - innerRect.top + viewportEl.scrollTop;
-      return { x, y };
-    };
-
-    const q = (searchBox.value || "").trim().toLowerCase();
-    const highlighted = (node) => q && (node.getAttribute("data-hay") || "").includes(q);
-
-    for(let c=0; c<cols.length-1; c++){
-      const leftMatches = [...cols[c].querySelectorAll(".matchNode")];
-      const rightMatches = [...cols[c+1].querySelectorAll(".matchNode")];
-      if(!leftMatches.length || !rightMatches.length) continue;
-
-      leftMatches.forEach((m, i) => {
-        const target = rightMatches[Math.floor(i/2)];
-        if(!target) return;
-
-        const a = pt(m, "right");
-        const b = pt(target, "left");
-        const midX = (a.x + b.x) / 2;
-
-        const d = `M ${a.x} ${a.y} C ${midX} ${a.y}, ${midX} ${b.y}, ${b.x} ${b.y}`;
-        const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-        path.setAttribute("d", d);
-        path.setAttribute("fill", "none");
-        path.setAttribute("stroke-width", "2");
-
-        if(q){
-          const h = highlighted(m) || highlighted(target);
-          path.setAttribute("stroke", h ? "rgba(59,130,246,.55)" : "rgba(234,240,255,.10)");
-          path.setAttribute("opacity", h ? "1" : "0.55");
-        }else{
-          path.setAttribute("stroke", "rgba(234,240,255,.18)");
-          path.setAttribute("opacity", "1");
-        }
-
-        svgEl.appendChild(path);
-      });
-    }
+      rl.appendChild(div);
+    });
   }
 
   function renderBracket(state){
     const { teams, matches, bracketSize } = renderMeta(state);
-    normalizeRosters(state);
-
-    const fmt = String(state.format || "single");
     const bracketMeta = document.getElementById("bracketMeta");
-    if(bracketMeta) bracketMeta.textContent = `${teams.length} teams • ${matches.length} matches • ${fmt} • size ${bracketSize}`;
+    if(bracketMeta) bracketMeta.textContent = `${teams.length} teams • ${matches.length} matches • bracket ${bracketSize}`;
 
-    // reset zoom application based on format
-    if(fmt === "double"){
-      renderDouble(teams, matches, bracketSize);
-      // ensure zoom applied
-      wInner.style.transform = `scale(${zoom})`;
-      lInner.style.transform = `scale(${zoom})`;
-    }else{
-      renderSingle(teams, matches, bracketSize);
-      inner.style.transform = `scale(${zoom})`;
+    const area = document.getElementById("bracketArea");
+    if(!area) return;
+
+    area.innerHTML = "";
+    if(!matches.length){
+      area.innerHTML = `<div class="muted">No bracket yet.</div>`;
+      return;
+    }
+
+    const rounds = Math.log2(bracketSize);
+    for(let r=1; r<=rounds; r++){
+      const col = document.createElement("div");
+      col.className = "list";
+      col.innerHTML = `<div class="pill"><b>Round ${r}</b></div>`;
+
+      matches.filter(m=>m.round===r).forEach(m=>{
+        const a = teamNameById(teams, m.aTeamId || "");
+        const b = teamNameById(teams, m.bTeamId || "");
+        const w = teamNameById(teams, m.winnerTeamId || "");
+        const div = document.createElement("div");
+        div.className = "match";
+        div.innerHTML = `
+          <div class="itemTop" style="margin-bottom:10px">
+            <b>${escapeHtml(m.id || "")}</b>
+            <span class="pill">${w ? "Winner set" : "No winner"}</span>
+          </div>
+          <div class="slot"><div>${escapeHtml(a || "—")}</div><div class="pill">${escapeHtml(m.scoreA ?? "") || " "}</div></div>
+          <div class="slot"><div>${escapeHtml(b || "—")}</div><div class="pill">${escapeHtml(m.scoreB ?? "") || " "}</div></div>
+          <div class="muted" style="margin-top:8px">Winner: <b>${escapeHtml(w || "—")}</b></div>
+        `;
+        col.appendChild(div);
+      });
+
+      area.appendChild(col);
     }
   }
+
   try{
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
@@ -884,6 +368,7 @@
     onSnapshot(doc(db, "tournament", "state"), (snap) => {
       dbgOff();
       const data = snap.exists() ? (snap.data() || {}) : { teams:[], matches:[], bracketSize:8, rosters:{} };
+      renderTeams(data);
       renderBracket(data);
     }, (e) => {
       const live = document.getElementById("livePill");
